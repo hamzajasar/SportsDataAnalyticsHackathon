@@ -140,6 +140,11 @@ def amount_emissions(key: str, amount: float) -> dict:
 # ---- Travel ---------------------------------------------------------------------------------
 
 VAN_SEATS = 8  # minibus/van for a youth team (assumption, shown in UI)
+COACH_SEATS = 50  # one hired coach per 50 people
+# UK factors give coach emissions per PASSENGER-km at average UK occupancy. A hired coach emits the
+# same whether it carries 18 or 50 people, so we convert to a per-VEHICLE-km factor:
+# per-passenger-km factor x assumed average occupancy (assumption, shown in UI).
+COACH_AVG_OCCUPANCY = 35
 CAR_KEYS = {"car_average", "car_small", "car_large", "car_diesel", "car_petrol", "car_hybrid"}
 
 
@@ -180,17 +185,34 @@ def trip_options(
         }
     )
 
-    for key, label in [("coach", "Hired coach"), ("rail", "Train")]:
-        f = factor(key)
-        opts.append(
-            {
-                "mode": key,
-                "label": label,
-                "vehicles": None,
-                "kg_co2e": round(people * km * f["kg_co2e"], 1),
-                "assumption": f"{f['kg_co2e']} kg CO2e per passenger-km",
-            }
-        )
+    # Hired coach: emissions per vehicle, not per passenger (an emptier coach emits the same).
+    coaches = math.ceil(people / COACH_SEATS)
+    per_vehicle_km = factor("coach")["kg_co2e"] * COACH_AVG_OCCUPANCY
+    opts.append(
+        {
+            "mode": "coach",
+            "label": f"{coaches} hired coach{'es' if coaches > 1 else ''} ({COACH_SEATS} seats)",
+            "vehicles": coaches,
+            "kg_co2e": round(coaches * km * per_vehicle_km, 1),
+            "assumption": (
+                f"{per_vehicle_km:.3f} kg CO2e per coach-km "
+                f"({factor('coach')['kg_co2e']} per passenger-km "
+                f"x {COACH_AVG_OCCUPANCY} avg passengers)"
+            ),
+        }
+    )
+
+    # Train: a scheduled service runs anyway, so the per-passenger factor is the right basis.
+    f = factor("rail")
+    opts.append(
+        {
+            "mode": "rail",
+            "label": "Train (scheduled service)",
+            "vehicles": None,
+            "kg_co2e": round(people * km * f["kg_co2e"], 1),
+            "assumption": f"{f['kg_co2e']} kg CO2e per passenger-km",
+        }
+    )
 
     opts.sort(key=lambda o: o["kg_co2e"])
     worst = max(o["kg_co2e"] for o in opts)

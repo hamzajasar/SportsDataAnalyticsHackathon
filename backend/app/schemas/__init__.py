@@ -108,3 +108,48 @@ class TripComparison(BaseModel):
     people: int
     options: list[TripOption]
     source: str
+
+
+# ---- Club data from data/clean (draft shapes until the organisers' pack is integrated) ----
+
+
+class Venue(BaseModel):
+    id: str
+    lat: float
+    lon: float
+    leisure: str | None
+    sport: str | None
+    name: str | None
+    distance_km: float | None = None
+
+
+class Source(BaseModel):
+    id: str
+    name: str
+    use: str | None = None
+    licence: str | None = None
+    credit: str | None = None
+    url: str | None = None
+    file: str | None = None
+    status: str | None = None
+
+
+class CostAssumption(BaseModel):
+    key: str
+    value: float
+    unit: str
+    note: str | None = None
+    source: str
+
+
+class MonthlyValue(BaseModel):
+    month: int
+    value: float
+    source: str
+
+
+class ClubAssumptions(BaseModel):
+    costs: list[CostAssumption]
+    upgrades: list[dict[str, Any]]
+    pv_yield_monthly: list[MonthlyValue]  # kWh per installed kWp
+    temperature_monthly: list[MonthlyValue]  # mean °C

@@ -526,6 +526,197 @@
           }
         }
       }
+    },
+    "/api/club/sample": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Sample Club",
+        "description": "Illustrative sample club (placeholder until the organisers' pack is integrated).",
+        "operationId": "getSampleClub",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Getsampleclub"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/club/assumptions": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Assumptions",
+        "operationId": "getAssumptions",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClubAssumptions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/venues": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Venues",
+        "operationId": "listVenues",
+        "parameters": [
+          {
+            "name": "leisure",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(pitch|stadium|sports_centre|sports_hall)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Leisure"
+            }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 46,
+                  "minimum": 42
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lat"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 20,
+                  "minimum": 15
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lon"
+            }
+          },
+          {
+            "name": "radius_km",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 500,
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Radius Km"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000,
+              "minimum": 1,
+              "default": 5000,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Venue"
+                  },
+                  "title": "Response Listvenues"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sources": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Sources",
+        "description": "Every data source with licence + credit line (for the Methodology page and final slide).",
+        "operationId": "listSources",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Source"
+                  },
+                  "type": "array",
+                  "title": "Response Listsources"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -567,6 +758,47 @@
           "source"
         ],
         "title": "AmountEstimate"
+      },
+      "ClubAssumptions": {
+        "properties": {
+          "costs": {
+            "items": {
+              "$ref": "#/components/schemas/CostAssumption"
+            },
+            "type": "array",
+            "title": "Costs"
+          },
+          "upgrades": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Upgrades"
+          },
+          "pv_yield_monthly": {
+            "items": {
+              "$ref": "#/components/schemas/MonthlyValue"
+            },
+            "type": "array",
+            "title": "Pv Yield Monthly"
+          },
+          "temperature_monthly": {
+            "items": {
+              "$ref": "#/components/schemas/MonthlyValue"
+            },
+            "type": "array",
+            "title": "Temperature Monthly"
+          }
+        },
+        "type": "object",
+        "required": [
+          "costs",
+          "upgrades",
+          "pv_yield_monthly",
+          "temperature_monthly"
+        ],
+        "title": "ClubAssumptions"
       },
       "ColumnSummary": {
         "properties": {
@@ -636,6 +868,45 @@
           "likely_key"
         ],
         "title": "ColumnSummary"
+      },
+      "CostAssumption": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "value",
+          "unit",
+          "source"
+        ],
+        "title": "CostAssumption"
       },
       "DatasetInfo": {
         "properties": {
@@ -898,6 +1169,113 @@
         ],
         "title": "IntensitySeries"
       },
+      "MonthlyValue": {
+        "properties": {
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "value",
+          "source"
+        ],
+        "title": "MonthlyValue"
+      },
+      "Source": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "use": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Use"
+          },
+          "licence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Licence"
+          },
+          "credit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credit"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "Source"
+      },
       "TripComparison": {
         "properties": {
           "distance_km": {
@@ -1058,6 +1436,76 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "Venue": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "leisure": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Leisure"
+          },
+          "sport": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sport"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "lat",
+          "lon",
+          "leisure",
+          "sport",
+          "name"
+        ],
+        "title": "Venue"
       }
     }
   }

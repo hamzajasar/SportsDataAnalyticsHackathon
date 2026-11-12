@@ -44,11 +44,13 @@ migration: ## Create migration from model changes: make migration m="add teams t
 	@test -n "$(m)" || (echo 'usage: make migration m="message"' && exit 1)
 	cd backend && uv run alembic revision --autogenerate -m "$(m)"
 
-data: ## Download Topic 6 open datasets into data/raw/sustainability (FORCE=1 to refresh)
+data: ## Download all open datasets: data/raw (ignored) + data/clean (shared). FORCE=1 to refresh
 	cd backend && FORCE=$(FORCE) uv run python -m scripts.fetch_open_data
+	uv run --project backend python scripts/fetch_data.py
 
-reference: ## Rebuild committed reference tables (backend/app/reference) from data/raw
+reference: ## Rebuild ALL committed reference tables in backend/app/reference
 	cd backend && uv run python -m scripts.build_reference
+	uv run --project backend python scripts/build_reference.py
 
 profile: ## Profile all datasets in data/raw -> data/processed/_profile.md
 	cd backend && uv run python -m scripts.profile_data
