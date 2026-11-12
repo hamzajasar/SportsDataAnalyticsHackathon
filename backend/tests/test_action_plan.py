@@ -19,3 +19,14 @@ def test_action_plan_shape_and_consistency():
 def test_baseline():
     b = client.get("/api/club/baseline").json()
     assert b["electricity_kwh"] > 0 and b["travel_t_co2"] > 0 and "example" in b
+
+
+def test_endpoints_serve_the_live_model():
+    from app.services import actions
+
+    p = client.get("/api/club/actions").json()
+    live = actions.rank_actions()
+    assert p["example"] is False
+    assert p["total_saves_km_year"] == live["total_saves_km_year"]
+    assert [a["id"] for a in p["actions"]] == [a["id"] for a in live["actions"]]
+    assert client.get("/api/club/baseline").json()["example"] is False
