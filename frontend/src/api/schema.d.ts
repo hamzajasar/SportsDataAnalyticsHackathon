@@ -328,6 +328,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/club/travel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Season Travel
+         * @description Season cost (KM) and CO2 of away travel: current mix vs cars, minibuses or a hired coach.
+         */
+        post: operations["calculateSeasonTravel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/venues/nearest": {
         parameters: {
             query?: never;
@@ -484,6 +504,23 @@ export interface components {
             /** Temperature Monthly */
             temperature_monthly: components["schemas"]["MonthlyValue"][];
         };
+        /** ClubProfile */
+        ClubProfile: {
+            /** Name */
+            name: string;
+            /** City */
+            city: string;
+            /** Lat */
+            lat: number;
+            /** Lon */
+            lon: number;
+            /** Children */
+            children: number;
+            /** Teams */
+            teams: number;
+            electricity_kwh_year: components["schemas"]["Electricity"];
+            travel: components["schemas"]["Travel"];
+        };
         /** ColumnSummary */
         ColumnSummary: {
             /** Name */
@@ -555,6 +592,18 @@ export interface components {
             circuity_factor: number;
             /** Note */
             note: string;
+        };
+        /**
+         * Electricity
+         * @description Yearly electricity use in kWh, split by what it is used for.
+         */
+        Electricity: {
+            /** Floodlights */
+            floodlights: number;
+            /** Heating */
+            heating: number;
+            /** Hall And Other */
+            hall_and_other: number;
         };
         /** ElectricityEstimate */
         ElectricityEstimate: {
@@ -645,6 +694,80 @@ export interface components {
             /** Source */
             source: string;
         };
+        /** SeasonTravel */
+        SeasonTravel: {
+            /** Trips */
+            trips: number;
+            /** Round Trip Km */
+            round_trip_km: number;
+            /** People Per Trip */
+            people_per_trip: number;
+            /** Share With Partner */
+            share_with_partner: boolean;
+            /** Shared With */
+            shared_with: string[];
+            /** Note */
+            note?: string | null;
+            /** Options */
+            options: components["schemas"]["SeasonTravelOption"][];
+            /** Cheapest */
+            cheapest: string;
+            /** Lowest Co2 */
+            lowest_co2: string;
+            /** Assumptions */
+            assumptions: {
+                [key: string]: unknown;
+            };
+        };
+        /** SeasonTravelOption */
+        SeasonTravelOption: {
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "current" | "cars" | "minibus" | "coach";
+            /** Label */
+            label: string;
+            /** Vehicles */
+            vehicles: {
+                [key: string]: number;
+            };
+            /** Cost Km */
+            cost_km: number;
+            /** Co2 Kg */
+            co2_kg: number;
+            /** Saving Vs Current Cost Km */
+            saving_vs_current_cost_km: number;
+            /** Saving Vs Current Co2 Kg */
+            saving_vs_current_co2_kg: number;
+        };
+        /**
+         * SeasonTravelRequest
+         * @description Shared club profile (`club: null` = sample club) plus the travel options.
+         *
+         *     `electricity_price_km_per_kwh` is part of the shared format but unused here: travel costs
+         *     use fuel and coach-hire prices.
+         */
+        SeasonTravelRequest: {
+            club?: components["schemas"]["ClubProfile"] | null;
+            /**
+             * Electricity Price Km Per Kwh
+             * @description Override the sourced electricity price (KM/kWh)
+             */
+            electricity_price_km_per_kwh?: number | null;
+            /**
+             * People Per Trip
+             * @description Squad + staff per away trip
+             * @default 18
+             */
+            people_per_trip: number;
+            /**
+             * Share With Partner
+             * @description One coach shared by two clubs
+             * @default false
+             */
+            share_with_partner: boolean;
+        };
         /** ShareSuggestions */
         ShareSuggestions: {
             /** Radius Km */
@@ -674,6 +797,14 @@ export interface components {
             file?: string | null;
             /** Status */
             status?: string | null;
+        };
+        /** Travel */
+        Travel: {
+            /** Away Trips Per Team Year */
+            away_trips_per_team_year: number;
+            /** Avg One Way Km */
+            avg_one_way_km: number;
+            vehicles_per_trip: components["schemas"]["Vehicles"];
         };
         /** TripComparison */
         TripComparison: {
@@ -740,6 +871,16 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /**
+         * Vehicles
+         * @description Vehicles used for one away trip of one team.
+         */
+        Vehicles: {
+            /** Minibus */
+            minibus: number;
+            /** Car */
+            car: number;
         };
         /** Venue */
         Venue: {
@@ -1239,6 +1380,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ActionPlan"];
+                };
+            };
+        };
+    };
+    calculateSeasonTravel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeasonTravelRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonTravel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

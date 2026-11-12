@@ -5,7 +5,8 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query
 
 from app.schemas import ActionPlan, Baseline, ClubAssumptions, MonthlySeries, Source, Venue
-from app.services import action_plan
+from app.schemas.travel import SeasonTravel, SeasonTravelRequest
+from app.services import action_plan, travel
 from app.services import club_data as svc
 
 router = APIRouter(tags=["club"])
@@ -86,3 +87,14 @@ def club_baseline() -> Baseline:
 def club_actions() -> ActionPlan:
     """Upgrades ranked by payback, with KM/CO2 saved and fee drop per child (summary bar)."""
     return ActionPlan(**action_plan.action_plan())
+
+
+@router.post("/club/travel", response_model=SeasonTravel, operation_id="calculateSeasonTravel")
+def season_travel(req: SeasonTravelRequest) -> SeasonTravel:
+    """Season cost (KM) and CO2 of away travel: current mix vs cars, minibuses or a hired coach."""
+    try:
+        club = req.club.model_dump() if req.club else svc.sample_club()
+        result = travel.season_travel(club, req.people_per_trip, req.share_with_partner)
+    except FileNotFoundError as e:
+        raise _missing(e) from None
+    return SeasonTravel(**result)

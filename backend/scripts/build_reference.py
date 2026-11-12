@@ -185,6 +185,7 @@ def build_costs(factors: pd.DataFrame) -> pd.DataFrame:
         ("fuel_use_minibus", use["minibus"], "l/100km", "diesel minibus", ASSUMPTION),
         ("fuel_cost_car", cost["car"], "KM/vehicle-km", "petrol price x consumption", f"{fs}; {ASSUMPTION}"),
         ("fuel_cost_minibus", cost["minibus"], "KM/vehicle-km", "diesel price x consumption", f"{fs}; {ASSUMPTION}"),
+        ("coach_hire_km_per_km", p["coach_hire_km_per_km"], "KM/vehicle-km", "hired coach with driver, per km driven", ASSUMPTION),
         ("minibus_kg_per_km", van, "kg CO2e/vehicle-km", "PROXY: DEFRA has no minibus row; average van up to 3.5 t, unknown fuel, km", ghg),
         ("coach_kg_per_km", round(coach_pkm * COACH_PASSENGERS, 3), "kg CO2e/vehicle-km", f"DEFRA coach {coach_pkm} kg CO2e per passenger-km x assumed {COACH_PASSENGERS} passengers (editable)", f"{ghg} + assumed occupancy"),
     ]  # fmt: skip

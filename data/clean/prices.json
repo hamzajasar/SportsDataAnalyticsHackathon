@@ -1,5 +1,5 @@
 {
- "_note": "Electricity and fuel pump prices are SOURCED. Fuel consumption (l/100km) is an ASSUMPTION.",
+ "_note": "Electricity and fuel pump prices are SOURCED. Fuel consumption (l/100km) and coach hire (KM per km driven) are ASSUMPTIONS.",
  "electricity_eur_per_kwh": 0.149,
  "electricity_km_per_kwh": 0.291,
  "electricity_source": "Eurostat nrg_pc_205, BiH, non-household band IB (20-499 MWh), all taxes, 2026-S1; converted at the fixed 1.95583 KM/EUR peg",
@@ -14,5 +14,6 @@
  "fuel_km_per_km_driven": {
   "car": 0.225,
   "minibus": 0.379
- }
+ },
+ "coach_hire_km_per_km": 1.5
 }

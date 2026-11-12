@@ -806,6 +806,48 @@
         }
       }
     },
+    "/api/club/travel": {
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Season Travel",
+        "description": "Season cost (KM) and CO2 of away travel: current mix vs cars, minibuses or a hired coach.",
+        "operationId": "calculateSeasonTravel",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeasonTravelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonTravel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/venues/nearest": {
       "get": {
         "tags": [
@@ -1325,6 +1367,64 @@
         ],
         "title": "ClubAssumptions"
       },
+      "ClubProfile": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "City"
+          },
+          "lat": {
+            "type": "number",
+            "maximum": 46.0,
+            "minimum": 42.0,
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "maximum": 20.0,
+            "minimum": 15.0,
+            "title": "Lon"
+          },
+          "children": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Children"
+          },
+          "teams": {
+            "type": "integer",
+            "maximum": 500.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Teams"
+          },
+          "electricity_kwh_year": {
+            "$ref": "#/components/schemas/Electricity"
+          },
+          "travel": {
+            "$ref": "#/components/schemas/Travel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "city",
+          "lat",
+          "lon",
+          "children",
+          "teams",
+          "electricity_kwh_year",
+          "travel"
+        ],
+        "title": "ClubProfile"
+      },
       "ColumnSummary": {
         "properties": {
           "name": {
@@ -1544,6 +1644,36 @@
           "note"
         ],
         "title": "Distance"
+      },
+      "Electricity": {
+        "properties": {
+          "floodlights": {
+            "type": "number",
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Floodlights"
+          },
+          "heating": {
+            "type": "number",
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Heating"
+          },
+          "hall_and_other": {
+            "type": "number",
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Hall And Other"
+          }
+        },
+        "type": "object",
+        "required": [
+          "floodlights",
+          "heating",
+          "hall_and_other"
+        ],
+        "title": "Electricity",
+        "description": "Yearly electricity use in kWh, split by what it is used for."
       },
       "ElectricityEstimate": {
         "properties": {
@@ -1782,6 +1912,174 @@
         ],
         "title": "MonthlyValue"
       },
+      "SeasonTravel": {
+        "properties": {
+          "trips": {
+            "type": "integer",
+            "title": "Trips"
+          },
+          "round_trip_km": {
+            "type": "number",
+            "title": "Round Trip Km"
+          },
+          "people_per_trip": {
+            "type": "integer",
+            "title": "People Per Trip"
+          },
+          "share_with_partner": {
+            "type": "boolean",
+            "title": "Share With Partner"
+          },
+          "shared_with": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Shared With"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/SeasonTravelOption"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "cheapest": {
+            "type": "string",
+            "title": "Cheapest"
+          },
+          "lowest_co2": {
+            "type": "string",
+            "title": "Lowest Co2"
+          },
+          "assumptions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Assumptions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trips",
+          "round_trip_km",
+          "people_per_trip",
+          "share_with_partner",
+          "shared_with",
+          "options",
+          "cheapest",
+          "lowest_co2",
+          "assumptions"
+        ],
+        "title": "SeasonTravel"
+      },
+      "SeasonTravelOption": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "current",
+              "cars",
+              "minibus",
+              "coach"
+            ],
+            "title": "Mode"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "vehicles": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Vehicles"
+          },
+          "cost_km": {
+            "type": "number",
+            "title": "Cost Km"
+          },
+          "co2_kg": {
+            "type": "number",
+            "title": "Co2 Kg"
+          },
+          "saving_vs_current_cost_km": {
+            "type": "number",
+            "title": "Saving Vs Current Cost Km"
+          },
+          "saving_vs_current_co2_kg": {
+            "type": "number",
+            "title": "Saving Vs Current Co2 Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "label",
+          "vehicles",
+          "cost_km",
+          "co2_kg",
+          "saving_vs_current_cost_km",
+          "saving_vs_current_co2_kg"
+        ],
+        "title": "SeasonTravelOption"
+      },
+      "SeasonTravelRequest": {
+        "properties": {
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "electricity_price_km_per_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Electricity Price Km Per Kwh",
+            "description": "Override the sourced electricity price (KM/kWh)"
+          },
+          "people_per_trip": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "People Per Trip",
+            "description": "Squad + staff per away trip",
+            "default": 18
+          },
+          "share_with_partner": {
+            "type": "boolean",
+            "title": "Share With Partner",
+            "description": "One coach shared by two clubs",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "SeasonTravelRequest",
+        "description": "Shared club profile (`club: null` = sample club) plus the travel options.\n\n`electricity_price_km_per_kwh` is part of the shared format but unused here: travel costs\nuse fuel and coach-hire prices."
+      },
       "ShareSuggestions": {
         "properties": {
           "radius_km": {
@@ -1899,6 +2197,32 @@
           "name"
         ],
         "title": "Source"
+      },
+      "Travel": {
+        "properties": {
+          "away_trips_per_team_year": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 0.0,
+            "title": "Away Trips Per Team Year"
+          },
+          "avg_one_way_km": {
+            "type": "number",
+            "maximum": 2000.0,
+            "minimum": 0.0,
+            "title": "Avg One Way Km"
+          },
+          "vehicles_per_trip": {
+            "$ref": "#/components/schemas/Vehicles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "away_trips_per_team_year",
+          "avg_one_way_km",
+          "vehicles_per_trip"
+        ],
+        "title": "Travel"
       },
       "TripComparison": {
         "properties": {
@@ -2060,6 +2384,29 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "Vehicles": {
+        "properties": {
+          "minibus": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Minibus"
+          },
+          "car": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Car"
+          }
+        },
+        "type": "object",
+        "required": [
+          "minibus",
+          "car"
+        ],
+        "title": "Vehicles",
+        "description": "Vehicles used for one away trip of one team."
       },
       "Venue": {
         "properties": {
