@@ -134,8 +134,22 @@ class Source(BaseModel):
     status: str | None = None
 
 
+class CostAssumption(BaseModel):
+    key: str
+    value: float
+    unit: str
+    note: str | None = None
+    source: str
+
+
+class MonthlyValue(BaseModel):
+    month: int
+    value: float
+    source: str
+
+
 class ClubAssumptions(BaseModel):
-    prices: dict[str, Any]
+    costs: list[CostAssumption]
     upgrades: list[dict[str, Any]]
-    pv_yield: dict[str, Any]
-    monthly_temp: dict[str, Any]
+    pv_yield_monthly: list[MonthlyValue]  # kWh per installed kWp
+    temperature_monthly: list[MonthlyValue]  # mean °C

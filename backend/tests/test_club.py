@@ -13,7 +13,9 @@ def test_sample_club_and_assumptions():
     club = client.get("/api/club/sample").json()
     assert club["children"] > 0 and "electricity_kwh_year" in club
     a = client.get("/api/club/assumptions").json()
-    assert {"prices", "upgrades", "pv_yield", "monthly_temp"} <= a.keys()
+    assert {"costs", "upgrades", "pv_yield_monthly", "temperature_monthly"} <= a.keys()
+    assert len(a["pv_yield_monthly"]) == 12 and len(a["temperature_monthly"]) == 12
+    assert all(c["source"] for c in a["costs"])
 
 
 def test_venues_filter_and_distance():
@@ -40,7 +42,9 @@ def test_sources_have_credits():
 
 def test_only_whitelisted_files():
     with pytest.raises(KeyError):
-        club_data.load("../../.env")
+        club_data.load_json("../../.env")
+    with pytest.raises(KeyError):
+        club_data.load_csv("../../.env")
 
 
 def test_haversine_sarajevo_mostar():

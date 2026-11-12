@@ -11,7 +11,7 @@ _"We help community sports clubs in Bosnia and Herzegovina see where their carbo
 | BiH electricity is coal-heavy | **571 g CO₂/kWh** in 2025 — **2.7×** EU average (210), **3.6×** Croatia (158) | Ember |
 | Coal share of BiH electricity | **55%** (2025); hydro 37%, solar 4%, wind 3% | Ember |
 | Every kWh a BiH club saves avoids | ~0.57 kg CO₂ (vs 0.21 kg in the EU) → **efficiency pays off ~3× more here** | Ember |
-| Away trip, 18 people, 120 km each way | 6 cars **241 kg** · 3 minibuses 183 kg · train 153 kg · **coach 120 kg** (–50%) | UK GHG 2025 |
+| Away trip, 18 people, 120 km each way | 6 cars **241 kg** · hired coach 233 kg · **3 minibuses 183 kg (–24%)** · train 153 kg. A coach counts per vehicle, so it only pays off when full (e.g. two teams sharing one) | UK GHG 2025 |
 | New vs re-used clothing | **22.3** vs **0.15** kg CO₂e per kg (~150×) → kit swaps are a huge, cheap lever | UK GHG 2025 |
 
 ## Why this can score well (mapping to the 6 criteria)
@@ -25,8 +25,8 @@ _"We help community sports clubs in Bosnia and Herzegovina see where their carbo
 | Presentation | One club, three numbers, one recommendation list |
 
 ## Open questions / to do
-- [ ] **Organisers' synthetic data pack** (incl. `equipment.csv`): get it into `data/raw/pack/`, run `make profile`
-- [ ] OpenStreetMap facilities: `make data` again (Overpass servers were overloaded at first try)
+- [ ] **Organisers' synthetic data pack**: get it into `data/raw/pack/`, run `make profile` (check whether it has `equipment.csv`)
+- [x] OpenStreetMap facilities: 3,705 BiH venues in `backend/app/reference/sport_venues_bih.csv`, served at `/api/venues`
 - [ ] Heating: relate monthly energy use to Sarajevo temperature (Open-Meteo) if the pack has energy data
 - [ ] Pick a "persona" club (e.g. a Sarajevo youth football club) for the demo story
 - [ ] "Action plan" view: rank actions by kg CO₂ saved per KM (convertible mark) spent

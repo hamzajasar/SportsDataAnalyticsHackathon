@@ -174,6 +174,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/club/sample": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sample Club
+         * @description Illustrative sample club (placeholder until the organisers' pack is integrated).
+         */
+        get: operations["getSampleClub"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/club/assumptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assumptions */
+        get: operations["getAssumptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/venues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Venues */
+        get: operations["listVenues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sources
+         * @description Every data source with licence + credit line (for the Methodology page and final slide).
+         */
+        get: operations["listSources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -193,6 +267,19 @@ export interface components {
             /** Source */
             source: string;
         };
+        /** ClubAssumptions */
+        ClubAssumptions: {
+            /** Costs */
+            costs: components["schemas"]["CostAssumption"][];
+            /** Upgrades */
+            upgrades: {
+                [key: string]: unknown;
+            }[];
+            /** Pv Yield Monthly */
+            pv_yield_monthly: components["schemas"]["MonthlyValue"][];
+            /** Temperature Monthly */
+            temperature_monthly: components["schemas"]["MonthlyValue"][];
+        };
         /** ColumnSummary */
         ColumnSummary: {
             /** Name */
@@ -211,6 +298,19 @@ export interface components {
             mean: number | null;
             /** Likely Key */
             likely_key: boolean;
+        };
+        /** CostAssumption */
+        CostAssumption: {
+            /** Key */
+            key: string;
+            /** Value */
+            value: number;
+            /** Unit */
+            unit: string;
+            /** Note */
+            note?: string | null;
+            /** Source */
+            source: string;
         };
         /** DatasetInfo */
         DatasetInfo: {
@@ -310,6 +410,34 @@ export interface components {
             /** Points */
             points: components["schemas"]["IntensityPoint"][];
         };
+        /** MonthlyValue */
+        MonthlyValue: {
+            /** Month */
+            month: number;
+            /** Value */
+            value: number;
+            /** Source */
+            source: string;
+        };
+        /** Source */
+        Source: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Use */
+            use?: string | null;
+            /** Licence */
+            licence?: string | null;
+            /** Credit */
+            credit?: string | null;
+            /** Url */
+            url?: string | null;
+            /** File */
+            file?: string | null;
+            /** Status */
+            status?: string | null;
+        };
         /** TripComparison */
         TripComparison: {
             /** Distance Km */
@@ -375,6 +503,23 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** Venue */
+        Venue: {
+            /** Id */
+            id: string;
+            /** Lat */
+            lat: number;
+            /** Lon */
+            lon: number;
+            /** Leisure */
+            leisure: string | null;
+            /** Sport */
+            sport: string | null;
+            /** Name */
+            name: string | null;
+            /** Distance Km */
+            distance_km?: number | null;
         };
     };
     responses: never;
@@ -680,6 +825,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    getSampleClub: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    getAssumptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubAssumptions"];
+                };
+            };
+        };
+    };
+    listVenues: {
+        parameters: {
+            query?: {
+                leisure?: string | null;
+                lat?: number | null;
+                lon?: number | null;
+                radius_km?: number | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Venue"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listSources: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Source"][];
                 };
             };
         };
