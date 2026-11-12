@@ -968,6 +968,48 @@
         }
       }
     },
+    "/api/club/affordability": {
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Club Affordability",
+        "description": "Cost per child today, fee drop per action, cost per child after (`club: null` = sample).",
+        "operationId": "calculateAffordability",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClubRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Affordability"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/venues/nearest": {
       "get": {
         "tags": [
@@ -1353,6 +1395,127 @@
           "illustrative_club"
         ],
         "title": "ActionPlanAssumptions"
+      },
+      "Affordability": {
+        "properties": {
+          "children": {
+            "type": "integer",
+            "title": "Children"
+          },
+          "running_cost_km_year": {
+            "type": "number",
+            "title": "Running Cost Km Year"
+          },
+          "electricity_km_year": {
+            "type": "number",
+            "title": "Electricity Km Year"
+          },
+          "travel_km_year": {
+            "type": "number",
+            "title": "Travel Km Year"
+          },
+          "cost_per_child_km": {
+            "type": "number",
+            "title": "Cost Per Child Km"
+          },
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/AffordabilityAction"
+            },
+            "type": "array",
+            "title": "Actions"
+          },
+          "total_fee_drop_per_child_km": {
+            "type": "number",
+            "title": "Total Fee Drop Per Child Km"
+          },
+          "cost_per_child_after_km": {
+            "type": "number",
+            "title": "Cost Per Child After Km"
+          },
+          "saving_share_pct": {
+            "type": "number",
+            "title": "Saving Share Pct"
+          },
+          "electricity_price_km_per_kwh": {
+            "type": "number",
+            "title": "Electricity Price Km Per Kwh"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "illustrative_club": {
+            "type": "boolean",
+            "title": "Illustrative Club"
+          }
+        },
+        "type": "object",
+        "required": [
+          "children",
+          "running_cost_km_year",
+          "electricity_km_year",
+          "travel_km_year",
+          "cost_per_child_km",
+          "actions",
+          "total_fee_drop_per_child_km",
+          "cost_per_child_after_km",
+          "saving_share_pct",
+          "electricity_price_km_per_kwh",
+          "scope",
+          "note",
+          "illustrative_club"
+        ],
+        "title": "Affordability"
+      },
+      "AffordabilityAction": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "cost_km": {
+            "type": "number",
+            "title": "Cost Km"
+          },
+          "saves_km_year": {
+            "type": "number",
+            "title": "Saves Km Year"
+          },
+          "fee_drop_per_child_km": {
+            "type": "number",
+            "title": "Fee Drop Per Child Km"
+          },
+          "payback_years": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payback Years"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "cost_km",
+          "saves_km_year",
+          "fee_drop_per_child_km",
+          "payback_years"
+        ],
+        "title": "AffordabilityAction"
       },
       "AmountEstimate": {
         "properties": {

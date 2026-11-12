@@ -377,6 +377,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/club/affordability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Club Affordability
+         * @description Cost per child today, fee drop per action, cost per child after (`club: null` = sample).
+         */
+        post: operations["calculateAffordability"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/venues/nearest": {
         parameters: {
             query?: never;
@@ -480,6 +500,50 @@ export interface components {
             grid_year: number;
             /** Illustrative Club */
             illustrative_club: boolean;
+        };
+        /** Affordability */
+        Affordability: {
+            /** Children */
+            children: number;
+            /** Running Cost Km Year */
+            running_cost_km_year: number;
+            /** Electricity Km Year */
+            electricity_km_year: number;
+            /** Travel Km Year */
+            travel_km_year: number;
+            /** Cost Per Child Km */
+            cost_per_child_km: number;
+            /** Actions */
+            actions: components["schemas"]["AffordabilityAction"][];
+            /** Total Fee Drop Per Child Km */
+            total_fee_drop_per_child_km: number;
+            /** Cost Per Child After Km */
+            cost_per_child_after_km: number;
+            /** Saving Share Pct */
+            saving_share_pct: number;
+            /** Electricity Price Km Per Kwh */
+            electricity_price_km_per_kwh: number;
+            /** Scope */
+            scope: string;
+            /** Note */
+            note: string;
+            /** Illustrative Club */
+            illustrative_club: boolean;
+        };
+        /** AffordabilityAction */
+        AffordabilityAction: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Cost Km */
+            cost_km: number;
+            /** Saves Km Year */
+            saves_km_year: number;
+            /** Fee Drop Per Child Km */
+            fee_drop_per_child_km: number;
+            /** Payback Years */
+            payback_years: number | null;
         };
         /** AmountEstimate */
         AmountEstimate: {
@@ -1649,6 +1713,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EnergyProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calculateAffordability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClubRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Affordability"];
                 };
             };
             /** @description Validation Error */
