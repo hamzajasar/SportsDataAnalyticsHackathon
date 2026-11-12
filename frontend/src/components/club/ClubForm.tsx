@@ -1,42 +1,11 @@
 import { useState, type ReactNode } from 'react'
 import type { ClubProfile } from '@/api/queries'
 import { Button } from '@/components/ui/button'
+import { NumberField as Field } from '@/components/common/NumberField'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { validateClub } from '@/lib/club'
 import { useClub } from '@/state/club'
-
-function Field({
-  id,
-  label,
-  value,
-  onChange,
-  hint,
-  step = 1,
-}: {
-  id: string
-  label: string
-  value: number
-  onChange: (v: number) => void
-  hint?: string
-  step?: number
-}) {
-  return (
-    <div className="grid gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        type="number"
-        inputMode="decimal"
-        min={0}
-        step={step}
-        value={Number.isFinite(value) ? value : ''}
-        onChange={(e) => onChange(e.target.valueAsNumber)}
-      />
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
-    </div>
-  )
-}
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (

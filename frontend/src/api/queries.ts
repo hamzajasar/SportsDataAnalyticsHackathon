@@ -178,3 +178,21 @@ export function useSources() {
     },
   })
 }
+
+export function useShareSuggestions(
+  lat: number | undefined,
+  lon: number | undefined,
+  radiusKm = 10,
+) {
+  return useQuery({
+    queryKey: ['share', lat, lon, radiusKm],
+    enabled: lat !== undefined && lon !== undefined,
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/share/suggestions', {
+        params: { query: { lat: lat!, lon: lon!, radius_km: radiusKm, n: 6 } },
+      })
+      if (error) throw error
+      return data
+    },
+  })
+}

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Activity, Database, Home, Info, Leaf, Moon, Sun } from 'lucide-react'
+import { Activity, Database, Home, Info, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useHealth } from '@/api/queries'
@@ -10,11 +10,13 @@ import { cn } from '@/lib/utils'
 
 const nav = [
   { to: '/', label: 'Club', icon: Home },
-  { to: '/footprint', label: 'Footprint', icon: Leaf },
   // Data explorer is a dev tool: its API is disabled in production (ENVIRONMENT=production)
   ...(import.meta.env.DEV ? [{ to: '/data', label: 'Data', icon: Database }] : []),
   { to: '/methodology', label: 'How it works', icon: Info },
 ]
+
+const NON_CLUB = ['/methodology', '/data']
+const isClubSection = (path: string) => !NON_CLUB.some((p) => path.startsWith(p))
 
 export function AppLayout() {
   const { theme, toggle } = useTheme()
@@ -38,7 +40,9 @@ export function AppLayout() {
                 className={({ isActive }) =>
                   cn(
                     'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground',
-                    isActive && 'bg-muted text-foreground',
+                    // "Club" covers all club tabs (/, /energy, /travel, …)
+                    (to === '/' ? isClubSection(location.pathname) : isActive) &&
+                      'bg-muted text-foreground',
                   )
                 }
               >
