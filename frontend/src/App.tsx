@@ -31,6 +31,9 @@ const DataExplorerPage = lazy(() =>
 const MethodologyPage = lazy(() =>
   import('@/pages/MethodologyPage').then((m) => ({ default: m.MethodologyPage })),
 )
+const QuickStartPage = lazy(() =>
+  import('@/pages/QuickStartPage').then((m) => ({ default: m.QuickStartPage })),
+)
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
@@ -59,6 +62,7 @@ export default function App() {
               <Route path="sources" element={<SourcesPage />} />
               <Route path="board-report" element={<BoardReportPage />} />
             </Route>
+            <Route path="quick-start" element={<QuickStartPage />} />
             {import.meta.env.DEV && <Route path="data" element={<DataExplorerPage />} />}
             <Route path="methodology" element={<MethodologyPage />} />
             <Route path="*" element={<NotFoundPage />} />
