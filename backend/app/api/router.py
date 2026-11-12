@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import club, datasets, health, share, sustainability
+from app.api.routes import club, datasets, energy, health, share, sustainability
 from app.core.config import settings
 
 api_router = APIRouter(prefix="/api")
@@ -9,4 +9,5 @@ if settings.datasets_enabled:
     api_router.include_router(datasets.router)
 api_router.include_router(sustainability.router)
 api_router.include_router(club.router)
+api_router.include_router(energy.router)
 api_router.include_router(share.router)

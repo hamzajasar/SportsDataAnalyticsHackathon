@@ -357,6 +357,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/club/energy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Club Energy
+         * @description 12 months of use, solar, net kWh, cost and CO2 for the club (`club: null` = sample).
+         */
+        post: operations["calculateEnergyProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/venues/nearest": {
         parameters: {
             query?: never;
@@ -664,6 +684,84 @@ export interface components {
             kg_co2e: number;
             /** Source */
             source: string;
+        };
+        /** EnergyMonth */
+        EnergyMonth: {
+            /** Month */
+            month: number;
+            /** Mean Temp C */
+            mean_temp_c: number;
+            /** Heating Kwh */
+            heating_kwh: number;
+            /** Floodlights Kwh */
+            floodlights_kwh: number;
+            /** Hall Kwh */
+            hall_kwh: number;
+            /** Total Kwh */
+            total_kwh: number;
+            /** Solar Produced Kwh */
+            solar_produced_kwh: number;
+            /** Solar Used Kwh */
+            solar_used_kwh: number;
+            /** Net Kwh */
+            net_kwh: number;
+            /** Cost Km */
+            cost_km: number;
+            /** Co2 Kg */
+            co2_kg: number;
+        };
+        /** EnergyProfile */
+        EnergyProfile: {
+            /** Months */
+            months: components["schemas"]["EnergyMonth"][];
+            totals: components["schemas"]["EnergyTotals"];
+            /** Kwp */
+            kwp: number;
+            /** Solar Self Use Share */
+            solar_self_use_share: number;
+            /** Electricity Price Km Per Kwh */
+            electricity_price_km_per_kwh: number;
+            /** Grid Gco2 Per Kwh */
+            grid_gco2_per_kwh: number;
+            /** Grid Year */
+            grid_year: number;
+            /** Method */
+            method: string[];
+            /** Illustrative Club */
+            illustrative_club: boolean;
+        };
+        /**
+         * EnergyRequest
+         * @description Shared club profile (`club: null` = sample club) plus the solar size to test.
+         */
+        EnergyRequest: {
+            club?: components["schemas"]["ClubProfile"] | null;
+            /**
+             * Electricity Price Km Per Kwh
+             * @description Override the sourced electricity price (KM/kWh)
+             */
+            electricity_price_km_per_kwh?: number | null;
+            /**
+             * Kwp
+             * @description Solar panels to add, in kWp (0 = none)
+             * @default 0
+             */
+            kwp: number;
+        };
+        /** EnergyTotals */
+        EnergyTotals: {
+            /** Total Kwh */
+            total_kwh: number;
+            /** Solar Produced Kwh */
+            solar_produced_kwh: number;
+            /** Solar Used Kwh */
+            solar_used_kwh: number;
+            /** Net Kwh */
+            net_kwh: number;
+            /** Cost Km */
+            cost_km: number;
+            /** Co2 Kg */
+            co2_kg: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1518,6 +1616,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SeasonTravel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calculateEnergyProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnergyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyProfile"];
                 };
             };
             /** @description Validation Error */

@@ -926,6 +926,48 @@
         }
       }
     },
+    "/api/club/energy": {
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Club Energy",
+        "description": "12 months of use, solar, net kWh, cost and CO2 for the club (`club: null` = sample).",
+        "operationId": "calculateEnergyProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnergyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnergyProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/venues/nearest": {
       "get": {
         "tags": [
@@ -1884,6 +1926,204 @@
           "source"
         ],
         "title": "EmissionFactor"
+      },
+      "EnergyMonth": {
+        "properties": {
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          },
+          "mean_temp_c": {
+            "type": "number",
+            "title": "Mean Temp C"
+          },
+          "heating_kwh": {
+            "type": "number",
+            "title": "Heating Kwh"
+          },
+          "floodlights_kwh": {
+            "type": "number",
+            "title": "Floodlights Kwh"
+          },
+          "hall_kwh": {
+            "type": "number",
+            "title": "Hall Kwh"
+          },
+          "total_kwh": {
+            "type": "number",
+            "title": "Total Kwh"
+          },
+          "solar_produced_kwh": {
+            "type": "number",
+            "title": "Solar Produced Kwh"
+          },
+          "solar_used_kwh": {
+            "type": "number",
+            "title": "Solar Used Kwh"
+          },
+          "net_kwh": {
+            "type": "number",
+            "title": "Net Kwh"
+          },
+          "cost_km": {
+            "type": "number",
+            "title": "Cost Km"
+          },
+          "co2_kg": {
+            "type": "number",
+            "title": "Co2 Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "mean_temp_c",
+          "heating_kwh",
+          "floodlights_kwh",
+          "hall_kwh",
+          "total_kwh",
+          "solar_produced_kwh",
+          "solar_used_kwh",
+          "net_kwh",
+          "cost_km",
+          "co2_kg"
+        ],
+        "title": "EnergyMonth"
+      },
+      "EnergyProfile": {
+        "properties": {
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/EnergyMonth"
+            },
+            "type": "array",
+            "title": "Months"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/EnergyTotals"
+          },
+          "kwp": {
+            "type": "number",
+            "title": "Kwp"
+          },
+          "solar_self_use_share": {
+            "type": "number",
+            "title": "Solar Self Use Share"
+          },
+          "electricity_price_km_per_kwh": {
+            "type": "number",
+            "title": "Electricity Price Km Per Kwh"
+          },
+          "grid_gco2_per_kwh": {
+            "type": "number",
+            "title": "Grid Gco2 Per Kwh"
+          },
+          "grid_year": {
+            "type": "integer",
+            "title": "Grid Year"
+          },
+          "method": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Method"
+          },
+          "illustrative_club": {
+            "type": "boolean",
+            "title": "Illustrative Club"
+          }
+        },
+        "type": "object",
+        "required": [
+          "months",
+          "totals",
+          "kwp",
+          "solar_self_use_share",
+          "electricity_price_km_per_kwh",
+          "grid_gco2_per_kwh",
+          "grid_year",
+          "method",
+          "illustrative_club"
+        ],
+        "title": "EnergyProfile"
+      },
+      "EnergyRequest": {
+        "properties": {
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "electricity_price_km_per_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Electricity Price Km Per Kwh",
+            "description": "Override the sourced electricity price (KM/kWh)"
+          },
+          "kwp": {
+            "type": "number",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Kwp",
+            "description": "Solar panels to add, in kWp (0 = none)",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "EnergyRequest",
+        "description": "Shared club profile (`club: null` = sample club) plus the solar size to test."
+      },
+      "EnergyTotals": {
+        "properties": {
+          "total_kwh": {
+            "type": "number",
+            "title": "Total Kwh"
+          },
+          "solar_produced_kwh": {
+            "type": "number",
+            "title": "Solar Produced Kwh"
+          },
+          "solar_used_kwh": {
+            "type": "number",
+            "title": "Solar Used Kwh"
+          },
+          "net_kwh": {
+            "type": "number",
+            "title": "Net Kwh"
+          },
+          "cost_km": {
+            "type": "number",
+            "title": "Cost Km"
+          },
+          "co2_kg": {
+            "type": "number",
+            "title": "Co2 Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_kwh",
+          "solar_produced_kwh",
+          "solar_used_kwh",
+          "net_kwh",
+          "cost_km",
+          "co2_kg"
+        ],
+        "title": "EnergyTotals"
       },
       "HTTPValidationError": {
         "properties": {
