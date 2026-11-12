@@ -926,6 +926,90 @@
         }
       }
     },
+    "/api/club/bill/read": {
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Read Bill",
+        "description": "Read an electricity bill or fuel receipt photo (JPEG, PNG, WebP or GIF, up to 5 MB).\n\nThe photo is processed in memory and not stored. The numbers are a first reading: show them to\nthe user to confirm or correct before calling `/club/bill/analyse`.",
+        "operationId": "readBill",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_readBill"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillReadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/club/bill/analyse": {
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Analyse Bill",
+        "description": "Waste check, updated plan (before/after) and a draft board decision in Bosnian.\n\nTakes the confirmed numbers, not a photo, and makes no AI call. `club: null` = sample club.",
+        "operationId": "analyseBill",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillAnalyseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillAnalysis"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/club/energy": {
       "post": {
         "tags": [
@@ -1609,6 +1693,289 @@
         ],
         "title": "Baseline"
       },
+      "BillAnalyseRequest": {
+        "properties": {
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "electricity_price_km_per_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Electricity Price Km Per Kwh",
+            "description": "Override the sourced electricity price (KM/kWh)"
+          },
+          "bill": {
+            "$ref": "#/components/schemas/ConfirmedBill"
+          },
+          "mean_temp_c": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 45.0,
+                "minimum": -40.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Temp C",
+            "description": "Actual mean temperature of the bill month; default is the typical month"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bill"
+        ],
+        "title": "BillAnalyseRequest",
+        "description": "Shared club profile (`club: null` = sample club) plus the confirmed bill."
+      },
+      "BillAnalysis": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "electricity",
+              "fuel"
+            ],
+            "title": "Kind"
+          },
+          "waste": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WasteCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fuel": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FuelCheck"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "plan": {
+            "$ref": "#/components/schemas/PlanUpdate"
+          },
+          "board_text_bs": {
+            "type": "string",
+            "title": "Board Text Bs"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "illustrative_club": {
+            "type": "boolean",
+            "title": "Illustrative Club"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "plan",
+          "board_text_bs",
+          "warnings",
+          "illustrative_club"
+        ],
+        "title": "BillAnalysis"
+      },
+      "BillReadResponse": {
+        "properties": {
+          "reading": {
+            "$ref": "#/components/schemas/BillReading"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reading",
+          "warnings",
+          "model"
+        ],
+        "title": "BillReadResponse"
+      },
+      "BillReading": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "electricity",
+              "fuel",
+              "other"
+            ],
+            "title": "Kind"
+          },
+          "period_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Year"
+          },
+          "period_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Month"
+          },
+          "kwh_total": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kwh Total"
+          },
+          "amount_total_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Total Km"
+          },
+          "unit_price_km_per_kwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price Km Per Kwh"
+          },
+          "litres": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Litres"
+          },
+          "fuel_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "diesel",
+                  "petrol",
+                  "lpg",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuel Type"
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Confidence"
+          },
+          "unreadable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unreadable Reason"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "confidence"
+        ],
+        "title": "BillReading",
+        "description": "Everything the reader found on the photo. Null means 'not visible', never a guess."
+      },
+      "Body_readBill": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_readBill"
+      },
       "ClubAssumptions": {
         "properties": {
           "costs": {
@@ -1806,6 +2173,117 @@
           "likely_key"
         ],
         "title": "ColumnSummary"
+      },
+      "ConfirmedBill": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "electricity",
+              "fuel"
+            ],
+            "title": "Kind"
+          },
+          "period_year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 2100.0,
+                "minimum": 2000.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Year"
+          },
+          "period_month": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 12.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Month"
+          },
+          "kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kwh"
+          },
+          "amount_km": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Km"
+          },
+          "unit_price_km_per_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price Km Per Kwh"
+          },
+          "litres": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Litres"
+          },
+          "fuel_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "diesel",
+                  "petrol"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuel Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "ConfirmedBill",
+        "description": "The numbers a person confirmed (or corrected) after the reader's first pass."
       },
       "CostAssumption": {
         "properties": {
@@ -2288,6 +2766,44 @@
         ],
         "title": "EnergyTotals"
       },
+      "FuelCheck": {
+        "properties": {
+          "fuel_type": {
+            "type": "string",
+            "title": "Fuel Type"
+          },
+          "litres": {
+            "type": "number",
+            "title": "Litres"
+          },
+          "amount_km": {
+            "type": "number",
+            "title": "Amount Km"
+          },
+          "price_km_per_litre": {
+            "type": "number",
+            "title": "Price Km Per Litre"
+          },
+          "assumed_km_per_litre": {
+            "type": "number",
+            "title": "Assumed Km Per Litre"
+          },
+          "difference_pct": {
+            "type": "number",
+            "title": "Difference Pct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fuel_type",
+          "litres",
+          "amount_km",
+          "price_km_per_litre",
+          "assumed_km_per_litre",
+          "difference_pct"
+        ],
+        "title": "FuelCheck"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2422,6 +2938,111 @@
           "source"
         ],
         "title": "MonthlyValue"
+      },
+      "PlanSummary": {
+        "properties": {
+          "electricity_kwh_year": {
+            "type": "number",
+            "title": "Electricity Kwh Year"
+          },
+          "electricity_km_year": {
+            "type": "number",
+            "title": "Electricity Km Year"
+          },
+          "travel_km_cost_year": {
+            "type": "number",
+            "title": "Travel Km Cost Year"
+          },
+          "total_saves_km_year": {
+            "type": "number",
+            "title": "Total Saves Km Year"
+          },
+          "total_saves_t_co2_year": {
+            "type": "number",
+            "title": "Total Saves T Co2 Year"
+          },
+          "fee_drop_per_child_km": {
+            "type": "number",
+            "title": "Fee Drop Per Child Km"
+          },
+          "top_actions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Top Actions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "electricity_kwh_year",
+          "electricity_km_year",
+          "travel_km_cost_year",
+          "total_saves_km_year",
+          "total_saves_t_co2_year",
+          "fee_drop_per_child_km",
+          "top_actions"
+        ],
+        "title": "PlanSummary"
+      },
+      "PlanUpdate": {
+        "properties": {
+          "before": {
+            "$ref": "#/components/schemas/PlanSummary"
+          },
+          "after": {
+            "$ref": "#/components/schemas/PlanSummary"
+          },
+          "scale_factor": {
+            "type": "number",
+            "title": "Scale Factor"
+          },
+          "annual_kwh_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual Kwh Estimate"
+          },
+          "price_km_per_kwh_used": {
+            "type": "number",
+            "title": "Price Km Per Kwh Used"
+          },
+          "price_source": {
+            "type": "string",
+            "title": "Price Source"
+          },
+          "price_source_id": {
+            "type": "string",
+            "enum": [
+              "unit_price",
+              "total_per_kwh",
+              "assumed",
+              "fuel"
+            ],
+            "title": "Price Source Id"
+          },
+          "based_on": {
+            "type": "string",
+            "title": "Based On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "before",
+          "after",
+          "scale_factor",
+          "price_km_per_kwh_used",
+          "price_source",
+          "price_source_id",
+          "based_on"
+        ],
+        "title": "PlanUpdate"
       },
       "SeasonTravel": {
         "properties": {
@@ -3101,6 +3722,91 @@
           "name"
         ],
         "title": "Venue"
+      },
+      "WasteCheck": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "above",
+              "high",
+              "below",
+              "unknown"
+            ],
+            "title": "Status"
+          },
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          },
+          "actual_kwh": {
+            "type": "number",
+            "title": "Actual Kwh"
+          },
+          "expected_kwh": {
+            "type": "number",
+            "title": "Expected Kwh"
+          },
+          "difference_kwh": {
+            "type": "number",
+            "title": "Difference Kwh"
+          },
+          "difference_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difference Pct"
+          },
+          "excess_kwh": {
+            "type": "number",
+            "title": "Excess Kwh"
+          },
+          "excess_km": {
+            "type": "number",
+            "title": "Excess Km"
+          },
+          "temperature_c": {
+            "type": "number",
+            "title": "Temperature C"
+          },
+          "temperature_source": {
+            "type": "string",
+            "title": "Temperature Source"
+          },
+          "basis": {
+            "type": "string",
+            "title": "Basis"
+          },
+          "suggestions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Suggestions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "month",
+          "actual_kwh",
+          "expected_kwh",
+          "difference_kwh",
+          "difference_pct",
+          "excess_kwh",
+          "excess_km",
+          "temperature_c",
+          "temperature_source",
+          "basis",
+          "suggestions"
+        ],
+        "title": "WasteCheck"
       }
     }
   }

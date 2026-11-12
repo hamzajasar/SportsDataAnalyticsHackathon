@@ -357,6 +357,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/club/bill/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read Bill
+         * @description Read an electricity bill or fuel receipt photo (JPEG, PNG, WebP or GIF, up to 5 MB).
+         *
+         *     The photo is processed in memory and not stored. The numbers are a first reading: show them to
+         *     the user to confirm or correct before calling `/club/bill/analyse`.
+         */
+        post: operations["readBill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/club/bill/analyse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Analyse Bill
+         * @description Waste check, updated plan (before/after) and a draft board decision in Bosnian.
+         *
+         *     Takes the confirmed numbers, not a photo, and makes no AI call. `club: null` = sample club.
+         */
+        post: operations["analyseBill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/club/energy": {
         parameters: {
             query?: never;
@@ -584,6 +629,88 @@ export interface components {
              */
             illustrative_club: boolean;
         };
+        /**
+         * BillAnalyseRequest
+         * @description Shared club profile (`club: null` = sample club) plus the confirmed bill.
+         */
+        BillAnalyseRequest: {
+            club?: components["schemas"]["ClubProfile"] | null;
+            /**
+             * Electricity Price Km Per Kwh
+             * @description Override the sourced electricity price (KM/kWh)
+             */
+            electricity_price_km_per_kwh?: number | null;
+            bill: components["schemas"]["ConfirmedBill"];
+            /**
+             * Mean Temp C
+             * @description Actual mean temperature of the bill month; default is the typical month
+             */
+            mean_temp_c?: number | null;
+        };
+        /** BillAnalysis */
+        BillAnalysis: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "electricity" | "fuel";
+            waste?: components["schemas"]["WasteCheck"] | null;
+            fuel?: components["schemas"]["FuelCheck"] | null;
+            plan: components["schemas"]["PlanUpdate"];
+            /** Board Text Bs */
+            board_text_bs: string;
+            /** Warnings */
+            warnings: string[];
+            /** Illustrative Club */
+            illustrative_club: boolean;
+        };
+        /** BillReadResponse */
+        BillReadResponse: {
+            reading: components["schemas"]["BillReading"];
+            /** Warnings */
+            warnings: string[];
+            /** Model */
+            model: string;
+        };
+        /**
+         * BillReading
+         * @description Everything the reader found on the photo. Null means 'not visible', never a guess.
+         */
+        BillReading: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "electricity" | "fuel" | "other";
+            /** Period Year */
+            period_year?: number | null;
+            /** Period Month */
+            period_month?: number | null;
+            /** Kwh Total */
+            kwh_total?: number | null;
+            /** Amount Total Km */
+            amount_total_km?: number | null;
+            /** Unit Price Km Per Kwh */
+            unit_price_km_per_kwh?: number | null;
+            /** Litres */
+            litres?: number | null;
+            /** Fuel Type */
+            fuel_type?: ("diesel" | "petrol" | "lpg" | "other") | null;
+            /**
+             * Confidence
+             * @enum {string}
+             */
+            confidence: "high" | "medium" | "low";
+            /** Unreadable Reason */
+            unreadable_reason?: string | null;
+            /** Note */
+            note?: string | null;
+        };
+        /** Body_readBill */
+        Body_readBill: {
+            /** File */
+            file: string;
+        };
         /** ClubAssumptions */
         ClubAssumptions: {
             /** Costs */
@@ -642,6 +769,31 @@ export interface components {
             mean: number | null;
             /** Likely Key */
             likely_key: boolean;
+        };
+        /**
+         * ConfirmedBill
+         * @description The numbers a person confirmed (or corrected) after the reader's first pass.
+         */
+        ConfirmedBill: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "electricity" | "fuel";
+            /** Period Year */
+            period_year?: number | null;
+            /** Period Month */
+            period_month?: number | null;
+            /** Kwh */
+            kwh?: number | null;
+            /** Amount Km */
+            amount_km?: number | null;
+            /** Unit Price Km Per Kwh */
+            unit_price_km_per_kwh?: number | null;
+            /** Litres */
+            litres?: number | null;
+            /** Fuel Type */
+            fuel_type?: ("diesel" | "petrol") | null;
         };
         /** CostAssumption */
         CostAssumption: {
@@ -827,6 +979,21 @@ export interface components {
             /** Co2 Kg */
             co2_kg: number;
         };
+        /** FuelCheck */
+        FuelCheck: {
+            /** Fuel Type */
+            fuel_type: string;
+            /** Litres */
+            litres: number;
+            /** Amount Km */
+            amount_km: number;
+            /** Price Km Per Litre */
+            price_km_per_litre: number;
+            /** Assumed Km Per Litre */
+            assumed_km_per_litre: number;
+            /** Difference Pct */
+            difference_pct: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -874,6 +1041,45 @@ export interface components {
             value: number;
             /** Source */
             source: string;
+        };
+        /** PlanSummary */
+        PlanSummary: {
+            /** Electricity Kwh Year */
+            electricity_kwh_year: number;
+            /** Electricity Km Year */
+            electricity_km_year: number;
+            /** Travel Km Cost Year */
+            travel_km_cost_year: number;
+            /** Total Saves Km Year */
+            total_saves_km_year: number;
+            /** Total Saves T Co2 Year */
+            total_saves_t_co2_year: number;
+            /** Fee Drop Per Child Km */
+            fee_drop_per_child_km: number;
+            /** Top Actions */
+            top_actions: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** PlanUpdate */
+        PlanUpdate: {
+            before: components["schemas"]["PlanSummary"];
+            after: components["schemas"]["PlanSummary"];
+            /** Scale Factor */
+            scale_factor: number;
+            /** Annual Kwh Estimate */
+            annual_kwh_estimate?: number | null;
+            /** Price Km Per Kwh Used */
+            price_km_per_kwh_used: number;
+            /** Price Source */
+            price_source: string;
+            /**
+             * Price Source Id
+             * @enum {string}
+             */
+            price_source_id: "unit_price" | "total_per_kwh" | "assumed" | "fuel";
+            /** Based On */
+            based_on: string;
         };
         /** SeasonTravel */
         SeasonTravel: {
@@ -1115,6 +1321,36 @@ export interface components {
             name: string | null;
             /** Distance Km */
             distance_km?: number | null;
+        };
+        /** WasteCheck */
+        WasteCheck: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "normal" | "above" | "high" | "below" | "unknown";
+            /** Month */
+            month: number;
+            /** Actual Kwh */
+            actual_kwh: number;
+            /** Expected Kwh */
+            expected_kwh: number;
+            /** Difference Kwh */
+            difference_kwh: number;
+            /** Difference Pct */
+            difference_pct: number | null;
+            /** Excess Kwh */
+            excess_kwh: number;
+            /** Excess Km */
+            excess_km: number;
+            /** Temperature C */
+            temperature_c: number;
+            /** Temperature Source */
+            temperature_source: string;
+            /** Basis */
+            basis: string;
+            /** Suggestions */
+            suggestions: string[];
         };
     };
     responses: never;
@@ -1685,6 +1921,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SeasonTravel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    readBill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_readBill"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillReadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    analyseBill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillAnalyseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillAnalysis"];
                 };
             };
             /** @description Validation Error */

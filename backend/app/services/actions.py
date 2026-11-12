@@ -113,9 +113,11 @@ def _travel_km(club: dict) -> float:
     return club["teams"] * t["away_trips_per_team_year"] * t["avg_one_way_km"] * 2
 
 
-def baseline(club: dict | None = None, country: str = "BIH") -> dict:
+def baseline(
+    club: dict | None = None, country: str = "BIH", costs: dict[str, float] | None = None
+) -> dict:
     club = club or sample_club()
-    c = cost_assumptions()
+    c = {**cost_assumptions(), **(costs or {})}
     gi = grid_intensity(country)
     kwh = sum(club["electricity_kwh_year"].values())
     km = _travel_km(club)
@@ -137,11 +139,17 @@ def baseline(club: dict | None = None, country: str = "BIH") -> dict:
 
 
 def rank_actions(
-    club: dict | None = None, country: str = "BIH", price_kwh: float | None = None
+    club: dict | None = None,
+    country: str = "BIH",
+    price_kwh: float | None = None,
+    costs: dict[str, float] | None = None,
 ) -> dict:
-    """Actions with yearly KM and CO2 saved and payback, sorted by payback (free ones first)."""
+    """Actions with yearly KM and CO2 saved and payback, sorted by payback (free ones first).
+
+    `costs` overrides rows of cost_assumptions.csv (e.g. a price read from the club's own bill).
+    """
     club = club or sample_club()
-    c = cost_assumptions()
+    c = {**cost_assumptions(), **(costs or {})}
     price = price_kwh if price_kwh is not None else c["electricity_price"]
     gi = grid_intensity(country)
     kg_per_kwh = gi.gco2_per_kwh / 1000
