@@ -68,4 +68,3 @@ CLAUDE.md
 # Raw downloads (large)
 data/raw/*
 !data/raw/.gitkeep
-scripts/__pycache__/

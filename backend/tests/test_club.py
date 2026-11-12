@@ -1,4 +1,4 @@
-"""API over data/clean (committed, so these run in CI without downloads)."""
+"""API over app/reference (committed, so these run in CI without downloads)."""
 
 import pytest
 from fastapi.testclient import TestClient
