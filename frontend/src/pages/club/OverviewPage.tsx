@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Leaf, Pencil, Zap, Bus, TrendingDown } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Leaf, Pencil, Zap, Bus, TrendingDown, ArrowRight } from 'lucide-react'
 import { useActionPlan, useClubBaseline } from '@/api/queries'
 import { useClub } from '@/state/club'
 import { ClubForm } from '@/components/club/ClubForm'
@@ -20,6 +21,7 @@ function StatBlock({ label, value, sub }: { label: string; value: string; sub?: 
 }
 
 export function OverviewPage() {
+  const navigate = useNavigate()
   const { club, isSample } = useClub()
   const [editOpen, setEditOpen] = useState(false)
   const actions = useActionPlan(club)
@@ -46,6 +48,18 @@ export function OverviewPage() {
       </div>
 
       {editOpen && <ClubForm onClose={() => setEditOpen(false)} />}
+
+      {isSample && !editOpen && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
+          <p className="text-sm">
+            This is an <span className="font-medium">example Sarajevo club</span>. Enter your own
+            numbers to see your real footprint.
+          </p>
+          <Button size="sm" onClick={() => navigate('/quick-start')}>
+            Enter my club <ArrowRight className="ml-1.5 size-3.5" />
+          </Button>
+        </div>
+      )}
 
       {/* Summary bar */}
       <Card className="border-primary/20 bg-primary/5">
