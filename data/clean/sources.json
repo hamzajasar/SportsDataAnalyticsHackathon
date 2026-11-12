@@ -56,7 +56,8 @@
    "licence": "Eurostat reuse policy (CC BY 4.0), credit source",
    "credit": "Source: Eurostat (nrg_pc_205)",
    "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_205",
-   "status": "planned"
+   "status": "loaded (BiH 0.149 EUR/kWh, 2026-S1, band IB)",
+   "file": "prices.json"
   },
   {
    "id": "pvgis",
@@ -69,12 +70,12 @@
   },
   {
    "id": "fuel",
-   "name": "BiH fuel prices (FBiH Ministry of Trade / aggregator)",
+   "name": "nafta.hr BiH average fuel prices",
    "use": "KM cost of away trips",
-   "licence": "Not verified",
-   "credit": "TBD once source confirmed",
-   "url": null,
-   "status": "planned, licence to check"
+   "licence": "Public price listing; cite source (terms not verified)",
+   "credit": "Fuel prices: nafta.hr, 12 Nov 2026",
+   "url": "https://nafta.hr/en/fuel-prices-bosnia-and-herzegovina/",
+   "status": "loaded (diesel 3.79, petrol 3.22 KM/L); consumption l/100km is an assumption"
   },
   {
    "id": "wages",

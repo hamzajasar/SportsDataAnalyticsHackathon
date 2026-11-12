@@ -1,9 +1,18 @@
 {
- "_note": "ASSUMPTIONS, verify before the pitch (Eurostat nrg_pc_205 / BHAS / FBiH Ministry of Trade).",
- "electricity_km_per_kwh": 0.22,
- "fuel_km_per_km_driven": {
-  "car": 0.32,
-  "minibus": 0.34
+ "_note": "Electricity and fuel pump prices are SOURCED. Fuel consumption (l/100km) is an ASSUMPTION.",
+ "electricity_eur_per_kwh": 0.149,
+ "electricity_km_per_kwh": 0.291,
+ "electricity_source": "Eurostat nrg_pc_205, BiH, non-household band IB (20-499 MWh), all taxes, 2026-S1; converted at the fixed 1.95583 KM/EUR peg",
+ "diesel_km_per_litre": 3.79,
+ "petrol_km_per_litre": 3.22,
+ "fuel_source": "nafta.hr average fuel prices Bosnia and Herzegovina, Diesel D5 and Premium 95, updated 2026-11-12",
+ "consumption_l_per_100km": {
+  "car": 7.0,
+  "minibus": 10.0
  },
- "currency": "KM"
+ "currency": "KM",
+ "fuel_km_per_km_driven": {
+  "car": 0.225,
+  "minibus": 0.379
+ }
 }

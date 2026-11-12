@@ -31,11 +31,16 @@ write("sport_venues_bih.csv", ["osm_id", "name", "leisure", "sport", "lat", "lon
         "OpenStreetMap contributors (ODbL)"] for v in venues])
 
 p, vf, club = load("prices.json"), load("vehicle_factors.json")["factors"], load("sample_club.json")
-A = "ASSUMPTION - verify before use"
+ES, FS = p["electricity_source"], p["fuel_source"]
+CA = "ASSUMPTION - verify before use"
 write("cost_assumptions.csv", ["key", "value", "unit", "note", "source"], [
-    ["electricity_price", p["electricity_km_per_kwh"], "KM/kWh", "non-household tariff estimate", A],
-    ["fuel_cost_car", p["fuel_km_per_km_driven"]["car"], "KM/vehicle-km", "fuel cost per km driven", A],
-    ["fuel_cost_minibus", p["fuel_km_per_km_driven"]["minibus"], "KM/vehicle-km", "fuel cost per km driven", A],
+    ["electricity_price", p["electricity_km_per_kwh"], "KM/kWh", "BiH non-household tariff, band IB", ES],
+    ["diesel_price", p["diesel_km_per_litre"], "KM/litre", "average pump price", FS],
+    ["petrol_price", p["petrol_km_per_litre"], "KM/litre", "Premium 95 average pump price", FS],
+    ["fuel_use_car", p["consumption_l_per_100km"]["car"], "l/100km", "petrol car", CA],
+    ["fuel_use_minibus", p["consumption_l_per_100km"]["minibus"], "l/100km", "diesel minibus", CA],
+    ["fuel_cost_car", p["fuel_km_per_km_driven"]["car"], "KM/vehicle-km", "petrol price x consumption", FS + "; " + CA],
+    ["fuel_cost_minibus", p["fuel_km_per_km_driven"]["minibus"], "KM/vehicle-km", "diesel price x consumption", FS + "; " + CA],
     ["minibus_kg_per_km", vf["minibus"]["value"], "kg CO2e/vehicle-km", vf["minibus"]["basis"], "UK GHG 2025 (OGL v3.0)"],
     ["coach_kg_per_km", vf["coach"]["value"], "kg CO2e/vehicle-km", vf["coach"]["basis"], "UK GHG 2025 (OGL v3.0) + assumed occupancy"],
 ])
