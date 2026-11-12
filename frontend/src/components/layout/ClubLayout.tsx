@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { BarChart2, Bus, Euro, Leaf, MapPin, Printer, Share2 } from 'lucide-react'
+import { BarChart2, Bus, Euro, Leaf, MapPin, Printer, ReceiptText, Share2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const tabs = [
@@ -9,6 +9,7 @@ const tabs = [
   { to: '/share', label: 'Share', icon: Share2, end: false },
   { to: '/affordability', label: 'Affordability', icon: Euro, end: false },
   { to: '/sources', label: 'Sources', icon: MapPin, end: false },
+  { to: '/bill', label: 'Check a bill', icon: ReceiptText, end: false },
   { to: '/board-report', label: 'Board report', icon: Printer, end: false },
 ]
 

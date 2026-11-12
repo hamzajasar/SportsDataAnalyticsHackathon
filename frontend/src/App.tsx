@@ -22,6 +22,7 @@ const AffordabilityPage = lazy(() =>
 const SourcesPage = lazy(() =>
   import('@/pages/club/SourcesPage').then((m) => ({ default: m.SourcesPage })),
 )
+const BillPage = lazy(() => import('@/pages/club/BillPage').then((m) => ({ default: m.BillPage })))
 const BoardReportPage = lazy(() =>
   import('@/pages/BoardReportPage').then((m) => ({ default: m.BoardReportPage })),
 )
@@ -57,6 +58,7 @@ export default function App() {
               <Route path="share" element={<SharePage />} />
               <Route path="affordability" element={<AffordabilityPage />} />
               <Route path="sources" element={<SourcesPage />} />
+              <Route path="bill" element={<BillPage />} />
               <Route path="board-report" element={<BoardReportPage />} />
             </Route>
             {import.meta.env.DEV && <Route path="data" element={<DataExplorerPage />} />}
