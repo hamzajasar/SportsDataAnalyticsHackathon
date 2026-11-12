@@ -52,7 +52,11 @@ __pycache__/
 # Node
 node_modules/
 dist/
+dist-ssr/
 *.tsbuildinfo
+*.local
+*.log
+npm-debug.log*
 
 # Claude Code (local only)
 CLAUDE.md

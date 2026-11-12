@@ -32,8 +32,8 @@ _Names and roles._
 
 | Layer | Tools |
 |---|---|
-| Frontend | React 19 · TypeScript · Vite · Tailwind CSS v4 · shadcn/ui · TanStack Query · React Router · Recharts · ECharts |
-| Backend | FastAPI · Pydantic · SQLAlchemy · Alembic · pandas · scikit-learn · xgboost · statsmodels · DuckDB |
+| Frontend | React 19 · TypeScript · Vite · Tailwind CSS v4 · shadcn/ui · TanStack Query · React Router · Recharts |
+| Backend | FastAPI · Pydantic · SQLAlchemy · Alembic · pandas · scikit-learn · statsmodels · DuckDB |
 | Database | PostgreSQL 17 (Docker) |
 | Tooling | uv · npm · ruff · oxlint · Prettier · pytest · Vitest · pre-commit · nbstripout · GitHub Actions |
 | Deploy | Vercel (frontend) · Render (backend, `render.yaml`) |
@@ -60,13 +60,12 @@ make data           # download the open datasets for our topic (see docs/DATA_SO
 make profile        # rows, columns, types, missing %, likely keys, probable joins
                     # -> data/processed/_profile.md
 make seed           # optional: load them into Postgres as raw_* tables
-make sample-data    # fake sports data to try the tooling (make clean-sample removes it)
 ```
 
 The **Data** page in the app (`/data`) browses any file in `data/raw/` (rows, sorting, column stats).
 In notebooks / backend code: `from app.services.datasets import load_df` → `load_df("file.csv")`.
 
-See [docs/HACKATHON_PLAYBOOK.md](docs/HACKATHON_PLAYBOOK.md) for the plan for the day.
+Who does what: [docs/WORK_PLAN.md](docs/WORK_PLAN.md). Plan for the day: [docs/HACKATHON_PLAYBOOK.md](docs/HACKATHON_PLAYBOOK.md).
 
 ## Project structure
 
@@ -74,23 +73,24 @@ See [docs/HACKATHON_PLAYBOOK.md](docs/HACKATHON_PLAYBOOK.md) for the plan for th
 backend/
   app/
     api/routes/     # FastAPI endpoints (one file per feature)
-    services/       # analytics / ML logic; datasets.py = generic data access
+    services/       # logic: emissions.py (Topic 6 calculations), datasets.py (generic data access)
+    reference/      # small committed reference tables (emission factors, grid intensity) — make reference
     schemas/        # Pydantic request/response schemas
     models/         # SQLAlchemy ORM models (DB tables)
     db/             # SQLAlchemy engine/session
     core/config.py  # settings from .env
   migrations/       # Alembic DB migrations
-  scripts/          # profile_data, seed_db, make_sample_data, export_openapi
+  scripts/          # fetch_open_data, build_reference, profile_data, seed_db, export_openapi
   tests/
 frontend/
   src/
     api/            # generated schema.d.ts + typed client + React Query hooks
     pages/          # one component per route
     components/     # common/ (DataTable, StatCard, PageHeader, QueryState, ErrorBoundary),
-                    # charts/, layout/, ui/ (shadcn primitives)
+                    # layout/, ui/ (shadcn primitives)
     lib/            # format, table, errors helpers
     test/           # Vitest setup + render helpers
-notebooks/          # 01_exploration, 02_baseline_model (outputs auto-stripped on commit)
+notebooks/          # 01_exploration (outputs auto-stripped on commit)
 models/             # saved models (git-ignored)
 data/raw|processed/ # git-ignored datasets
 docs/               # brief, judging criteria, presentation assets
@@ -106,6 +106,20 @@ docs/               # brief, judging criteria, presentation assets
 
 ## Team workflow
 
-- Branch per feature: `feat/<name>`, PR into `main`, keep PRs small.
-- Never commit data files or `.env`; put download steps in `backend/scripts/`.
-- Notebooks: prefix with a number (`02_model.ipynb`); move reusable code into `services/`.
+```
+main  ─────────────────────────────────────────────●  (final release only)
+                                                  ↑ PR at the end
+dev   ──●──────────●──────────●───────────────────●
+         \        ↑ \        ↑
+          feature/a   feature/b      (one branch per feature)
+```
+
+1. `make feature name=<short-name>` → creates `feature/<short-name>` from the latest `dev`
+2. Commit + `git push -u origin feature/<short-name>` (CI runs on every push)
+3. `make sync` if `dev` moved on, `make check` locally
+4. Open a PR **into `dev`**; merge only when CI is green
+5. **Never commit or push to `main`.** It only receives one PR from `dev` at the end
+   (a local hook blocks commits on `main`).
+
+Other rules: never commit data files or `.env`; notebooks are numbered (`02_model.ipynb`) and reusable
+code moves into `backend/app/services/`.

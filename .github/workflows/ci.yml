@@ -1,9 +1,11 @@
 name: CI
 
+# Workflow: feature/<name> branches off dev -> PR into dev after CI passes -> main only at the end
 on:
   push:
-    branches: [main]
+    branches: [dev, main, "feature/**"]
   pull_request:
+    branches: [dev, main]
 
 # Least privilege: CI can only read the repo
 permissions:

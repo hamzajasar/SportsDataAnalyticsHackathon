@@ -9,7 +9,6 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, './src') },
   },
-  build: { chunkSizeWarningLimit: 2500 },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

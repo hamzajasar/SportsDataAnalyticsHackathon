@@ -72,7 +72,7 @@ export function DataExplorerPage() {
         empty={
           <>
             No datasets yet. Drop CSV / Parquet / JSON / Excel files into <code>data/raw/</code> (or
-            run <code>make sample-data</code>).
+            run <code>make data</code>).
           </>
         }
       >
