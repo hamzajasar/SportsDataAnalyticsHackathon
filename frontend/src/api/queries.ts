@@ -121,3 +121,29 @@ export function useTripComparison(req: TripRequest, enabled = true) {
     },
   })
 }
+
+// ---- Club action plan ----
+
+export function useActionPlan() {
+  return useQuery({
+    queryKey: ['club', 'actions'],
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/club/actions')
+      if (error) throw error
+      return data
+    },
+    staleTime: Infinity,
+  })
+}
+
+export function useClubBaseline() {
+  return useQuery({
+    queryKey: ['club', 'baseline'],
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/club/baseline')
+      if (error) throw error
+      return data
+    },
+    staleTime: Infinity,
+  })
+}
