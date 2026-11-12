@@ -130,11 +130,44 @@
 }
 
 @media print {
+  /* Print is always light and high-contrast, even when the app is in dark mode:
+     the screen's light-grey "muted" text is far too faint on paper. */
+  :root,
+  .dark {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0 0 0);
+    --muted: oklch(0.96 0 0);
+    --muted-foreground: oklch(0.3 0 0);
+    --accent: oklch(0.96 0 0);
+    --accent-foreground: oklch(0 0 0);
+    --secondary: oklch(0.94 0 0);
+    --secondary-foreground: oklch(0 0 0);
+    --primary: oklch(0.2 0 0);
+    --primary-foreground: oklch(1 0 0);
+    --border: oklch(0.7 0 0);
+  }
+  /* Keep coloured blocks (e.g. the dark headline band with white text) when printing;
+     browsers drop backgrounds by default, which would leave white text on white paper. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   .no-print {
     display: none !important;
   }
   body {
     background: white !important;
     color: black !important;
+  }
+  /* Faded/"loading" states and small grey captions must stay readable on paper */
+  [class*='opacity-'] {
+    opacity: 1 !important;
+  }
+  .text-muted-foreground {
+    color: oklch(0.3 0 0) !important;
   }
 }

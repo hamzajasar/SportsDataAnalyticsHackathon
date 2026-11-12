@@ -6,6 +6,7 @@ numbers update the club's plan.
 
 from datetime import date
 
+from app.i18n import Lang, num, t
 from app.schemas.bill import BillReading
 
 
@@ -16,37 +17,39 @@ def effective_price(r: BillReading) -> float | None:
     return None
 
 
-def plausibility_warnings(r: BillReading, today: date | None = None) -> list[str]:
+def plausibility_warnings(
+    r: BillReading, today: date | None = None, lang: Lang = "en"
+) -> list[str]:
     """Sanity checks on a bill's numbers: a typo should be caught before it is used."""
     today = today or date.today()
     w: list[str] = []
     if r.kind == "other":
-        w.append(r.unreadable_reason or "This does not look like an electricity bill or receipt.")
+        w.append(r.unreadable_reason or t("check.other", lang))
         return w
     if r.confidence == "low":
-        w.append("Some numbers are uncertain: check every number against the bill.")
+        w.append(t("check.uncertain", lang))
     if r.period_month is not None and not 1 <= r.period_month <= 12:
-        w.append("The billing month is not a valid month.")
+        w.append(t("check.bad_month", lang))
     known = r.period_year is not None and r.period_month is not None
     if known and (r.period_year, r.period_month) > (today.year, today.month):
-        w.append("The billing period is in the future: check the month and year.")
+        w.append(t("check.future", lang))
     if r.kind == "electricity":
         if r.kwh_total is None:
-            w.append("No kWh found: type in the consumption from the bill.")
+            w.append(t("check.no_kwh", lang))
         elif not 0 < r.kwh_total <= 100_000:
-            w.append("The kWh figure looks implausible for a club: check it.")
+            w.append(t("check.kwh_implausible", lang))
         price = effective_price(r)
         if price is not None and not 0.05 <= price <= 1.0:
-            w.append(f"Total ÷ kWh is {price:.2f} KM/kWh, which looks unusual: check both numbers.")
+            w.append(t("check.price_unusual", lang, price=num(price, lang, 2)))
         if r.unit_price_km_per_kwh is not None and not 0.03 <= r.unit_price_km_per_kwh <= 0.6:
-            w.append("The printed price per kWh looks unusual: check it.")
+            w.append(t("check.unit_price_unusual", lang))
     if r.kind == "fuel":
         if r.litres is None or r.amount_total_km is None:
-            w.append("Litres or amount not found: type them in from the receipt.")
+            w.append(t("check.fuel_missing", lang))
         else:
             per_litre = r.amount_total_km / r.litres if r.litres else 0
             if not 1.5 <= per_litre <= 6.0:
-                w.append(f"{per_litre:.2f} KM per litre looks unusual: check litres and amount.")
+                w.append(t("check.per_litre_unusual", lang, price=num(per_litre, lang, 2)))
         if r.fuel_type in (None, "other", "lpg"):
-            w.append("Only diesel and petrol receipts can update the travel plan.")
+            w.append(t("check.fuel_type", lang))
     return w

@@ -9,6 +9,7 @@ unless the caller supplies the real one, so a cold month is not mistaken for was
 real temperature is passed in. A flag means "worth checking", never a diagnosis.
 """
 
+from app.i18n import Lang, t
 from app.services import actions
 
 NORMAL_BAND_PCT = 10.0  # within +/- this: normal
@@ -21,7 +22,9 @@ SUGGESTIONS = {
 }
 
 
-def expected_month_kwh(club: dict, month: int, mean_temp_c: float | None = None) -> dict:
+def expected_month_kwh(
+    club: dict, month: int, mean_temp_c: float | None = None, lang: Lang = "en"
+) -> dict:
     """What the club's own yearly figures predict for `month` (1-12)."""
     el = club["electricity_kwh_year"]
     temps = actions.monthly_temps()
@@ -34,18 +37,23 @@ def expected_month_kwh(club: dict, month: int, mean_temp_c: float | None = None)
         "total": flood + hall + heating,
         "heating": heating,
         "temperature_c": temp,
-        "temperature_source": (
-            "typical Sarajevo temperature for the month (Open-Meteo 2024-2025)"
-            if mean_temp_c is None
-            else "temperature supplied for the bill month"
+        # stable id for code (the board text), translated sentence for people
+        "temperature_source_id": "typical" if mean_temp_c is None else "supplied",
+        "temperature_source": t(
+            "waste.temp.typical" if mean_temp_c is None else "waste.temp.supplied", lang
         ),
     }
 
 
 def check_month(
-    club: dict, month: int, kwh: float, price_km_per_kwh: float, mean_temp_c: float | None = None
+    club: dict,
+    month: int,
+    kwh: float,
+    price_km_per_kwh: float,
+    mean_temp_c: float | None = None,
+    lang: Lang = "en",
 ) -> dict:
-    exp = expected_month_kwh(club, month, mean_temp_c)
+    exp = expected_month_kwh(club, month, mean_temp_c, lang)
     expected = exp["total"]
     diff = kwh - expected
     pct = diff / expected * 100 if expected > 0 else None
@@ -77,11 +85,8 @@ def check_month(
         "excess_kwh": round(excess),
         "excess_km": round(excess * price_km_per_kwh),
         "temperature_c": round(exp["temperature_c"], 1),
+        "temperature_source_id": exp["temperature_source_id"],
         "temperature_source": exp["temperature_source"],
-        "basis": (
-            "Expected = floodlights and hall spread evenly over 12 months + yearly heating "
-            f"spread by heating degree days (base {actions.HEATING_BASE_C:.0f} °C), "
-            "from the club's own yearly figures"
-        ),
+        "basis": t("waste.basis", lang, base=f"{actions.HEATING_BASE_C:.0f}"),
         "suggestions": suggestions,
     }

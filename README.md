@@ -69,7 +69,6 @@ make data           # download the open datasets for our topic (see docs/DATA_SO
 # organisers' synthetic pack -> data/raw/pack/  (git-ignored)
 make profile        # rows, columns, types, missing %, likely keys, probable joins
                     # -> data/processed/_profile.md
-make seed           # optional: load them into Postgres as raw_* tables
 ```
 
 In notebooks / backend code: `from app.services.datasets import load_df` → `load_df("file.csv")`.
@@ -89,7 +88,7 @@ backend/
     db/             # SQLAlchemy engine/session
     core/config.py  # settings from .env
   migrations/       # Alembic DB migrations
-  scripts/          # fetch_open_data, build_reference, profile_data, seed_db, export_openapi
+  scripts/          # fetch_open_data, build_reference, profile_data, export_openapi
   tests/
 frontend/
   src/

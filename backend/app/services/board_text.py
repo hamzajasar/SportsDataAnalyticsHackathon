@@ -7,6 +7,8 @@ Decimal comma and thousands dot, as is usual in Bosnian.
 
 from datetime import date
 
+from app.i18n import M
+
 MONTHS = [
     "januar", "februar", "mart", "april", "maj", "juni",
     "juli", "august", "septembar", "oktobar", "novembar", "decembar",
@@ -47,7 +49,11 @@ def fmt(x: float, decimals: int = 0) -> str:
 
 
 def _action_name(a: dict) -> str:
-    return ACTION_NAMES.get(a["id"], a["name"])
+    """Always Bosnian, whatever language the plan was computed in."""
+    if a["id"] in ACTION_NAMES:
+        return ACTION_NAMES[a["id"]]
+    key = f"action.{a['id']}"
+    return M[key]["bs"] if key in M and "{" not in M[key]["bs"] else a["name"]
 
 
 def _payback(a: dict) -> str:
@@ -115,7 +121,7 @@ def _electricity_text(analysis: dict, club: dict, bill: dict, today: date) -> st
     pct = w["difference_pct"]
     temp_src = (
         "uobičajena za taj mjesec"
-        if "typical" in w["temperature_source"]
+        if w.get("temperature_source_id", "typical") == "typical"
         else "stvarna temperatura mjeseca"
     )
     verdict = {

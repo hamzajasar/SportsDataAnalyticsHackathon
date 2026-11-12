@@ -236,6 +236,113 @@ M: dict[str, dict[Lang, str]] = {
         "bs": "Udaljenost zračnom linijom (haversine); cestovna udaljenost procijenjena kao "
         "zračna × 1,3",
     },
+    # ---- Check a bill ----
+    "bill.err_electricity": {
+        "en": "An electricity bill needs the kWh and the billing month.",
+        "bs": "Za račun za struju potrebni su kWh i mjesec obračuna.",
+    },
+    "bill.err_fuel": {
+        "en": "A fuel receipt needs litres, the amount and the fuel type.",
+        "bs": "Za račun za gorivo potrebni su litri, iznos i vrsta goriva.",
+    },
+    "bill.scale_warning": {
+        "en": "The bill is far from the club's profile (x{raw}); the yearly estimate was limited "
+        "to x{used}. Check the kWh and the club's yearly figures.",
+        "bs": "Račun znatno odstupa od profila kluba (x{raw}); godišnja procjena je ograničena na "
+        "x{used}. Provjerite kWh i godišnje podatke kluba.",
+    },
+    "bill.price.unit_price": {
+        "en": "price per kWh printed on the bill",
+        "bs": "cijena po kWh štampana na računu",
+    },
+    "bill.price.total_per_kwh": {
+        "en": "bill total divided by kWh (includes fixed charges, so savings from using less "
+        "electricity may be slightly overstated)",
+        "bs": "ukupan iznos računa podijeljen sa kWh (uključuje fiksne naknade, pa uštede od manje "
+        "potrošnje mogu biti malo precijenjene)",
+    },
+    "bill.price.assumed": {
+        "en": "assumed Eurostat price for BiH (the bill gave no price)",
+        "bs": "pretpostavljena cijena za BiH (Eurostat), jer račun ne sadrži cijenu",
+    },
+    "bill.price.fuel": {
+        "en": "electricity price unchanged (a fuel receipt says nothing about it)",
+        "bs": "cijena struje nepromijenjena (račun za gorivo ne govori ništa o njoj)",
+    },
+    "bill.based_on_electricity": {
+        "en": "One bill (month {month}): the club's yearly electricity is scaled from this single "
+        "month. Each further bill makes the estimate firmer.",
+        "bs": "Jedan račun (mjesec {month}): godišnja potrošnja kluba preračunata je iz ovog "
+        "jednog mjeseca. Svaki sljedeći račun čini procjenu pouzdanijom.",
+    },
+    "bill.based_on_fuel": {
+        "en": "One {fuel} receipt: the pump price replaces the assumed one in the cost of a "
+        "{vehicle} kilometre.",
+        "bs": "Jedan račun za gorivo ({fuel}): cijena sa pumpe zamjenjuje pretpostavljenu u "
+        "trošku po kilometru ({vehicle}).",
+    },
+    "fuel.diesel": {"en": "diesel", "bs": "dizel"},
+    "fuel.petrol": {"en": "petrol", "bs": "benzin"},
+    "vehicle.car": {"en": "car", "bs": "automobil"},
+    "vehicle.minibus": {"en": "minibus", "bs": "minibus"},
+    "waste.temp.typical": {
+        "en": "typical Sarajevo temperature for the month (Open-Meteo 2024-2025)",
+        "bs": "uobičajena temperatura u Sarajevu za taj mjesec (Open-Meteo 2024-2025)",
+    },
+    "waste.temp.supplied": {
+        "en": "temperature supplied for the bill month",
+        "bs": "unesena temperatura za mjesec računa",
+    },
+    "waste.basis": {
+        "en": "Expected = floodlights and hall spread evenly over 12 months + yearly heating "
+        "spread by heating degree days (base {base} °C), from the club's own yearly figures",
+        "bs": "Očekivano = reflektori i dvorana ravnomjerno na 12 mjeseci + godišnje grijanje "
+        "raspoređeno po stepen-danima grijanja (osnova {base} °C), iz godišnjih podataka kluba",
+    },
+    "check.other": {
+        "en": "This does not look like an electricity bill or receipt.",
+        "bs": "Ovo ne izgleda kao račun za struju ili gorivo.",
+    },
+    "check.uncertain": {
+        "en": "Some numbers are uncertain: check every number against the bill.",
+        "bs": "Neki brojevi su nesigurni: provjerite svaki broj na računu.",
+    },
+    "check.bad_month": {
+        "en": "The billing month is not a valid month.",
+        "bs": "Mjesec obračuna nije ispravan.",
+    },
+    "check.future": {
+        "en": "The billing period is in the future: check the month and year.",
+        "bs": "Obračunski period je u budućnosti: provjerite mjesec i godinu.",
+    },
+    "check.no_kwh": {
+        "en": "No kWh found: type in the consumption from the bill.",
+        "bs": "Nema kWh: unesite potrošnju sa računa.",
+    },
+    "check.kwh_implausible": {
+        "en": "The kWh figure looks implausible for a club: check it.",
+        "bs": "Iznos kWh izgleda nevjerovatno za klub: provjerite ga.",
+    },
+    "check.price_unusual": {
+        "en": "Total ÷ kWh is {price} KM/kWh, which looks unusual: check both numbers.",
+        "bs": "Ukupno ÷ kWh iznosi {price} KM/kWh, što izgleda neobično: provjerite oba broja.",
+    },
+    "check.unit_price_unusual": {
+        "en": "The printed price per kWh looks unusual: check it.",
+        "bs": "Štampana cijena po kWh izgleda neobično: provjerite je.",
+    },
+    "check.fuel_missing": {
+        "en": "Litres or amount not found: type them in from the receipt.",
+        "bs": "Nedostaju litri ili iznos: unesite ih sa računa.",
+    },
+    "check.per_litre_unusual": {
+        "en": "{price} KM per litre looks unusual: check litres and amount.",
+        "bs": "{price} KM po litru izgleda neobično: provjerite litre i iznos.",
+    },
+    "check.fuel_type": {
+        "en": "Only diesel and petrol receipts can update the travel plan.",
+        "bs": "Samo računi za dizel i benzin mogu ažurirati plan putovanja.",
+    },
 }
 
 # Nouns with Bosnian counting forms (see plural()).
