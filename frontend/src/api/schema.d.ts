@@ -397,6 +397,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cities
+         * @description BiH cities with approximate centre coordinates, for the club's location picker.
+         */
+        get: operations["listCities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/club/quick": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Quick Club
+         * @description Turn a few easy answers into a full club profile, marking every estimated value.
+         */
+        post: operations["quickClub"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/venues/nearest": {
         parameters: {
             query?: never;
@@ -640,6 +680,17 @@ export interface components {
              * @description True when calculated for the sample club
              */
             illustrative_club: boolean;
+        };
+        /** City */
+        City: {
+            /** City */
+            city: string;
+            /** Lat */
+            lat: number;
+            /** Lon */
+            lon: number;
+            /** Source */
+            source: string;
         };
         /** ClubAssumptions */
         ClubAssumptions: {
@@ -954,6 +1005,78 @@ export interface components {
             value: number;
             /** Source */
             source: string;
+        };
+        /**
+         * QuickClubInput
+         * @description What a volunteer knows. Only city, children and teams are required.
+         */
+        QuickClubInput: {
+            /** Name */
+            name?: string | null;
+            /**
+             * City
+             * @description A city from GET /api/cities
+             */
+            city: string;
+            /**
+             * Lat
+             * @description Optional exact location
+             */
+            lat?: number | null;
+            /** Lon */
+            lon?: number | null;
+            /** Children */
+            children: number;
+            /** Teams */
+            teams: number;
+            /**
+             * Pays Electricity
+             * @default true
+             */
+            pays_electricity: boolean;
+            /**
+             * Monthly Bill Km
+             * @description Average KM/month
+             */
+            monthly_bill_km?: number | null;
+            /**
+             * Yearly Kwh
+             * @description If known (overrides bill)
+             */
+            yearly_kwh?: number | null;
+            /**
+             * Heating Type
+             * @default unknown
+             * @enum {string}
+             */
+            heating_type: "electric" | "district" | "gas" | "wood" | "other" | "unknown";
+            /**
+             * Away Games Per Team
+             * @description Per season
+             */
+            away_games_per_team?: number | null;
+            /** Avg One Way Km */
+            avg_one_way_km?: number | null;
+            /**
+             * Transport
+             * @default mixed
+             * @enum {string}
+             */
+            transport: "cars" | "minibus" | "mixed";
+        };
+        /** QuickClubResult */
+        QuickClubResult: {
+            club: components["schemas"]["ClubProfile"];
+            /**
+             * Estimated
+             * @description Profile parts we estimated (not given by the club)
+             */
+            estimated: string[];
+            /**
+             * Notes
+             * @description Plain-language explanation of every estimate
+             */
+            notes: string[];
         };
         /** SeasonTravel */
         SeasonTravel: {
@@ -1845,6 +1968,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Affordability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listCities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["City"][];
+                };
+            };
+        };
+    };
+    quickClub: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuickClubInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuickClubResult"];
                 };
             };
             /** @description Validation Error */

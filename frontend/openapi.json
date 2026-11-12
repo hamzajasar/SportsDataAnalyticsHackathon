@@ -1010,6 +1010,74 @@
         }
       }
     },
+    "/api/cities": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "List Cities",
+        "description": "BiH cities with approximate centre coordinates, for the club's location picker.",
+        "operationId": "listCities",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  },
+                  "type": "array",
+                  "title": "Response Listcities"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/club/quick": {
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Quick Club",
+        "description": "Turn a few easy answers into a full club profile, marking every estimated value.",
+        "operationId": "quickClub",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuickClubInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuickClubResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/venues/nearest": {
       "get": {
         "tags": [
@@ -1677,6 +1745,34 @@
           "illustrative_club"
         ],
         "title": "Baseline"
+      },
+      "City": {
+        "properties": {
+          "city": {
+            "type": "string",
+            "title": "City"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city",
+          "lat",
+          "lon",
+          "source"
+        ],
+        "title": "City"
       },
       "ClubAssumptions": {
         "properties": {
@@ -2521,6 +2617,189 @@
           "source"
         ],
         "title": "MonthlyValue"
+      },
+      "QuickClubInput": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "City",
+            "description": "A city from GET /api/cities"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 46.0,
+                "minimum": 42.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat",
+            "description": "Optional exact location"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 20.0,
+                "minimum": 15.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "children": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Children"
+          },
+          "teams": {
+            "type": "integer",
+            "maximum": 500.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Teams"
+          },
+          "pays_electricity": {
+            "type": "boolean",
+            "title": "Pays Electricity",
+            "default": true
+          },
+          "monthly_bill_km": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Bill Km",
+            "description": "Average KM/month"
+          },
+          "yearly_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yearly Kwh",
+            "description": "If known (overrides bill)"
+          },
+          "heating_type": {
+            "type": "string",
+            "enum": [
+              "electric",
+              "district",
+              "gas",
+              "wood",
+              "other",
+              "unknown"
+            ],
+            "title": "Heating Type",
+            "default": "unknown"
+          },
+          "away_games_per_team": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Away Games Per Team",
+            "description": "Per season"
+          },
+          "avg_one_way_km": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 2000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg One Way Km"
+          },
+          "transport": {
+            "type": "string",
+            "enum": [
+              "cars",
+              "minibus",
+              "mixed"
+            ],
+            "title": "Transport",
+            "default": "mixed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city",
+          "children",
+          "teams"
+        ],
+        "title": "QuickClubInput",
+        "description": "What a volunteer knows. Only city, children and teams are required."
+      },
+      "QuickClubResult": {
+        "properties": {
+          "club": {
+            "$ref": "#/components/schemas/ClubProfile"
+          },
+          "estimated": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Estimated",
+            "description": "Profile parts we estimated (not given by the club)"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes",
+            "description": "Plain-language explanation of every estimate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "club",
+          "estimated",
+          "notes"
+        ],
+        "title": "QuickClubResult"
       },
       "SeasonTravel": {
         "properties": {
