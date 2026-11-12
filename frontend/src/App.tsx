@@ -4,6 +4,9 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Skeleton } from '@/components/ui/skeleton'
 
 // Each page is its own chunk: the first load only downloads the page you open.
+const OverviewPage = lazy(() =>
+  import('@/pages/OverviewPage').then((m) => ({ default: m.OverviewPage })),
+)
 const FootprintPage = lazy(() =>
   import('@/pages/FootprintPage').then((m) => ({ default: m.FootprintPage })),
 )
@@ -32,7 +35,8 @@ export default function App() {
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route index element={<FootprintPage />} />
+            <Route index element={<OverviewPage />} />
+            <Route path="footprint" element={<FootprintPage />} />
             <Route path="data" element={<DataExplorerPage />} />
             <Route path="methodology" element={<MethodologyPage />} />
             <Route path="*" element={<NotFoundPage />} />

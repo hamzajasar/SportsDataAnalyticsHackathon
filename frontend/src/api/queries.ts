@@ -121,3 +121,60 @@ export function useTripComparison(req: TripRequest, enabled = true) {
     },
   })
 }
+
+// ---- Club (profile, baseline, action plan, sources) ----
+
+export type ClubProfile = components['schemas']['ClubProfile']
+
+/** Body for club calculations: `club: null` = the illustrative sample club. */
+function clubBody(club: ClubProfile | null) {
+  return club ? { club } : {}
+}
+
+export function useSampleClub() {
+  return useQuery({
+    queryKey: ['club', 'sample'],
+    staleTime: Infinity,
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/club/sample')
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function useClubBaseline(club: ClubProfile | null) {
+  return useQuery({
+    queryKey: ['club', 'baseline', club],
+    placeholderData: keepPreviousData,
+    queryFn: async () => {
+      const { data, error } = await api.POST('/api/club/baseline', { body: clubBody(club) })
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function useActionPlan(club: ClubProfile | null) {
+  return useQuery({
+    queryKey: ['club', 'actions', club],
+    placeholderData: keepPreviousData,
+    queryFn: async () => {
+      const { data, error } = await api.POST('/api/club/actions', { body: clubBody(club) })
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function useSources() {
+  return useQuery({
+    queryKey: ['sources'],
+    staleTime: Infinity,
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/sources')
+      if (error) throw error
+      return data
+    },
+  })
+}
