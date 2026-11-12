@@ -1,4 +1,4 @@
-.PHONY: help setup dev db db-stop migrate migration data reference profile seed sample-data clean-sample backend frontend notebook gen-api lint format test check clean
+.PHONY: help setup feature sync dev db db-stop migrate migration data reference profile seed sample-data clean-sample backend frontend notebook gen-api lint format test check clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -9,6 +9,16 @@ setup: ## Install all dependencies + git hooks (run once after cloning)
 	cd frontend && npm install
 	uv run --project backend pre-commit install
 	uv run --project backend nbstripout --install
+
+feature: ## Start a feature branch from latest dev: make feature name=trip-calculator
+	@test -n "$(name)" || (echo 'usage: make feature name=<short-name>' && exit 1)
+	git fetch origin
+	git switch -c feature/$(name) origin/dev
+	@echo "On feature/$(name). Push with: git push -u origin feature/$(name)"
+
+sync: ## Update current feature branch with latest dev (merge)
+	git fetch origin
+	git merge origin/dev
 
 db: ## Start Postgres in Docker
 	docker compose up -d --wait db

@@ -106,6 +106,20 @@ docs/               # brief, judging criteria, presentation assets
 
 ## Team workflow
 
-- Branch per feature: `feat/<name>`, PR into `main`, keep PRs small.
-- Never commit data files or `.env`; put download steps in `backend/scripts/`.
-- Notebooks: prefix with a number (`02_model.ipynb`); move reusable code into `services/`.
+```
+main  ─────────────────────────────────────────────●  (final release only)
+                                                  ↑ PR at the end
+dev   ──●──────────●──────────●───────────────────●
+         \        ↑ \        ↑
+          feature/a   feature/b      (one branch per feature)
+```
+
+1. `make feature name=<short-name>` → creates `feature/<short-name>` from the latest `dev`
+2. Commit + `git push -u origin feature/<short-name>` (CI runs on every push)
+3. `make sync` if `dev` moved on, `make check` locally
+4. Open a PR **into `dev`**; merge only when CI is green
+5. **Never commit or push to `main`.** It only receives one PR from `dev` at the end
+   (a local hook blocks commits on `main`).
+
+Other rules: never commit data files or `.env`; notebooks are numbered (`02_model.ipynb`) and reusable
+code moves into `backend/app/services/`.
