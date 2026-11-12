@@ -470,6 +470,19 @@ export interface components {
             payback_years: number | null;
             /** Basis */
             basis: string;
+            /**
+             * Owner
+             * @description Who takes (and saves from) this action
+             * @default club
+             * @enum {string}
+             */
+            owner: "club" | "facility_owner" | "families";
+            /**
+             * Counts For Club
+             * @description Included in the club's totals and fee drop
+             * @default true
+             */
+            counts_for_club: boolean;
         };
         /** ActionPlan */
         ActionPlan: {
@@ -481,6 +494,17 @@ export interface components {
             total_saves_t_co2_year: number;
             /** Fee Drop Per Child Km */
             fee_drop_per_child_km: number;
+            /**
+             * Facility Owner Saves Km Year
+             * @description Savings for the facility owner when the club doesn't pay electricity
+             * @default 0
+             */
+            facility_owner_saves_km_year: number;
+            /**
+             * Notes
+             * @description Plain-language caveats to show
+             */
+            notes?: string[];
             /** Children */
             children: number;
             assumptions: components["schemas"]["ActionPlanAssumptions"];
@@ -579,6 +603,21 @@ export interface components {
             /** Grid Year */
             grid_year: number;
             /**
+             * Club Pays Electricity
+             * @default true
+             */
+            club_pays_electricity: boolean;
+            /**
+             * Club Electricity Km
+             * @description Electricity cost the club itself pays
+             */
+            club_electricity_km: number;
+            /**
+             * Heating Type
+             * @default electric
+             */
+            heating_type: string;
+            /**
              * Illustrative Club
              * @description True when calculated for the sample club
              */
@@ -611,6 +650,19 @@ export interface components {
             teams: number;
             electricity_kwh_year: components["schemas"]["Electricity"];
             travel: components["schemas"]["Travel"];
+            /**
+             * Pays Electricity
+             * @description Does the club pay the electricity bill?
+             * @default true
+             */
+            pays_electricity: boolean;
+            /**
+             * Heating Type
+             * @description How the facility is heated
+             * @default electric
+             * @enum {string}
+             */
+            heating_type: "electric" | "district" | "gas" | "wood" | "other" | "unknown";
         };
         /**
          * ClubRequest
@@ -791,6 +843,16 @@ export interface components {
             grid_year: number;
             /** Method */
             method: string[];
+            /**
+             * Club Pays Electricity
+             * @default true
+             */
+            club_pays_electricity: boolean;
+            /**
+             * Heating Type
+             * @default electric
+             */
+            heating_type: string;
             /** Illustrative Club */
             illustrative_club: boolean;
         };

@@ -1307,6 +1307,23 @@
           "basis": {
             "type": "string",
             "title": "Basis"
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "club",
+              "facility_owner",
+              "families"
+            ],
+            "title": "Owner",
+            "description": "Who takes (and saves from) this action",
+            "default": "club"
+          },
+          "counts_for_club": {
+            "type": "boolean",
+            "title": "Counts For Club",
+            "description": "Included in the club's totals and fee drop",
+            "default": true
           }
         },
         "type": "object",
@@ -1342,6 +1359,20 @@
           "fee_drop_per_child_km": {
             "type": "number",
             "title": "Fee Drop Per Child Km"
+          },
+          "facility_owner_saves_km_year": {
+            "type": "number",
+            "title": "Facility Owner Saves Km Year",
+            "description": "Savings for the facility owner when the club doesn't pay electricity",
+            "default": 0
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes",
+            "description": "Plain-language caveats to show"
           },
           "children": {
             "type": "integer",
@@ -1589,6 +1620,21 @@
             "type": "integer",
             "title": "Grid Year"
           },
+          "club_pays_electricity": {
+            "type": "boolean",
+            "title": "Club Pays Electricity",
+            "default": true
+          },
+          "club_electricity_km": {
+            "type": "number",
+            "title": "Club Electricity Km",
+            "description": "Electricity cost the club itself pays"
+          },
+          "heating_type": {
+            "type": "string",
+            "title": "Heating Type",
+            "default": "electric"
+          },
           "illustrative_club": {
             "type": "boolean",
             "title": "Illustrative Club",
@@ -1605,6 +1651,7 @@
           "travel_t_co2",
           "grid_gco2_per_kwh",
           "grid_year",
+          "club_electricity_km",
           "illustrative_club"
         ],
         "title": "Baseline"
@@ -1692,6 +1739,26 @@
           },
           "travel": {
             "$ref": "#/components/schemas/Travel"
+          },
+          "pays_electricity": {
+            "type": "boolean",
+            "title": "Pays Electricity",
+            "description": "Does the club pay the electricity bill?",
+            "default": true
+          },
+          "heating_type": {
+            "type": "string",
+            "enum": [
+              "electric",
+              "district",
+              "gas",
+              "wood",
+              "other",
+              "unknown"
+            ],
+            "title": "Heating Type",
+            "description": "How the facility is heated",
+            "default": "electric"
           }
         },
         "type": "object",
@@ -2191,6 +2258,16 @@
             },
             "type": "array",
             "title": "Method"
+          },
+          "club_pays_electricity": {
+            "type": "boolean",
+            "title": "Club Pays Electricity",
+            "default": true
+          },
+          "heating_type": {
+            "type": "string",
+            "title": "Heating Type",
+            "default": "electric"
           },
           "illustrative_club": {
             "type": "boolean",

@@ -124,9 +124,14 @@ def baseline(club: dict | None = None, country: str = "BIH") -> dict:
         "car": factor("car_average")["kg_co2e"],
         "minibus": factor("van_average")["kg_co2e"],
     }
+    pays = club.get("pays_electricity", True)
+    electricity_km = round(kwh * c["electricity_price"])
     return {
         "electricity_kwh": kwh,
-        "electricity_km": round(kwh * c["electricity_price"]),
+        "electricity_km": electricity_km,  # the facility's bill, whoever pays it
+        "club_pays_electricity": pays,
+        "club_electricity_km": electricity_km if pays else 0,
+        "heating_type": club.get("heating_type", "electric"),
         "electricity_t_co2": round(kwh * gi.gco2_per_kwh / 1e6, 1),
         "travel_km_driven": km * sum(veh.values()),
         "travel_km_cost": round(sum(km * n * c[f"fuel_cost_{v}"] for v, n in veh.items())),
@@ -180,13 +185,39 @@ def rank_actions(
             kwh_saved = el[u["saves_share_of"]] * u["share"]
             basis = f"{u['share']:.0%} of {u['saves_share_of']} ({el[u['saves_share_of']]} kWh)"
         rows.append(_row(u, cost, kwh_saved * price, kwh_saved * kg_per_kwh, kwh_saved, basis))
+    # Who acts: electricity upgrades belong to whoever pays the electricity bill.
+    pays = club.get("pays_electricity", True)
+    heating = club.get("heating_type", "electric")
+    for r in rows:
+        is_electricity = r["saves_kwh_year"] > 0 or r["id"] in {"led", "solar", "insul"}
+        r["owner"] = "facility_owner" if is_electricity and not pays else "club"
+        r["counts_for_club"] = r["owner"] == "club"
+
     rows.sort(key=lambda r: (r["payback_years"] is None, r["payback_years"] or 0))
-    total_km = sum(r["saves_km_year"] for r in rows)
+    mine = [r for r in rows if r["counts_for_club"]]
+    total_km = sum(r["saves_km_year"] for r in mine)
+    notes = []
+    if not pays:
+        notes.append(
+            "The club doesn't pay the electricity bill: LED, solar and insulation would save "
+            "money for the facility owner (e.g. the municipality). They are shown as a proposal "
+            "to make, not as club savings."
+        )
+    if heating != "electric":
+        kind = "an unknown system" if heating == "unknown" else heating
+        notes.append(
+            f"Heating by {kind} isn't included: only electricity is counted. Better insulation "
+            "would also lower that heating bill."
+        )
     return {
         "actions": rows,
         "total_saves_km_year": total_km,
-        "total_saves_t_co2_year": round(sum(r["saves_kg_co2_year"] for r in rows) / 1000, 1),
+        "total_saves_t_co2_year": round(sum(r["saves_kg_co2_year"] for r in mine) / 1000, 1),
         "fee_drop_per_child_km": round(total_km / club["children"], 1),
+        "facility_owner_saves_km_year": sum(
+            r["saves_km_year"] for r in rows if not r["counts_for_club"]
+        ),
+        "notes": notes,
         "children": club["children"],
         "assumptions": {
             "electricity_price_km_per_kwh": price,

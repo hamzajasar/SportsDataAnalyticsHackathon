@@ -43,4 +43,6 @@ class EnergyProfile(BaseModel):
     grid_gco2_per_kwh: float
     grid_year: int
     method: list[str]
+    club_pays_electricity: bool = True
+    heating_type: str = "electric"
     illustrative_club: bool
