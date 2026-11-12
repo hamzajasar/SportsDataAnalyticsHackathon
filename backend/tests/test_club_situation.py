@@ -57,8 +57,8 @@ def test_non_electric_heating_is_flagged(club):
     club["electricity_kwh_year"]["heating"] = 0
     plan = post("actions", club)
     assert any("Heating by district" in n for n in plan["notes"])
-    insul = next(a for a in plan["actions"] if a["id"] == "insul")
-    assert insul["saves_km_year"] == 0
+    ids = {a["id"] for a in plan["actions"]}
+    assert "insul" not in ids and "heat_setpoint" not in ids  # no electric heating to improve
     assert post("energy", club)["heating_type"] == "district"
 
 

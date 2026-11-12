@@ -45,10 +45,10 @@ def test_doubling_children_halves_fee_drop(club):
     )
 
 
-def test_no_floodlights_means_led_saves_nothing(club):
+def test_no_floodlights_means_no_floodlight_actions(club):
     club["electricity_kwh_year"]["floodlights"] = 0
-    led = next(a for a in post_actions({"club": club})["actions"] if a["id"] == "led")
-    assert led["saves_km_year"] == 0 and led["saves_kwh_year"] == 0
+    ids = {a["id"] for a in post_actions({"club": club})["actions"]}
+    assert "led" not in ids and "lights_off" not in ids
 
 
 def test_club_numbers_flow_into_baseline(club):

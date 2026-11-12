@@ -222,6 +222,9 @@ def rank_actions(
             "free" if r["cost_km"] == 0 else "low" if r["cost_km"] <= 1000 else "investment"
         )
 
+    # Hide actions that don't apply to this club (e.g. insulation of an electric heater it doesn't
+    # have, LED when it has no floodlights): they'd show up as "free" with no saving.
+    rows = [r for r in rows if r["saves_km_year"] > 0]
     rows.sort(key=lambda r: (r["payback_years"] is None, r["payback_years"] or 0))
     mine = [r for r in rows if r["counts_for_club"]]
     total_km = sum(r["saves_km_year"] for r in mine)

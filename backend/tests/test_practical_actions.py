@@ -41,8 +41,7 @@ def test_solar_size_limits(club):
     club["electricity_kwh_year"] = {"floodlights": 500000, "heating": 0, "hall_and_other": 0}
     assert plan_for(club)[0]["solar"]["name"] == "Solar roof 50 kWp"  # max
     club["electricity_kwh_year"] = {"floodlights": 0, "heating": 0, "hall_and_other": 0}
-    solar = plan_for(club)[0]["solar"]
-    assert solar["saves_km_year"] == 0 and solar["cost_km"] == 0
+    assert "solar" not in plan_for(club)[0]  # no electricity use -> no solar suggestion
 
 
 def test_free_and_low_cost_actions_present_and_first():
@@ -64,3 +63,10 @@ def test_kit_swap_saves_for_families_not_the_club():
     aff = client.post("/api/club/affordability", json={}).json()
     assert aff["families_save_per_child_km"] > 0
     assert "kit_swap" not in {a["id"] for a in aff["actions"]}
+
+
+def test_no_listed_action_is_a_zero_saving_free_action(club):
+    club["heating_type"] = "district"
+    club["electricity_kwh_year"]["heating"] = 0
+    for a in plan_for(club)[1]["actions"]:
+        assert a["saves_km_year"] > 0, a["id"]
