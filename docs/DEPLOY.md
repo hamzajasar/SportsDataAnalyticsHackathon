@@ -26,4 +26,3 @@ Render → service → Environment → `CORS_ORIGINS` = `["https://club-footprin
 ## Before the presentation
 - Render's free tier **sleeps after ~15 min idle**; the first request then takes ~1 minute.
   Open the app 2–3 minutes before presenting.
-- In production the Data explorer is hidden and its API disabled (raw data isn't deployed).

@@ -21,8 +21,7 @@ Summary bar **"Save X KM/yr · Y t CO₂/yr · fee −Z KM/child"** + top 3 acti
 tabs **Energy | Travel | Share | Affordability | Assumptions & Sources** · printable board report ·
 opens with the sample Sarajevo club, every assumption editable.
 
-**Already in `dev`:** Footprint page (grid chart + electricity / trip / kit calculators), Data explorer,
-How-it-works page; API: `/api/sustainability/*`, `/api/club/sample`, `/api/club/assumptions`,
+**Already in `dev`:** Footprint page (grid chart + electricity / trip / kit calculators), How-it-works page; API: `/api/sustainability/*`, `/api/club/sample`, `/api/club/assumptions`,
 `/api/venues` (3,705 BiH venues, distance filter), `/api/sources`.
 
 ## Backlog (in priority order per lane)

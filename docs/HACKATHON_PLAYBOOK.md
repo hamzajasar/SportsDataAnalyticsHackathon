@@ -3,7 +3,7 @@
 ## Hour 0 – setup (15 min)
 1. Everyone: clone, `make setup`, `make dev` → app on http://localhost:5173, API docs on http://localhost:8000/docs
 2. Put the provided datasets in `data/raw/` (share files via drive, **not git**)
-3. `make profile` → read `data/processed/_profile.md`; open the **Data** page in the app
+3. `make profile` → read `data/processed/_profile.md`
 4. Put the brief + judging criteria in `docs/`
 
 ## Hour 0–1 – choose the topic

@@ -18,57 +18,6 @@ export function useHealth() {
   })
 }
 
-// ---- Datasets (generic explorer over data/raw) ----
-
-export type DatasetPreviewParams = {
-  limit?: number
-  offset?: number
-  sort?: string | null
-  desc?: boolean
-}
-
-export function useDatasets() {
-  return useQuery({
-    queryKey: ['datasets'],
-    queryFn: async () => {
-      const { data, error } = await api.GET('/api/datasets')
-      if (error) throw error
-      return data
-    },
-  })
-}
-
-export function useDatasetPreview(id: string | undefined, params: DatasetPreviewParams = {}) {
-  return useQuery({
-    queryKey: ['datasets', id, 'preview', params],
-    enabled: !!id,
-    placeholderData: keepPreviousData,
-    queryFn: async () => {
-      const { data, error } = await api.GET('/api/datasets/preview', {
-        params: { query: { id: id!, ...params } },
-      })
-      if (error) throw error
-      return data
-    },
-  })
-}
-
-export function useDatasetSummary(id: string | undefined) {
-  return useQuery({
-    queryKey: ['datasets', id, 'summary'],
-    enabled: !!id,
-    queryFn: async () => {
-      const { data, error } = await api.GET('/api/datasets/summary', {
-        params: { query: { id: id! } },
-      })
-      if (error) throw error
-      return data
-    },
-  })
-}
-
-// ---- Sustainability (Topic 6) ----
-
 export type TripRequest = components['schemas']['TripRequest']
 
 export function useGridIntensity(countries: string[], fromYear = 2010) {

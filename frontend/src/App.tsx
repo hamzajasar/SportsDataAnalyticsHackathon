@@ -26,9 +26,6 @@ const BillPage = lazy(() => import('@/pages/club/BillPage').then((m) => ({ defau
 const BoardReportPage = lazy(() =>
   import('@/pages/BoardReportPage').then((m) => ({ default: m.BoardReportPage })),
 )
-const DataExplorerPage = lazy(() =>
-  import('@/pages/DataExplorerPage').then((m) => ({ default: m.DataExplorerPage })),
-)
 const MethodologyPage = lazy(() =>
   import('@/pages/MethodologyPage').then((m) => ({ default: m.MethodologyPage })),
 )
@@ -61,7 +58,6 @@ export default function App() {
               <Route path="bill" element={<BillPage />} />
               <Route path="board-report" element={<BoardReportPage />} />
             </Route>
-            {import.meta.env.DEV && <Route path="data" element={<DataExplorerPage />} />}
             <Route path="methodology" element={<MethodologyPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>

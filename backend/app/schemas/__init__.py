@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -6,36 +6,6 @@ from pydantic import BaseModel, Field
 class Health(BaseModel):
     status: str
     database: bool
-
-
-class DatasetInfo(BaseModel):
-    id: str
-    name: str
-    format: str
-    size_bytes: int
-
-
-class DatasetPreview(BaseModel):
-    columns: list[str]
-    rows: list[list[Any]]
-    total_rows: int
-
-
-class ColumnSummary(BaseModel):
-    name: str
-    type: str
-    null_pct: float
-    approx_unique: int
-    min: str | None
-    max: str | None
-    mean: float | None
-    likely_key: bool
-
-
-class DatasetSummary(BaseModel):
-    dataset_id: str
-    rows: int
-    columns: list[ColumnSummary]
 
 
 # ---- Sustainability (Topic 6) ----

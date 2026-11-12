@@ -72,7 +72,6 @@ make profile        # rows, columns, types, missing %, likely keys, probable joi
 make seed           # optional: load them into Postgres as raw_* tables
 ```
 
-The **Data** page in the app (`/data`) browses any file in `data/raw/` (rows, sorting, column stats).
 In notebooks / backend code: `from app.services.datasets import load_df` → `load_df("file.csv")`.
 
 Who does what: [docs/WORK_PLAN.md](docs/WORK_PLAN.md). Plan for the day: [docs/HACKATHON_PLAYBOOK.md](docs/HACKATHON_PLAYBOOK.md).
@@ -96,7 +95,7 @@ frontend/
   src/
     api/            # generated schema.d.ts + typed client + React Query hooks
     pages/          # one component per route
-    components/     # common/ (DataTable, StatCard, PageHeader, QueryState, ErrorBoundary),
+    components/     # common/ (StatCard, PageHeader, QueryState, ErrorBoundary),
                     # layout/, ui/ (shadcn primitives)
     lib/            # format, table, errors helpers
     test/           # Vitest setup + render helpers

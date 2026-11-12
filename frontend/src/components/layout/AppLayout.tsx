@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { Activity, Database, Info, Moon, Sun } from 'lucide-react'
+import { Activity, Info, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useHealth } from '@/api/queries'
@@ -8,7 +8,6 @@ import { useTheme } from '@/hooks/use-theme'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 
 const secondaryNav = [
-  ...(import.meta.env.DEV ? [{ to: '/data', label: 'Data', icon: Database }] : []),
   { to: '/methodology', label: 'How it works', icon: Info },
 ]
 

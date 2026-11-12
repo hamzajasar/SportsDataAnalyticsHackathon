@@ -21,57 +21,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/datasets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Datasets */
-        get: operations["listDatasets"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/datasets/preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Preview Dataset */
-        get: operations["previewDataset"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/datasets/summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Summarize Dataset */
-        get: operations["summarizeDataset"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/sustainability/grid-intensity": {
         parameters: {
             query?: never;
@@ -802,25 +751,6 @@ export interface components {
              */
             electricity_price_km_per_kwh?: number | null;
         };
-        /** ColumnSummary */
-        ColumnSummary: {
-            /** Name */
-            name: string;
-            /** Type */
-            type: string;
-            /** Null Pct */
-            null_pct: number;
-            /** Approx Unique */
-            approx_unique: number;
-            /** Min */
-            min: string | null;
-            /** Max */
-            max: string | null;
-            /** Mean */
-            mean: number | null;
-            /** Likely Key */
-            likely_key: boolean;
-        };
         /**
          * ConfirmedBill
          * @description The numbers the club typed in from its bill.
@@ -858,35 +788,6 @@ export interface components {
             note?: string | null;
             /** Source */
             source: string;
-        };
-        /** DatasetInfo */
-        DatasetInfo: {
-            /** Id */
-            id: string;
-            /** Name */
-            name: string;
-            /** Format */
-            format: string;
-            /** Size Bytes */
-            size_bytes: number;
-        };
-        /** DatasetPreview */
-        DatasetPreview: {
-            /** Columns */
-            columns: string[];
-            /** Rows */
-            rows: unknown[][];
-            /** Total Rows */
-            total_rows: number;
-        };
-        /** DatasetSummary */
-        DatasetSummary: {
-            /** Dataset Id */
-            dataset_id: string;
-            /** Rows */
-            rows: number;
-            /** Columns */
-            columns: components["schemas"]["ColumnSummary"][];
         };
         /** Distance */
         Distance: {
@@ -1524,92 +1425,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Health"];
-                };
-            };
-        };
-    };
-    listDatasets: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DatasetInfo"][];
-                };
-            };
-        };
-    };
-    previewDataset: {
-        parameters: {
-            query: {
-                id: string;
-                limit?: number;
-                offset?: number;
-                sort?: string | null;
-                desc?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DatasetPreview"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    summarizeDataset: {
-        parameters: {
-            query: {
-                id: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DatasetSummary"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
