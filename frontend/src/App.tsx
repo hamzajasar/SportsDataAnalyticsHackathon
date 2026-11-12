@@ -1,11 +1,29 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { ClubLayout } from '@/components/layout/ClubLayout'
 import { Skeleton } from '@/components/ui/skeleton'
 
-// Each page is its own chunk: the first load only downloads the page you open.
-const FootprintPage = lazy(() =>
-  import('@/pages/FootprintPage').then((m) => ({ default: m.FootprintPage })),
+const OverviewPage = lazy(() =>
+  import('@/pages/club/OverviewPage').then((m) => ({ default: m.OverviewPage })),
+)
+const EnergyPage = lazy(() =>
+  import('@/pages/club/EnergyPage').then((m) => ({ default: m.EnergyPage })),
+)
+const TravelPage = lazy(() =>
+  import('@/pages/club/TravelPage').then((m) => ({ default: m.TravelPage })),
+)
+const SharePage = lazy(() =>
+  import('@/pages/club/SharePage').then((m) => ({ default: m.SharePage })),
+)
+const AffordabilityPage = lazy(() =>
+  import('@/pages/club/AffordabilityPage').then((m) => ({ default: m.AffordabilityPage })),
+)
+const SourcesPage = lazy(() =>
+  import('@/pages/club/SourcesPage').then((m) => ({ default: m.SourcesPage })),
+)
+const BoardReportPage = lazy(() =>
+  import('@/pages/BoardReportPage').then((m) => ({ default: m.BoardReportPage })),
 )
 const DataExplorerPage = lazy(() =>
   import('@/pages/DataExplorerPage').then((m) => ({ default: m.DataExplorerPage })),
@@ -32,8 +50,16 @@ export default function App() {
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route index element={<FootprintPage />} />
-            <Route path="data" element={<DataExplorerPage />} />
+            <Route element={<ClubLayout />}>
+              <Route index element={<OverviewPage />} />
+              <Route path="energy" element={<EnergyPage />} />
+              <Route path="travel" element={<TravelPage />} />
+              <Route path="share" element={<SharePage />} />
+              <Route path="affordability" element={<AffordabilityPage />} />
+              <Route path="sources" element={<SourcesPage />} />
+              <Route path="board-report" element={<BoardReportPage />} />
+            </Route>
+            {import.meta.env.DEV && <Route path="data" element={<DataExplorerPage />} />}
             <Route path="methodology" element={<MethodologyPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
