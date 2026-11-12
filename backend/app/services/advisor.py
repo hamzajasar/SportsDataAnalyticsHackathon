@@ -16,7 +16,7 @@ from datetime import date
 
 from app.schemas.bill import BillReading
 from app.services import actions, board_text, waste
-from app.services.bill_reader import plausibility_warnings
+from app.services.bill_checks import plausibility_warnings
 
 SCALE_MIN, SCALE_MAX = 0.25, 4.0  # one bill may not move the yearly estimate more than this
 

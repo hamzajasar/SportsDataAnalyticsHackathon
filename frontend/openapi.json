@@ -1096,55 +1096,13 @@
         }
       }
     },
-    "/api/club/bill/read": {
-      "post": {
-        "tags": [
-          "club"
-        ],
-        "summary": "Read Bill",
-        "description": "Read an electricity bill or fuel receipt photo (JPEG, PNG, WebP or GIF, up to 5 MB).\n\nThe photo is processed in memory and not stored. The numbers are a first reading: show them to\nthe user to confirm or correct before calling `/club/bill/analyse`.",
-        "operationId": "readBill",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_readBill"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BillReadResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/club/bill/analyse": {
       "post": {
         "tags": [
           "club"
         ],
         "summary": "Analyse Bill",
-        "description": "Waste check, updated plan (before/after) and a draft board decision in Bosnian.\n\nTakes the confirmed numbers, not a photo, and makes no AI call. `club: null` = sample club.",
+        "description": "Waste check, updated plan (before/after) and a draft board decision in Bosnian.\n\nTakes the numbers from the club's bill (no photo, no AI call). `club: null` = sample club.",
         "operationId": "analyseBill",
         "requestBody": {
           "content": {
@@ -2306,179 +2264,6 @@
         ],
         "title": "BillAnalysis"
       },
-      "BillReadResponse": {
-        "properties": {
-          "reading": {
-            "$ref": "#/components/schemas/BillReading"
-          },
-          "warnings": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Warnings"
-          },
-          "model": {
-            "type": "string",
-            "title": "Model"
-          }
-        },
-        "type": "object",
-        "required": [
-          "reading",
-          "warnings",
-          "model"
-        ],
-        "title": "BillReadResponse"
-      },
-      "BillReading": {
-        "properties": {
-          "kind": {
-            "type": "string",
-            "enum": [
-              "electricity",
-              "fuel",
-              "other"
-            ],
-            "title": "Kind"
-          },
-          "period_year": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Period Year"
-          },
-          "period_month": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Period Month"
-          },
-          "kwh_total": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Kwh Total"
-          },
-          "amount_total_km": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Amount Total Km"
-          },
-          "unit_price_km_per_kwh": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Unit Price Km Per Kwh"
-          },
-          "litres": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Litres"
-          },
-          "fuel_type": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "diesel",
-                  "petrol",
-                  "lpg",
-                  "other"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Fuel Type"
-          },
-          "confidence": {
-            "type": "string",
-            "enum": [
-              "high",
-              "medium",
-              "low"
-            ],
-            "title": "Confidence"
-          },
-          "unreadable_reason": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Unreadable Reason"
-          },
-          "note": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Note"
-          }
-        },
-        "type": "object",
-        "required": [
-          "kind",
-          "confidence"
-        ],
-        "title": "BillReading",
-        "description": "Everything the reader found on the photo. Null means 'not visible', never a guess."
-      },
-      "Body_readBill": {
-        "properties": {
-          "file": {
-            "type": "string",
-            "contentMediaType": "application/octet-stream",
-            "title": "File"
-          }
-        },
-        "type": "object",
-        "required": [
-          "file"
-        ],
-        "title": "Body_readBill"
-      },
       "City": {
         "properties": {
           "city": {
@@ -2834,7 +2619,7 @@
           "kind"
         ],
         "title": "ConfirmedBill",
-        "description": "The numbers a person confirmed (or corrected) after the reader's first pass."
+        "description": "The numbers the club typed in from its bill."
       },
       "CostAssumption": {
         "properties": {

@@ -1,9 +1,7 @@
-"""'Snap your bill': what the AI reads from a photo, what a person confirms, what we derive.
+"""Check a bill: the numbers a club types in from a bill, and what we derive from them.
 
-Two shapes on purpose:
-- `BillReading` is the lenient output of the AI reader (any field may be missing).
-- `ConfirmedBill` is the strict input to the analysis. A person checks and edits the numbers
-  first, so an OCR slip can never silently change the club's plan.
+- `ConfirmedBill` is the strict input the club sends.
+- `BillReading` is the internal, lenient form the sanity checks run on (any field may be missing).
 """
 
 from typing import Literal
@@ -14,7 +12,7 @@ from app.schemas.club import ClubRequest
 
 
 class BillReading(BaseModel):
-    """Everything the reader found on the photo. Null means 'not visible', never a guess."""
+    """A bill's numbers for the sanity checks. Null means 'not given', never a guess."""
 
     kind: Literal["electricity", "fuel", "other"]
     period_year: int | None = None
@@ -29,14 +27,8 @@ class BillReading(BaseModel):
     note: str | None = None
 
 
-class BillReadResponse(BaseModel):
-    reading: BillReading
-    warnings: list[str]
-    model: str
-
-
 class ConfirmedBill(BaseModel):
-    """The numbers a person confirmed (or corrected) after the reader's first pass."""
+    """The numbers the club typed in from its bill."""
 
     kind: Literal["electricity", "fuel"]
     period_year: int | None = Field(None, ge=2000, le=2100)

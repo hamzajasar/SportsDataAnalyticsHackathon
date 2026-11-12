@@ -357,29 +357,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/club/bill/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Read Bill
-         * @description Read an electricity bill or fuel receipt photo (JPEG, PNG, WebP or GIF, up to 5 MB).
-         *
-         *     The photo is processed in memory and not stored. The numbers are a first reading: show them to
-         *     the user to confirm or correct before calling `/club/bill/analyse`.
-         */
-        post: operations["readBill"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/club/bill/analyse": {
         parameters: {
             query?: never;
@@ -393,7 +370,7 @@ export interface paths {
          * Analyse Bill
          * @description Waste check, updated plan (before/after) and a draft board decision in Bosnian.
          *
-         *     Takes the confirmed numbers, not a photo, and makes no AI call. `club: null` = sample club.
+         *     Takes the numbers from the club's bill (no photo, no AI call). `club: null` = sample club.
          */
         post: operations["analyseBill"];
         delete?: never;
@@ -761,53 +738,6 @@ export interface components {
             /** Illustrative Club */
             illustrative_club: boolean;
         };
-        /** BillReadResponse */
-        BillReadResponse: {
-            reading: components["schemas"]["BillReading"];
-            /** Warnings */
-            warnings: string[];
-            /** Model */
-            model: string;
-        };
-        /**
-         * BillReading
-         * @description Everything the reader found on the photo. Null means 'not visible', never a guess.
-         */
-        BillReading: {
-            /**
-             * Kind
-             * @enum {string}
-             */
-            kind: "electricity" | "fuel" | "other";
-            /** Period Year */
-            period_year?: number | null;
-            /** Period Month */
-            period_month?: number | null;
-            /** Kwh Total */
-            kwh_total?: number | null;
-            /** Amount Total Km */
-            amount_total_km?: number | null;
-            /** Unit Price Km Per Kwh */
-            unit_price_km_per_kwh?: number | null;
-            /** Litres */
-            litres?: number | null;
-            /** Fuel Type */
-            fuel_type?: ("diesel" | "petrol" | "lpg" | "other") | null;
-            /**
-             * Confidence
-             * @enum {string}
-             */
-            confidence: "high" | "medium" | "low";
-            /** Unreadable Reason */
-            unreadable_reason?: string | null;
-            /** Note */
-            note?: string | null;
-        };
-        /** Body_readBill */
-        Body_readBill: {
-            /** File */
-            file: string;
-        };
         /** City */
         City: {
             /** City */
@@ -893,7 +823,7 @@ export interface components {
         };
         /**
          * ConfirmedBill
-         * @description The numbers a person confirmed (or corrected) after the reader's first pass.
+         * @description The numbers the club typed in from its bill.
          */
         ConfirmedBill: {
             /**
@@ -2167,39 +2097,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SeasonTravel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    readBill: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_readBill"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BillReadResponse"];
                 };
             };
             /** @description Validation Error */

@@ -17,10 +17,6 @@ class Settings(BaseSettings):
     # Raw-data explorer endpoints (/api/datasets/*). On for local dev, OFF when deployed
     # so the organisers' datasets are never publicly downloadable.
     expose_datasets: bool | None = None
-    # "Snap your bill": photo -> numbers via the Claude API (needs ANTHROPIC_API_KEY or an
-    # `ant auth login` profile; without credentials the read endpoint answers 503).
-    anthropic_model: str = "claude-opus-5-5"
-    bill_reads_per_hour: int = 20  # per client IP: every read is a paid API call
 
     @field_validator("database_url")
     @classmethod
