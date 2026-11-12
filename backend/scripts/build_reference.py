@@ -7,6 +7,8 @@ deployed server work without the raw files. Licences allow redistribution with a
 (see docs/DATA_SOURCES.md) — the `source` column carries the credit.
 """
 
+import json
+
 import pandas as pd
 
 from app.core.config import settings
@@ -122,6 +124,73 @@ def build_factors() -> pd.DataFrame:
     return pd.DataFrame(rows).drop_duplicates("key")
 
 
+# ---- Club tables (Sarajevo weather, solar, venues, prices) -----------------------------------
+
+CLEAN_DIR = settings.data_dir / "clean"
+WEATHER_SOURCE = "Open-Meteo historical weather, Sarajevo 2024-2025 (CC BY 4.0)"
+PV_SOURCE = "PVGIS (c) European Communities; tilt 35, south, 14% losses"
+OSM_SOURCE = "OpenStreetMap contributors (ODbL)"
+ASSUMPTION = "ASSUMPTION - verify before use"
+COACH_PASSENGERS = 35  # assumed average load of a hired coach (DEFRA gives per passenger-km)
+
+
+def build_temperature() -> pd.DataFrame:
+    w = pd.read_csv(RAW / "weather_sarajevo_daily.csv", parse_dates=["time"])
+    w = w[w["time"].dt.year.isin([2024, 2025])].dropna(subset=["temperature_2m_mean"])
+    m = w.groupby(w["time"].dt.month)["temperature_2m_mean"].mean().round(1)
+    return pd.DataFrame({"month": m.index, "mean_temp_c": m.values, "source": WEATHER_SOURCE})
+
+
+def build_pv_yield() -> pd.DataFrame:
+    d = json.loads((RAW / "pvgis_sarajevo.json").read_text(encoding="utf-8"))
+    months = d["outputs"]["monthly"]["fixed"]
+    return pd.DataFrame(
+        {
+            "month": [m["month"] for m in months],
+            "kwh_per_kwp": [round(m["E_m"], 1) for m in months],
+            "source": PV_SOURCE,
+        }
+    )
+
+
+def build_venues() -> pd.DataFrame:
+    v = pd.read_csv(RAW / "osm_ba_sports_facilities.csv").dropna(subset=["lat", "lon"])
+    return pd.DataFrame(
+        {
+            "osm_id": v["osm_type"] + "/" + v["osm_id"].astype(str),
+            "name": v["name"].fillna(""),
+            "leisure": v["leisure"],
+            "sport": v["sport"].fillna(""),
+            "lat": v["lat"],
+            "lon": v["lon"],
+            "source": OSM_SOURCE,
+        }
+    )
+
+
+def build_costs(factors: pd.DataFrame) -> pd.DataFrame:
+    """Prices come from data/clean/prices.json (hand-sourced: Eurostat + nafta.hr)."""
+    p = json.loads((CLEAN_DIR / "prices.json").read_text(encoding="utf-8"))
+    kg = factors.set_index("key")["kg_co2e"]
+    van, coach_pkm = float(kg["van_average"]), float(kg["coach"])
+    es, fs = p["electricity_source"], p["fuel_source"]
+    use = p["consumption_l_per_100km"]
+    cost = p["fuel_km_per_km_driven"]
+    ghg = "UK GHG 2025 (OGL v3.0)"
+    rows = [
+        ("electricity_price", p["electricity_km_per_kwh"], "KM/kWh", "BiH non-household tariff, band IB", es),
+        ("diesel_price", p["diesel_km_per_litre"], "KM/litre", "average pump price", fs),
+        ("petrol_price", p["petrol_km_per_litre"], "KM/litre", "Premium 95 average pump price", fs),
+        ("fuel_use_car", use["car"], "l/100km", "petrol car", ASSUMPTION),
+        ("fuel_use_minibus", use["minibus"], "l/100km", "diesel minibus", ASSUMPTION),
+        ("fuel_cost_car", cost["car"], "KM/vehicle-km", "petrol price x consumption", f"{fs}; {ASSUMPTION}"),
+        ("fuel_cost_minibus", cost["minibus"], "KM/vehicle-km", "diesel price x consumption", f"{fs}; {ASSUMPTION}"),
+        ("minibus_kg_per_km", van, "kg CO2e/vehicle-km", "PROXY: DEFRA has no minibus row; average van up to 3.5 t, unknown fuel, km", ghg),
+        ("coach_kg_per_km", round(coach_pkm * COACH_PASSENGERS, 3), "kg CO2e/vehicle-km", f"DEFRA coach {coach_pkm} kg CO2e per passenger-km x assumed {COACH_PASSENGERS} passengers (editable)", f"{ghg} + assumed occupancy"),
+    ]  # fmt: skip
+    return pd.DataFrame(rows, columns=["key", "value", "unit", "note", "source"])
+
+
 def main() -> None:
     REFERENCE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -140,6 +209,11 @@ def main() -> None:
 
     f = build_factors()
     f.to_csv(REFERENCE_DIR / "emission_factors.csv", index=False)
+
+    build_temperature().to_csv(REFERENCE_DIR / "sarajevo_temperature.csv", index=False)
+    build_pv_yield().to_csv(REFERENCE_DIR / "pv_yield_sarajevo.csv", index=False)
+    build_venues().to_csv(REFERENCE_DIR / "sport_venues_bih.csv", index=False)
+    build_costs(f).to_csv(REFERENCE_DIR / "cost_assumptions.csv", index=False)
 
     for p in sorted(REFERENCE_DIR.glob("*.csv")):
         print(f"  {p.name:<24} {len(pd.read_csv(p)):>6} rows  {p.stat().st_size / 1024:6.0f} KB")

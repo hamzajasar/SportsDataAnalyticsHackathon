@@ -12,11 +12,11 @@
 | Price assumptions (electricity, fuel) | KM costs, payback | — | Mark as assumptions on the slide | `backend/app/reference/cost_assumptions.csv` (**verify before the pitch**) |
 | Organisers' synthetic data pack | Club-level energy / travel / children (main club data) | Hackathon use | "Sports Analytics Hackathon synthetic data pack" | Raw in `data/raw/pack/` (ignored) → cleaned into `data/clean/` |
 
-The full list with credit lines is also served by the API at `/api/sources` (from `data/clean/sources.json`).
+The full list with credit lines is also served by the API at `/api/sources` (from `backend/app/reference/sources.json`).
 
 ## How to get the data
 ```bash
-make data        # downloads all open datasets (raw -> data/raw, cleaned -> data/clean)
+make data        # downloads all open datasets into data/raw (git-ignored)
 make reference   # rebuilds ALL committed tables in backend/app/reference/ (reproducible, no diff if unchanged)
 make profile     # data report -> data/processed/_profile.md
 ```

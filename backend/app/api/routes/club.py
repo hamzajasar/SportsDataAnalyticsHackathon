@@ -1,4 +1,4 @@
-"""Club data, assumptions, venues and sources (from data/clean, shared via git)."""
+"""Club data, assumptions, venues and sources (from app/reference, shipped with the backend)."""
 
 from typing import Any
 

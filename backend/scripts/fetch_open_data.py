@@ -27,6 +27,17 @@ UA = {"User-Agent": "sports-analytics-hackathon/0.1 (data download script)"}
 PLACES = {"sarajevo": (43.8563, 18.4131)}
 WEATHER_START, WEATHER_END = "2015-01-01", "2025-12-31"
 
+
+def pvgis(path: Path) -> None:
+    # PVGIS (EU JRC), free to reuse with source acknowledged: yearly kWh per kWp, Sarajevo
+    lat, lon = PLACES["sarajevo"]
+    params = {"lat": lat, "lon": lon, "peakpower": 1, "loss": 14, "angle": 35, "aspect": 0}
+    url = "https://re.jrc.ec.europa.eu/api/v5_3/PVcalc?" + urllib.parse.urlencode(
+        {**params, "outputformat": "json"}
+    )
+    path.write_bytes(fetch(url, timeout=90))
+
+
 OVERPASS_MIRRORS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
@@ -176,6 +187,7 @@ def main() -> None:
             (f"Daily weather {p} (Open-Meteo)", OUT / f"weather_{p}_daily.csv", weather(p, *ll))
             for p, ll in PLACES.items()
         ],
+        ("Solar yield Sarajevo (PVGIS)", OUT / "pvgis_sarajevo.json", pvgis),
         (
             "BiH sports facilities (OpenStreetMap)",
             OUT / "osm_ba_sports_facilities.csv",

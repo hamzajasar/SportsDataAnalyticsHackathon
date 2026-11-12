@@ -1,6 +1,10 @@
 key,value,unit,note,source
-electricity_price,0.22,KM/kWh,non-household tariff estimate,ASSUMPTION - verify before use
-fuel_cost_car,0.32,KM/vehicle-km,fuel cost per km driven,ASSUMPTION - verify before use
-fuel_cost_minibus,0.34,KM/vehicle-km,fuel cost per km driven,ASSUMPTION - verify before use
+electricity_price,0.291,KM/kWh,"BiH non-household tariff, band IB","Eurostat nrg_pc_205, BiH, non-household band IB (20-499 MWh), all taxes, 2026-S1; converted at the fixed 1.95583 KM/EUR peg"
+diesel_price,3.79,KM/litre,average pump price,"nafta.hr average fuel prices Bosnia and Herzegovina, Diesel D5 and Premium 95, updated 2026-11-12"
+petrol_price,3.22,KM/litre,Premium 95 average pump price,"nafta.hr average fuel prices Bosnia and Herzegovina, Diesel D5 and Premium 95, updated 2026-11-12"
+fuel_use_car,7.0,l/100km,petrol car,ASSUMPTION - verify before use
+fuel_use_minibus,10.0,l/100km,diesel minibus,ASSUMPTION - verify before use
+fuel_cost_car,0.225,KM/vehicle-km,petrol price x consumption,"nafta.hr average fuel prices Bosnia and Herzegovina, Diesel D5 and Premium 95, updated 2026-11-12; ASSUMPTION - verify before use"
+fuel_cost_minibus,0.379,KM/vehicle-km,diesel price x consumption,"nafta.hr average fuel prices Bosnia and Herzegovina, Diesel D5 and Premium 95, updated 2026-11-12; ASSUMPTION - verify before use"
 minibus_kg_per_km,0.2543,kg CO2e/vehicle-km,"PROXY: DEFRA has no minibus row; average van up to 3.5 t, unknown fuel, km",UK GHG 2025 (OGL v3.0)
 coach_kg_per_km,0.972,kg CO2e/vehicle-km,DEFRA coach 0.02776 kg CO2e per passenger-km x assumed 35 passengers (editable),UK GHG 2025 (OGL v3.0) + assumed occupancy

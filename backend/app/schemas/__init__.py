@@ -110,7 +110,7 @@ class TripComparison(BaseModel):
     source: str
 
 
-# ---- Club data from data/clean (draft shapes until the organisers' pack is integrated) ----
+# ---- Club data from app/reference (draft shapes until the organisers' pack is integrated) ----
 
 
 class Venue(BaseModel):

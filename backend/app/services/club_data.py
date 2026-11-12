@@ -4,10 +4,9 @@ One source per number:
 - app/reference/*.csv (committed, built by `make reference`):
     emission_factors, grid_intensity, electricity_mix   -> services/emissions.py
     sport_venues_bih, pv_yield_sarajevo, sarajevo_temperature, cost_assumptions -> this module
-- data/clean/*.json (committed): only what has no reference table yet —
-    sample_club.json, upgrades.json, sources.json
-data/clean/grid_factor.json and vehicle_factors.json duplicate the reference tables and are not
-read by the API.
+- app/reference/*.json (committed, hand-maintained): sample_club.json, upgrades.json, sources.json.
+  Everything the API serves lives under backend/app/reference so it ships inside the Docker image.
+- data/clean/prices.json is a build-time input only (hand-sourced prices -> cost_assumptions.csv).
 """
 
 import json
@@ -17,7 +16,6 @@ from typing import Any
 
 import pandas as pd
 
-from app.core.config import settings
 from app.services.emissions import REFERENCE_DIR
 
 # Only these files can be served — never build a path from user input.
@@ -38,9 +36,9 @@ CSV_FILES = {
 def load_json(name: str) -> Any:
     if name not in JSON_FILES:
         raise KeyError(name)
-    path = settings.data_dir / "clean" / JSON_FILES[name]
+    path = REFERENCE_DIR / JSON_FILES[name]
     if not path.exists():
-        raise FileNotFoundError(f"data/clean/{JSON_FILES[name]} is missing — run git pull")
+        raise FileNotFoundError(f"app/reference/{JSON_FILES[name]} is missing — run git pull")
     return json.loads(path.read_text(encoding="utf-8"))
 
 

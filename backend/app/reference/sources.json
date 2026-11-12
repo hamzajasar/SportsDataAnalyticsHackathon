@@ -11,12 +11,12 @@
   },
   {
    "id": "ember",
-   "name": "Ember yearly electricity data",
+   "name": "Ember electricity carbon intensity, via Our World in Data",
    "use": "Grid CO2 per kWh: BiH vs Croatia vs EU",
    "licence": "CC BY 4.0",
-   "credit": "Ember, Yearly Electricity Data (CC BY 4.0)",
-   "url": "https://ember-energy.org/data/yearly-electricity-data/",
-   "file": "grid_factor.json",
+   "credit": "Ember, via Our World in Data (CC BY 4.0)",
+   "url": "https://ourworldindata.org/grapher/carbon-intensity-electricity",
+   "file": "grid_intensity.csv, electricity_mix.csv",
    "status": "loaded"
   },
   {
@@ -26,7 +26,7 @@
    "licence": "Open Government Licence v3.0",
    "credit": "Contains public sector information licensed under the Open Government Licence v3.0. DESNZ/Defra, GHG Conversion Factors 2025",
    "url": "https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2025",
-   "file": "vehicle_factors.json",
+   "file": "emission_factors.csv",
    "status": "loaded"
   },
   {
@@ -36,7 +36,7 @@
    "licence": "CC BY 4.0 (free API is non-commercial)",
    "credit": "Weather data by Open-Meteo.com (CC BY 4.0)",
    "url": "https://open-meteo.com/",
-   "file": "sarajevo_monthly_temp.json",
+   "file": "sarajevo_temperature.csv",
    "status": "loaded"
   },
   {
@@ -46,7 +46,7 @@
    "licence": "ODbL 1.0",
    "credit": "© OpenStreetMap contributors (ODbL)",
    "url": "https://www.openstreetmap.org/copyright",
-   "file": "osm_sport_venues.json",
+   "file": "sport_venues_bih.csv",
    "status": "loaded"
   },
   {
@@ -56,7 +56,8 @@
    "licence": "Eurostat reuse policy (CC BY 4.0), credit source",
    "credit": "Source: Eurostat (nrg_pc_205)",
    "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_205",
-   "status": "planned"
+   "status": "loaded (BiH 0.149 EUR/kWh, 2026-S1, band IB)",
+   "file": "cost_assumptions.csv"
   },
   {
    "id": "pvgis",
@@ -65,16 +66,18 @@
    "licence": "Free reuse with source acknowledged",
    "credit": "PVGIS © European Communities",
    "url": "https://re.jrc.ec.europa.eu/pvg_tools/en/",
-   "status": "planned"
+   "status": "loaded",
+   "file": "pv_yield_sarajevo.csv"
   },
   {
    "id": "fuel",
-   "name": "BiH fuel prices (FBiH Ministry of Trade / aggregator)",
+   "name": "nafta.hr BiH average fuel prices",
    "use": "KM cost of away trips",
-   "licence": "Not verified",
-   "credit": "TBD once source confirmed",
-   "url": null,
-   "status": "planned, licence to check"
+   "licence": "Public price listing; cite source (terms not verified)",
+   "credit": "Fuel prices: nafta.hr, 12 Nov 2026",
+   "url": "https://nafta.hr/en/fuel-prices-bosnia-and-herzegovina/",
+   "status": "loaded (diesel 3.79, petrol 3.22 KM/L); consumption l/100km is an assumption",
+   "file": "cost_assumptions.csv"
   },
   {
    "id": "wages",
