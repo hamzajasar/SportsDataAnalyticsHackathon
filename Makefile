@@ -64,7 +64,7 @@ backend: ## Run FastAPI with reload on :8000 (docs at /docs)
 frontend: ## Run Vite dev server on :5173
 	cd frontend && npm run dev
 
-dev: db migrate ## Start DB + backend + frontend together (Ctrl+C stops all)
+dev: ## Start backend + frontend together (no database needed; Ctrl+C stops all)
 	@trap 'kill 0' INT TERM EXIT; \
 	(cd backend && uv run fastapi dev app/main.py --port 8000) & \
 	(cd frontend && npm run dev) & \
