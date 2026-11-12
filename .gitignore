@@ -68,3 +68,7 @@ CLAUDE.md
 # Raw downloads (large)
 data/raw/*
 !data/raw/.gitkeep
+
+# macOS/iCloud sync conflict copies, e.g. "actions 2.py" (never commit these)
+* [0-9].*
+* [0-9]
