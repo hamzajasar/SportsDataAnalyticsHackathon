@@ -14,8 +14,9 @@ photo, and a person confirms the numbers first.
 
 from datetime import date
 
+from app.i18n import Lang, M, num, t
 from app.schemas.bill import BillReading
-from app.services import actions, board_text, waste
+from app.services import actions, board_text, board_text_en, waste
 from app.services.bill_checks import plausibility_warnings
 
 SCALE_MIN, SCALE_MAX = 0.25, 4.0  # one bill may not move the yearly estimate more than this
@@ -25,9 +26,11 @@ class BillInputError(ValueError):
     """The confirmed bill lacks what this kind of analysis needs."""
 
 
-def _plan_summary(club: dict, costs: dict[str, float] | None = None) -> dict:
+def _plan_summary(club: dict, costs: dict[str, float] | None = None, lang: Lang = "en") -> dict:
     base = actions.baseline(club, costs=costs)
-    plan = actions.rank_actions(club, costs=costs, price_kwh=(costs or {}).get("electricity_price"))
+    plan = actions.rank_actions(
+        club, costs=costs, price_kwh=(costs or {}).get("electricity_price"), lang=lang
+    )
     return {
         "electricity_kwh_year": base["electricity_kwh"],
         "electricity_km_year": base["electricity_km"],
@@ -56,37 +59,28 @@ def _electricity_price(bill: dict, assumed: float) -> tuple[float, str]:
     return assumed, "assumed"
 
 
-PRICE_SOURCES = {
-    "unit_price": "price per kWh printed on the bill",
-    "total_per_kwh": "bill total divided by kWh (includes fixed charges, so savings from "
-    "using less electricity may be slightly overstated)",
-    "assumed": "assumed Eurostat price for BiH (the bill gave no price)",
-}
-
-
-def _electricity(club: dict, bill: dict, mean_temp_c: float | None) -> dict:
+def _electricity(club: dict, bill: dict, mean_temp_c: float | None, lang: Lang = "en") -> dict:
     kwh, month = bill.get("kwh"), bill.get("period_month")
     if not kwh or not month:
-        raise BillInputError("An electricity bill needs the kWh and the billing month.")
+        raise BillInputError(t("bill.err_electricity", lang))
     assumed = actions.cost_assumptions()["electricity_price"]
     price, price_key = _electricity_price(bill, assumed)
 
-    check = waste.check_month(club, month, kwh, price, mean_temp_c)
+    check = waste.check_month(club, month, kwh, price, mean_temp_c, lang)
     expected = waste.expected_month_kwh(club, month, mean_temp_c)["total"]
     warnings: list[str] = []
     raw_scale = kwh / expected if expected > 0 else 1.0
     scale = min(SCALE_MAX, max(SCALE_MIN, raw_scale))
     if scale != raw_scale:
         warnings.append(
-            f"The bill is far from the club's profile (x{raw_scale:.2f}); the yearly estimate was "
-            f"limited to x{scale:.2f}. Check the kWh and the club's yearly figures."
+            t("bill.scale_warning", lang, raw=num(raw_scale, lang, 2), used=num(scale, lang, 2))
         )
     scaled = {
         **club,
         "electricity_kwh_year": {k: v * scale for k, v in club["electricity_kwh_year"].items()},
     }
-    before = _plan_summary(club)
-    after = _plan_summary(scaled, {"electricity_price": price})
+    before = _plan_summary(club, lang=lang)
+    after = _plan_summary(scaled, {"electricity_price": price}, lang)
     return {
         "waste": check,
         "plan": {
@@ -95,28 +89,25 @@ def _electricity(club: dict, bill: dict, mean_temp_c: float | None) -> dict:
             "scale_factor": round(scale, 3),
             "annual_kwh_estimate": after["electricity_kwh_year"],
             "price_km_per_kwh_used": round(price, 4),
-            "price_source": PRICE_SOURCES[price_key],
+            "price_source": t(f"bill.price.{price_key}", lang),
             "price_source_id": price_key,
-            "based_on": (
-                f"One bill (month {month}): the club's yearly electricity is scaled from this "
-                "single month. Each further bill makes the estimate firmer."
-            ),
+            "based_on": t("bill.based_on_electricity", lang, month=month),
         },
         "warnings": warnings,
     }
 
 
-def _fuel(club: dict, bill: dict) -> dict:
+def _fuel(club: dict, bill: dict, lang: Lang = "en") -> dict:
     litres, amount, ftype = bill.get("litres"), bill.get("amount_km"), bill.get("fuel_type")
     if not (litres and amount and ftype):
-        raise BillInputError("A fuel receipt needs litres, the amount and the fuel type.")
+        raise BillInputError(t("bill.err_fuel", lang))
     c = actions.cost_assumptions()
     price_l = amount / litres
     assumed = c[f"{ftype}_price"]
     # petrol -> the club's cars, diesel -> its minibus (as in cost_assumptions.csv)
     vehicle = "car" if ftype == "petrol" else "minibus"
     override = {f"fuel_cost_{vehicle}": price_l * c[f"fuel_use_{vehicle}"] / 100}
-    before, after = _plan_summary(club), _plan_summary(club, override)
+    before, after = _plan_summary(club, lang=lang), _plan_summary(club, override, lang)
     return {
         "fuel": {
             "fuel_type": ftype,
@@ -132,11 +123,13 @@ def _fuel(club: dict, bill: dict) -> dict:
             "scale_factor": 1.0,
             "annual_kwh_estimate": None,
             "price_km_per_kwh_used": c["electricity_price"],
-            "price_source": "electricity price unchanged (a fuel receipt says nothing about it)",
+            "price_source": t("bill.price.fuel", lang),
             "price_source_id": "fuel",
-            "based_on": (
-                f"One {ftype} receipt: the pump price replaces the assumed one in the cost of "
-                f"a {vehicle} kilometre."
+            "based_on": t(
+                "bill.based_on_fuel",
+                lang,
+                fuel=t(f"fuel.{ftype}", lang) if f"fuel.{ftype}" in M else ftype,
+                vehicle=t(f"vehicle.{vehicle}", lang),
             ),
         },
         "warnings": [],
@@ -148,6 +141,7 @@ def analyse_bill(
     bill: dict,
     mean_temp_c: float | None = None,
     today: date | None = None,
+    lang: Lang = "en",
 ) -> dict:
     illustrative = club is None
     club = club or actions.sample_club()
@@ -162,11 +156,11 @@ def analyse_bill(
         fuel_type=bill.get("fuel_type"),
         confidence="high",  # the person confirmed it
     )
-    warnings = plausibility_warnings(reading, today)
+    warnings = plausibility_warnings(reading, today, lang)
     result = (
-        _electricity(club, bill, mean_temp_c)
+        _electricity(club, bill, mean_temp_c, lang)
         if bill["kind"] == "electricity"
-        else _fuel(club, bill)
+        else _fuel(club, bill, lang)
     )
     warnings += result.pop("warnings")
     analysis = {
@@ -178,4 +172,10 @@ def analyse_bill(
         "illustrative_club": illustrative,
     }
     analysis["board_text_bs"] = board_text.decision_text_bs(analysis, club, bill, today)
+    analysis["board_text"] = (
+        analysis["board_text_bs"]
+        if lang == "bs"
+        else board_text_en.decision_text_en(analysis, club, bill, today)
+    )
+    analysis["board_text_lang"] = lang
     return analysis

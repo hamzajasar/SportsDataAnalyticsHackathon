@@ -115,7 +115,7 @@ export function BillPage() {
   const copyText = async () => {
     if (!data) return
     try {
-      await navigator.clipboard.writeText(data.board_text_bs)
+      await navigator.clipboard.writeText(data.board_text)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
@@ -444,7 +444,7 @@ function Results({
         </CardHeader>
         <CardContent>
           <pre className="font-sans text-sm leading-relaxed whitespace-pre-wrap">
-            {data.board_text_bs}
+            {data.board_text}
           </pre>
         </CardContent>
       </Card>

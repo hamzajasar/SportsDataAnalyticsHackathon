@@ -317,7 +317,7 @@ export interface paths {
         put?: never;
         /**
          * Analyse Bill
-         * @description Waste check, updated plan (before/after) and a draft board decision in Bosnian.
+         * @description Waste check, updated plan (before/after) and a draft board decision.
          *
          *     Takes the numbers from the club's bill (no photo, no AI call). `club: null` = sample club.
          */
@@ -680,7 +680,21 @@ export interface components {
             waste?: components["schemas"]["WasteCheck"] | null;
             fuel?: components["schemas"]["FuelCheck"] | null;
             plan: components["schemas"]["PlanUpdate"];
-            /** Board Text Bs */
+            /**
+             * Board Text
+             * @description Draft board decision in the requested language
+             */
+            board_text: string;
+            /**
+             * Board Text Lang
+             * @default en
+             * @enum {string}
+             */
+            board_text_lang: "en" | "bs";
+            /**
+             * Board Text Bs
+             * @description Always Bosnian: the version for a real club board
+             */
             board_text_bs: string;
             /** Warnings */
             warnings: string[];
@@ -1395,6 +1409,12 @@ export interface components {
             temperature_c: number;
             /** Temperature Source */
             temperature_source: string;
+            /**
+             * Temperature Source Id
+             * @default typical
+             * @enum {string}
+             */
+            temperature_source_id: "typical" | "supplied";
             /** Basis */
             basis: string;
             /** Suggestions */
@@ -1927,8 +1947,13 @@ export interface operations {
     };
     analyseBill: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };

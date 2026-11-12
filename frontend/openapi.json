@@ -944,17 +944,57 @@
           "club"
         ],
         "summary": "Analyse Bill",
-        "description": "Waste check, updated plan (before/after) and a draft board decision in Bosnian.\n\nTakes the numbers from the club's bill (no photo, no AI call). `club: null` = sample club.",
+        "description": "Waste check, updated plan (before/after) and a draft board decision.\n\nTakes the numbers from the club's bill (no photo, no AI call). `club: null` = sample club.",
         "operationId": "analyseBill",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "en",
+                    "bs"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language: en or bs",
+              "title": "Lang"
+            },
+            "description": "Response language: en or bs"
+          },
+          {
+            "name": "accept-language",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Accept-Language"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BillAnalyseRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -2080,9 +2120,24 @@
           "plan": {
             "$ref": "#/components/schemas/PlanUpdate"
           },
+          "board_text": {
+            "type": "string",
+            "title": "Board Text",
+            "description": "Draft board decision in the requested language"
+          },
+          "board_text_lang": {
+            "type": "string",
+            "enum": [
+              "en",
+              "bs"
+            ],
+            "title": "Board Text Lang",
+            "default": "en"
+          },
           "board_text_bs": {
             "type": "string",
-            "title": "Board Text Bs"
+            "title": "Board Text Bs",
+            "description": "Always Bosnian: the version for a real club board"
           },
           "warnings": {
             "items": {
@@ -2100,6 +2155,7 @@
         "required": [
           "kind",
           "plan",
+          "board_text",
           "board_text_bs",
           "warnings",
           "illustrative_club"
@@ -4073,6 +4129,15 @@
           "temperature_source": {
             "type": "string",
             "title": "Temperature Source"
+          },
+          "temperature_source_id": {
+            "type": "string",
+            "enum": [
+              "typical",
+              "supplied"
+            ],
+            "title": "Temperature Source Id",
+            "default": "typical"
           },
           "basis": {
             "type": "string",

@@ -7,9 +7,7 @@ import { project } from '@/content/project'
 import { useTheme } from '@/hooks/use-theme'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 
-const secondaryNav = [
-  { to: '/methodology', label: 'How it works', icon: Info },
-]
+const secondaryNav = [{ to: '/methodology', label: 'How it works', icon: Info }]
 
 export function AppLayout() {
   const { theme, toggle } = useTheme()

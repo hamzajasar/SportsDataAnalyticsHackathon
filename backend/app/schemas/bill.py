@@ -63,6 +63,7 @@ class WasteCheck(BaseModel):
     excess_km: float
     temperature_c: float
     temperature_source: str
+    temperature_source_id: Literal["typical", "supplied"] = "typical"
     basis: str
     suggestions: list[str]  # ids, mapped to wording by the client / board text
 
@@ -102,6 +103,8 @@ class BillAnalysis(BaseModel):
     waste: WasteCheck | None = None
     fuel: FuelCheck | None = None
     plan: PlanUpdate
-    board_text_bs: str
+    board_text: str = Field(description="Draft board decision in the requested language")
+    board_text_lang: Literal["en", "bs"] = "en"
+    board_text_bs: str = Field(description="Always Bosnian: the version for a real club board")
     warnings: list[str]
     illustrative_club: bool
