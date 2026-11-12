@@ -1,4 +1,4 @@
-.PHONY: help setup feature sync finish dev db db-stop migrate migration data reference profile seed backend frontend notebook gen-api lint format test check clean
+.PHONY: help setup feature sync finish deps dev db db-stop migrate migration data reference profile seed backend frontend notebook gen-api lint format test check clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -62,7 +62,12 @@ backend: ## Run FastAPI with reload on :8000 (docs at /docs)
 frontend: ## Run Vite dev server on :5173
 	cd frontend && npm run dev
 
-dev: ## Start backend + frontend together (no database needed; Ctrl+C stops all)
+deps: ## Install frontend packages if package-lock.json changed since the last install
+	@cd frontend && if [ ! -f node_modules/.package-lock.json ] || [ package-lock.json -nt node_modules/.package-lock.json ]; then \
+		echo "Frontend packages changed after a pull: installing (npm ci)…"; npm ci --no-audit --no-fund; \
+	fi
+
+dev: deps ## Start backend + frontend together (no database needed; Ctrl+C stops all)
 	@trap 'kill 0' INT TERM EXIT; \
 	(cd backend && uv run fastapi dev app/main.py --port 8000) & \
 	(cd frontend && npm run dev) & \
