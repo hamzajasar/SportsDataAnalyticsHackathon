@@ -11,7 +11,8 @@ def test_action_plan_shape_and_consistency():
     assert acts and p["children"] > 0
     paybacks = [a["payback_years"] for a in acts if a["payback_years"] is not None]
     assert paybacks == sorted(paybacks)  # ranked by payback
-    assert p["total_saves_km_year"] == sum(a["saves_km_year"] for a in acts)
+    club_own = [a for a in acts if a["counts_for_club"]]
+    assert p["total_saves_km_year"] == sum(a["saves_km_year"] for a in club_own)
     assert abs(p["fee_drop_per_child_km"] - p["total_saves_km_year"] / p["children"]) < 0.1
     assert p["illustrative_club"] is True
 

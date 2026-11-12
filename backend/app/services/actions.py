@@ -152,46 +152,75 @@ def rank_actions(
     kg_per_kwh = gi.gco2_per_kwh / 1000
     el = club["electricity_kwh_year"]
     km = _travel_km(club)
+    pays = club.get("pays_electricity", True)
+    heating = club.get("heating_type", "electric")
+    club_kwh = sum(el.values())
     rows = []
     for u in upgrades():
-        if "kwp" in u:
-            cost = u["kwp"] * u["cost_km_per_kwp"]
-            produced_used = u["kwp"] * pv_kwh_per_kwp_year() * u["self_use_share"]
+        if "kwp" in u:  # solar, sized to the club's own use
+            kwp = u["kwp"]
+            if u.get("reference_kwh"):
+                kwp = round(u["kwp"] * club_kwh / u["reference_kwh"])
+                kwp = min(max(kwp, u.get("min_kwp", 0)), u.get("max_kwp", kwp)) if club_kwh else 0
+            cost = kwp * u["cost_km_per_kwp"]
+            produced_used = kwp * pv_kwh_per_kwp_year() * u["self_use_share"]
             # A club can't save more electricity than it actually buys.
-            club_kwh = sum(el.values())
             kwh_saved = min(produced_used, club_kwh)
             basis = (
-                f"{u['kwp']} kWp x {pv_kwh_per_kwp_year():.0f} kWh/kWp (PVGIS) "
+                f"{kwp} kWp x {pv_kwh_per_kwp_year():.0f} kWh/kWp (PVGIS) "
                 f"x {u['self_use_share']:.0%} used on site"
             )
             if kwh_saved < produced_used:
                 basis += f", capped at the club's own use ({club_kwh:.0f} kWh)"
+            row = _row(u, cost, kwh_saved * price, kwh_saved * kg_per_kwh, kwh_saved, basis)
+            row["name"] = f"Solar roof {kwp} kWp"
+            row["_electricity"] = True
         elif "cuts_car_trips_share" in u:
             car_km = km * club["travel"]["vehicles_per_trip"]["car"] * u["cuts_car_trips_share"]
             basis = f"{u['cuts_car_trips_share']:.0%} fewer car-km ({car_km:.0f} km)"
-            rows.append(
-                _row(
-                    u,
-                    u["cost_km"],
-                    car_km * c["fuel_cost_car"],
-                    car_km * factor("car_average")["kg_co2e"],
-                    0.0,
-                    basis,
-                )
+            row = _row(
+                u,
+                u["cost_km"],
+                car_km * c["fuel_cost_car"],
+                car_km * factor("car_average")["kg_co2e"],
+                0.0,
+                basis,
             )
-            continue
-        else:
+            row["_electricity"] = False
+        elif "kits_per_child_year" in u:  # saves money for families, not the club
+            swapped = club["children"] * u["kits_per_child_year"] * u["swap_share"]
+            kg = swapped * u["kg_per_kit"]
+            co2 = kg * (
+                factor("material_clothing_new")["kg_co2e"]
+                - factor("material_clothing_reused")["kg_co2e"]
+            )
+            basis = (
+                f"{swapped:.0f} kits a year passed on instead of bought new "
+                f"(~{u['kit_price_km']} KM and {u['kg_per_kit']} kg each)"
+            )
+            row = _row(u, u["cost_km"], swapped * u["kit_price_km"], co2, 0.0, basis)
+            row["_electricity"] = False
+            row["owner"] = "families"
+        else:  # a share of one electricity use (LED, insulation, timers, setpoint)
+            use = el[u["saves_share_of"]]
             cost = u["cost_km"]
-            kwh_saved = el[u["saves_share_of"]] * u["share"]
-            basis = f"{u['share']:.0%} of {u['saves_share_of']} ({el[u['saves_share_of']]} kWh)"
-        rows.append(_row(u, cost, kwh_saved * price, kwh_saved * kg_per_kwh, kwh_saved, basis))
-    # Who acts: electricity upgrades belong to whoever pays the electricity bill.
-    pays = club.get("pays_electricity", True)
-    heating = club.get("heating_type", "electric")
+            if u.get("reference_kwh"):
+                cost = cost * use / u["reference_kwh"]
+            kwh_saved = use * u["share"]
+            basis = f"{u['share']:.0%} of {u['saves_share_of']} ({use:.0f} kWh)"
+            row = _row(u, cost, kwh_saved * price, kwh_saved * kg_per_kwh, kwh_saved, basis)
+            row["_electricity"] = True
+        rows.append(row)
+
+    # Who acts: electricity actions belong to whoever pays the electricity bill.
     for r in rows:
-        is_electricity = r["saves_kwh_year"] > 0 or r["id"] in {"led", "solar", "insul"}
-        r["owner"] = "facility_owner" if is_electricity and not pays else "club"
+        is_electricity = r.pop("_electricity")
+        if "owner" not in r:
+            r["owner"] = "facility_owner" if is_electricity and not pays else "club"
         r["counts_for_club"] = r["owner"] == "club"
+        r["cost_type"] = (
+            "free" if r["cost_km"] == 0 else "low" if r["cost_km"] <= 1000 else "investment"
+        )
 
     rows.sort(key=lambda r: (r["payback_years"] is None, r["payback_years"] or 0))
     mine = [r for r in rows if r["counts_for_club"]]
@@ -215,8 +244,9 @@ def rank_actions(
         "total_saves_t_co2_year": round(sum(r["saves_kg_co2_year"] for r in mine) / 1000, 1),
         "fee_drop_per_child_km": round(total_km / club["children"], 1),
         "facility_owner_saves_km_year": sum(
-            r["saves_km_year"] for r in rows if not r["counts_for_club"]
+            r["saves_km_year"] for r in rows if r["owner"] == "facility_owner"
         ),
+        "families_save_km_year": sum(r["saves_km_year"] for r in rows if r["owner"] == "families"),
         "notes": notes,
         "children": club["children"],
         "assumptions": {

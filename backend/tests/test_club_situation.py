@@ -24,7 +24,9 @@ def post(path, club):
 
 def test_defaults_keep_old_behaviour(club):
     plan = post("actions", club)
-    assert all(a["owner"] == "club" and a["counts_for_club"] for a in plan["actions"])
+    for a in plan["actions"]:
+        expected = "families" if a["id"] == "kit_swap" else "club"
+        assert a["owner"] == expected and a["counts_for_club"] == (expected == "club")
     assert plan["facility_owner_saves_km_year"] == 0 and plan["notes"] == []
 
 

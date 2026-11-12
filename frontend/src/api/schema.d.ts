@@ -483,6 +483,13 @@ export interface components {
              * @default true
              */
             counts_for_club: boolean;
+            /**
+             * Cost Type
+             * @description free = 0 KM, low = up to 1,000 KM, investment = more
+             * @default investment
+             * @enum {string}
+             */
+            cost_type: "free" | "low" | "investment";
         };
         /** ActionPlan */
         ActionPlan: {
@@ -500,6 +507,12 @@ export interface components {
              * @default 0
              */
             facility_owner_saves_km_year: number;
+            /**
+             * Families Save Km Year
+             * @description Savings for families (e.g. kit swap), not part of the club's totals
+             * @default 0
+             */
+            families_save_km_year: number;
             /**
              * Notes
              * @description Plain-language caveats to show
@@ -543,6 +556,11 @@ export interface components {
             total_fee_drop_per_child_km: number;
             /** Cost Per Child After Km */
             cost_per_child_after_km: number;
+            /**
+             * Families Save Per Child Km
+             * @default 0
+             */
+            families_save_per_child_km: number;
             /** Saving Share Pct */
             saving_share_pct: number;
             /** Electricity Price Km Per Kwh */
@@ -1135,6 +1153,20 @@ export interface components {
             self_use_share?: number | null;
             /** Cuts Car Trips Share */
             cuts_car_trips_share?: number | null;
+            /** Reference Kwh */
+            reference_kwh?: number | null;
+            /** Min Kwp */
+            min_kwp?: number | null;
+            /** Max Kwp */
+            max_kwp?: number | null;
+            /** Kits Per Child Year */
+            kits_per_child_year?: number | null;
+            /** Swap Share */
+            swap_share?: number | null;
+            /** Kg Per Kit */
+            kg_per_kit?: number | null;
+            /** Kit Price Km */
+            kit_price_km?: number | null;
             /** Note */
             note?: string | null;
         };

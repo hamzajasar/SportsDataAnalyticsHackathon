@@ -74,9 +74,10 @@ def test_invalid_club_rejected(club):
 
 
 def test_solar_saving_capped_at_club_use(club):
-    club["electricity_kwh_year"] = {"floodlights": 2000, "heating": 2000, "hall_and_other": 1000}
+    # smallest system (3 kWp) still produces more than this club uses
+    club["electricity_kwh_year"] = {"floodlights": 500, "heating": 300, "hall_and_other": 200}
     solar = next(a for a in post_actions({"club": club})["actions"] if a["id"] == "solar")
-    assert solar["saves_kwh_year"] == 5000  # not the ~19,000 kWh the panels produce
+    assert solar["saves_kwh_year"] == 1000
     assert "capped" in solar["basis"]
 
 

@@ -1324,6 +1324,17 @@
             "title": "Counts For Club",
             "description": "Included in the club's totals and fee drop",
             "default": true
+          },
+          "cost_type": {
+            "type": "string",
+            "enum": [
+              "free",
+              "low",
+              "investment"
+            ],
+            "title": "Cost Type",
+            "description": "free = 0 KM, low = up to 1,000 KM, investment = more",
+            "default": "investment"
           }
         },
         "type": "object",
@@ -1364,6 +1375,12 @@
             "type": "number",
             "title": "Facility Owner Saves Km Year",
             "description": "Savings for the facility owner when the club doesn't pay electricity",
+            "default": 0
+          },
+          "families_save_km_year": {
+            "type": "number",
+            "title": "Families Save Km Year",
+            "description": "Savings for families (e.g. kit swap), not part of the club's totals",
             "default": 0
           },
           "notes": {
@@ -1463,6 +1480,11 @@
           "cost_per_child_after_km": {
             "type": "number",
             "title": "Cost Per Child After Km"
+          },
+          "families_save_per_child_km": {
+            "type": "number",
+            "title": "Families Save Per Child Km",
+            "default": 0
           },
           "saving_share_pct": {
             "type": "number",
@@ -3025,6 +3047,83 @@
               }
             ],
             "title": "Cuts Car Trips Share"
+          },
+          "reference_kwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Kwh"
+          },
+          "min_kwp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Kwp"
+          },
+          "max_kwp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Kwp"
+          },
+          "kits_per_child_year": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kits Per Child Year"
+          },
+          "swap_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Swap Share"
+          },
+          "kg_per_kit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kg Per Kit"
+          },
+          "kit_price_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kit Price Km"
           },
           "note": {
             "anyOf": [

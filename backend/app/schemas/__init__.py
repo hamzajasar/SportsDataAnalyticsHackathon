@@ -166,6 +166,13 @@ class Upgrade(BaseModel):
     cost_km_per_kwp: float | None = None
     self_use_share: float | None = None
     cuts_car_trips_share: float | None = None
+    reference_kwh: float | None = None
+    min_kwp: float | None = None
+    max_kwp: float | None = None
+    kits_per_child_year: float | None = None
+    swap_share: float | None = None
+    kg_per_kit: float | None = None
+    kit_price_km: float | None = None
     note: str | None = None
 
 
@@ -228,6 +235,9 @@ class Action(BaseModel):
         "club", description="Who takes (and saves from) this action"
     )
     counts_for_club: bool = Field(True, description="Included in the club's totals and fee drop")
+    cost_type: Literal["free", "low", "investment"] = Field(
+        "investment", description="free = 0 KM, low = up to 1,000 KM, investment = more"
+    )
 
 
 class ActionPlanAssumptions(BaseModel):
@@ -244,6 +254,9 @@ class ActionPlan(BaseModel):
     fee_drop_per_child_km: float
     facility_owner_saves_km_year: float = Field(
         0, description="Savings for the facility owner when the club doesn't pay electricity"
+    )
+    families_save_km_year: float = Field(
+        0, description="Savings for families (e.g. kit swap), not part of the club's totals"
     )
     notes: list[str] = Field(default_factory=list, description="Plain-language caveats to show")
     children: int

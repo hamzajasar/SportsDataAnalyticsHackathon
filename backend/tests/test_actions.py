@@ -23,7 +23,8 @@ def test_rank_actions_sorted_and_consistent():
     paybacks = [a["payback_years"] for a in r["actions"]]
     assert paybacks[0] == 0  # free car-sharing first
     assert paybacks == sorted(paybacks)
-    assert r["total_saves_km_year"] == sum(a["saves_km_year"] for a in r["actions"])
+    club_own = [a for a in r["actions"] if a["counts_for_club"]]
+    assert r["total_saves_km_year"] == sum(a["saves_km_year"] for a in club_own)
     assert r["fee_drop_per_child_km"] == pytest.approx(
         r["total_saves_km_year"] / r["children"], abs=0.1
     )

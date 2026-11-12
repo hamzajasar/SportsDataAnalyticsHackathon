@@ -48,6 +48,7 @@ def affordability(club: dict | None = None, price: float | None = None) -> dict:
         "actions": rows,
         "total_fee_drop_per_child_km": round(total_drop, 1),
         "cost_per_child_after_km": round(max(0.0, per_child - total_drop), 1),
+        "families_save_per_child_km": round(plan["families_save_km_year"] / children, 1),
         "saving_share_pct": round(100 * plan["total_saves_km_year"] / running, 1) if running else 0,
         "electricity_price_km_per_kwh": price,
         "scope": "Electricity and away-travel fuel only (not staff, pitch rent or kit)",
