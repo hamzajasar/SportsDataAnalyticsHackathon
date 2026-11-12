@@ -10,6 +10,7 @@ from functools import lru_cache
 
 import pandas as pd
 
+from app.i18n import Lang, count, num, t
 from app.services import actions
 from app.services.emissions import REFERENCE_DIR
 
@@ -54,7 +55,7 @@ def _vehicles(transport: str) -> dict:
     return {"minibus": 1, "car": math.ceil((p - SEATS["minibus"]) / SEATS["car"])}
 
 
-def quick_club(a: dict) -> dict:
+def quick_club(a: dict, lang: Lang = "en") -> dict:
     estimated: list[str] = []
     notes: list[str] = []
 
@@ -64,10 +65,10 @@ def quick_club(a: dict) -> dict:
     else:
         city = find_city(a["city"])
         if city is None:
-            raise KeyError(f"Unknown city: {a['city']}. Pick one from /api/cities or send lat/lon.")
+            raise KeyError(t("quick.unknown_city", lang, city=a["city"]))
         lat, lon = city["lat"], city["lon"]
         estimated.append("location")
-        notes.append(f"Location: centre of {city['city']} (used to find nearby pitches and clubs).")
+        notes.append(t("quick.location", lang, city=city["city"]))
 
     # Electricity per year
     price = actions.cost_assumptions()["electricity_price"]
@@ -78,47 +79,54 @@ def quick_club(a: dict) -> dict:
         kwh = a["monthly_bill_km"] * 12 / price
         estimated.append("electricity_kwh_year")
         notes.append(
-            f"Electricity: {a['monthly_bill_km']:.0f} KM a month ÷ {price} KM/kWh "
-            f"≈ {kwh:,.0f} kWh a year."
+            t(
+                "quick.bill",
+                lang,
+                bill=num(a["monthly_bill_km"], lang),
+                price=num(price, lang, 3),
+                kwh=num(kwh, lang),
+            )
         )
     else:
         kwh = a["teams"] * KWH_PER_TEAM_YEAR
         estimated.append("electricity_kwh_year")
         notes.append(
-            f"Electricity: no bill given, so a rough estimate of {KWH_PER_TEAM_YEAR:,.0f} kWh "
-            f"per team ({kwh:,.0f} kWh a year). Enter your bill for a real number."
+            t("quick.no_bill", lang, per_team=num(KWH_PER_TEAM_YEAR, lang), kwh=num(kwh, lang))
         )
 
     split = SPLIT_ELECTRIC_HEATING if heating_type == "electric" else SPLIT_OTHER_HEATING
     estimated.append("electricity_split")
-    notes.append(
-        "Split of electricity (floodlights / heating / hall) is typical, not measured"
-        + ("." if heating_type == "electric" else "; heating is not electric so it isn't counted.")
-    )
+    notes.append(t("quick.split" if heating_type == "electric" else "quick.split_no_heating", lang))
     if heating_type == "unknown":
-        notes.append("Heating type unknown: we assume it isn't electric. Change it if it is.")
+        notes.append(t("quick.heating_unknown", lang))
 
     # Away travel
     away = a.get("away_games_per_team")
     if away is None:
         away = DEFAULT_AWAY_GAMES
         estimated.append("away_trips_per_team_year")
-        notes.append(f"Away games: assumed {DEFAULT_AWAY_GAMES} per team per season.")
+        notes.append(t("quick.away_games", lang, n=DEFAULT_AWAY_GAMES))
     km = a.get("avg_one_way_km")
     if km is None:
         km = DEFAULT_ONE_WAY_KM
         estimated.append("avg_one_way_km")
-        notes.append(f"Distance to away games: assumed {DEFAULT_ONE_WAY_KM} km one way.")
+        notes.append(t("quick.distance", lang, km=DEFAULT_ONE_WAY_KM))
     transport = a.get("transport") or "mixed"
     vehicles = _vehicles(transport)
     estimated.append("vehicles_per_trip")
     notes.append(
-        f"Vehicles per trip for {PEOPLE_PER_TRIP} people ({transport}): "
-        f"{vehicles['minibus']} minibus(es), {vehicles['car']} car(s)."
+        t(
+            "quick.vehicles",
+            lang,
+            people=PEOPLE_PER_TRIP,
+            transport=t(f"transport.{transport}", lang),
+            minibuses=count(vehicles["minibus"], "minibus", lang),
+            cars=count(vehicles["car"], "car", lang),
+        )
     )
 
     club = {
-        "name": a.get("name") or "My club",
+        "name": a.get("name") or t("quick.default_name", lang),
         "city": a["city"],
         "lat": lat,
         "lon": lon,
@@ -134,8 +142,5 @@ def quick_club(a: dict) -> dict:
         "heating_type": heating_type,
     }
     if not club["pays_electricity"]:
-        notes.append(
-            "The club doesn't pay electricity: facility upgrades will be shown as proposals "
-            "for the facility owner."
-        )
+        notes.append(t("quick.not_paying", lang))
     return {"club": club, "estimated": estimated, "notes": notes}

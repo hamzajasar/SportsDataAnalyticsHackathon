@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, HTTPException, Query
 
+from app.i18n import LangDep
 from app.schemas import ActionPlan, Baseline, ClubAssumptions, MonthlySeries, Source, Venue
 from app.schemas.club import ClubProfile, ClubRequest
 from app.schemas.travel import SeasonTravel, SeasonTravelRequest
@@ -84,9 +85,9 @@ def club_baseline() -> Baseline:
 
 
 @router.get("/club/actions", response_model=ActionPlan, operation_id="getActionPlan")
-def club_actions() -> ActionPlan:
+def club_actions(lang: LangDep) -> ActionPlan:
     """Upgrades ranked by payback, with KM/CO2 saved and fee drop per child (summary bar)."""
-    return ActionPlan(**action_plan.action_plan())
+    return ActionPlan(**action_plan.action_plan(lang=lang))
 
 
 def _club(req: ClubRequest) -> dict | None:
@@ -100,17 +101,17 @@ def calculate_baseline(req: ClubRequest) -> Baseline:
 
 
 @router.post("/club/actions", response_model=ActionPlan, operation_id="calculateActionPlan")
-def calculate_actions(req: ClubRequest) -> ActionPlan:
+def calculate_actions(req: ClubRequest, lang: LangDep) -> ActionPlan:
     """Ranked actions for the club in the body, optionally with a different electricity price."""
-    return ActionPlan(**action_plan.action_plan(_club(req), req.electricity_price_km_per_kwh))
+    return ActionPlan(**action_plan.action_plan(_club(req), req.electricity_price_km_per_kwh, lang))
 
 
 @router.post("/club/travel", response_model=SeasonTravel, operation_id="calculateSeasonTravel")
-def season_travel(req: SeasonTravelRequest) -> SeasonTravel:
+def season_travel(req: SeasonTravelRequest, lang: LangDep) -> SeasonTravel:
     """Season cost (KM) and CO2 of away travel: current mix vs cars, minibuses or a hired coach."""
     try:
         club = req.club.model_dump() if req.club else svc.sample_club()
-        result = travel.season_travel(club, req.people_per_trip, req.share_with_partner)
+        result = travel.season_travel(club, req.people_per_trip, req.share_with_partner, lang)
     except FileNotFoundError as e:
         raise _missing(e) from None
     return SeasonTravel(**result, illustrative_club=req.club is None)

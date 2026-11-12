@@ -17,6 +17,7 @@ from pathlib import Path
 
 import numpy as np
 
+from app.i18n import Lang, M, num, pct, t
 from app.services.emissions import factor, grid_intensity
 
 REFERENCE_DIR = Path(__file__).resolve().parents[1] / "reference"
@@ -148,6 +149,7 @@ def rank_actions(
     country: str = "BIH",
     price_kwh: float | None = None,
     costs: dict[str, float] | None = None,
+    lang: Lang = "en",
 ) -> dict:
     """Actions with yearly KM and CO2 saved and payback, sorted by payback (free ones first).
 
@@ -174,18 +176,26 @@ def rank_actions(
             produced_used = kwp * pv_kwh_per_kwp_year() * u["self_use_share"]
             # A club can't save more electricity than it actually buys.
             kwh_saved = min(produced_used, club_kwh)
-            basis = (
-                f"{kwp} kWp x {pv_kwh_per_kwp_year():.0f} kWh/kWp (PVGIS) "
-                f"x {u['self_use_share']:.0%} used on site"
+            basis = t(
+                "basis.solar",
+                lang,
+                kwp=kwp,
+                yield_=num(pv_kwh_per_kwp_year(), lang),
+                self_use=pct(u["self_use_share"], lang),
             )
             if kwh_saved < produced_used:
-                basis += f", capped at the club's own use ({club_kwh:.0f} kWh)"
+                basis += t("basis.solar_capped", lang, kwh=num(club_kwh, lang))
             row = _row(u, cost, kwh_saved * price, kwh_saved * kg_per_kwh, kwh_saved, basis)
-            row["name"] = f"Solar roof {kwp} kWp"
+            row["name"] = t("action.solar", lang, kwp=kwp)
             row["_electricity"] = True
         elif "cuts_car_trips_share" in u:
             car_km = km * club["travel"]["vehicles_per_trip"]["car"] * u["cuts_car_trips_share"]
-            basis = f"{u['cuts_car_trips_share']:.0%} fewer car-km ({car_km:.0f} km)"
+            basis = t(
+                "basis.carshare",
+                lang,
+                share=pct(u["cuts_car_trips_share"], lang),
+                km=num(car_km, lang),
+            )
             row = _row(
                 u,
                 u["cost_km"],
@@ -202,9 +212,12 @@ def rank_actions(
                 factor("material_clothing_new")["kg_co2e"]
                 - factor("material_clothing_reused")["kg_co2e"]
             )
-            basis = (
-                f"{swapped:.0f} kits a year passed on instead of bought new "
-                f"(~{u['kit_price_km']} KM and {u['kg_per_kit']} kg each)"
+            basis = t(
+                "basis.kit",
+                lang,
+                kits=num(swapped, lang),
+                price=num(u["kit_price_km"], lang),
+                kg=num(u["kg_per_kit"], lang, 1),
             )
             row = _row(u, u["cost_km"], swapped * u["kit_price_km"], co2, 0.0, basis)
             row["_electricity"] = False
@@ -215,9 +228,17 @@ def rank_actions(
             if u.get("reference_kwh"):
                 cost = cost * use / u["reference_kwh"]
             kwh_saved = use * u["share"]
-            basis = f"{u['share']:.0%} of {u['saves_share_of']} ({use:.0f} kWh)"
+            basis = t(
+                "basis.share_of",
+                lang,
+                share=pct(u["share"], lang),
+                use=t(f"use.{u['saves_share_of']}", lang),
+                kwh=num(use, lang),
+            )
             row = _row(u, cost, kwh_saved * price, kwh_saved * kg_per_kwh, kwh_saved, basis)
             row["_electricity"] = True
+        if f"action.{u['id']}" in M and "kwp" not in u:
+            row["name"] = t(f"action.{u['id']}", lang)
         rows.append(row)
 
     # Who acts: electricity actions belong to whoever pays the electricity bill.
@@ -238,17 +259,9 @@ def rank_actions(
     total_km = sum(r["saves_km_year"] for r in mine)
     notes = []
     if not pays:
-        notes.append(
-            "The club doesn't pay the electricity bill: LED, solar and insulation would save "
-            "money for the facility owner (e.g. the municipality). They are shown as a proposal "
-            "to make, not as club savings."
-        )
+        notes.append(t("note.not_paying", lang))
     if heating != "electric":
-        kind = "an unknown system" if heating == "unknown" else heating
-        notes.append(
-            f"Heating by {kind} isn't included: only electricity is counted. Better insulation "
-            "would also lower that heating bill."
-        )
+        notes.append(t("note.heating_not_electric", lang, kind=t(f"heating.{heating}", lang)))
     return {
         "actions": rows,
         "total_saves_km_year": total_km,

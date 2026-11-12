@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 
+from app.i18n import LangDep
 from app.schemas.quick import City, QuickClubInput, QuickClubResult
 from app.services import quick_start
 
@@ -15,11 +16,11 @@ def list_cities() -> list[City]:
 
 
 @router.post("/club/quick", response_model=QuickClubResult, operation_id="quickClub")
-def quick_club(answers: QuickClubInput) -> QuickClubResult:
+def quick_club(answers: QuickClubInput, lang: LangDep) -> QuickClubResult:
     """Turn a few easy answers into a full club profile, marking every estimated value."""
     if answers.city and (answers.lat is None) != (answers.lon is None):
         raise HTTPException(422, "Give both lat and lon, or neither")
     try:
-        return QuickClubResult(**quick_start.quick_club(answers.model_dump()))
+        return QuickClubResult(**quick_start.quick_club(answers.model_dump(), lang))
     except KeyError as e:
         raise HTTPException(422, str(e.args[0])) from None

@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, HTTPException, Query
 
+from app.i18n import LangDep
 from app.schemas import (
     AmountEstimate,
     ElectricityEstimate,
@@ -68,8 +69,8 @@ def estimate(key: str, amount: float = Query(gt=0, le=1e9)) -> AmountEstimate:
 
 
 @router.post("/trip", response_model=TripComparison, operation_id="compareTrip")
-def trip(req: TripRequest) -> TripComparison:
+def trip(req: TripRequest, lang: LangDep) -> TripComparison:
     try:
-        return TripComparison(**svc.trip_options(**req.model_dump()))
+        return TripComparison(**svc.trip_options(**req.model_dump(), lang=lang))
     except KeyError as e:
         raise _not_found(e) from None

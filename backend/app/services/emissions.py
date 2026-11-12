@@ -16,6 +16,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from app.i18n import Lang, count, num, t
+
 REFERENCE_DIR = Path(__file__).resolve().parents[1] / "reference"
 
 # Aliases so the API accepts friendly names
@@ -154,6 +156,7 @@ def trip_options(
     round_trip: bool = True,
     car_occupancy: int = 3,
     car_type: str = "car_average",
+    lang: Lang = "en",
 ) -> dict:
     """Compare ways to get a squad to an away game. Returns options sorted by kg CO2e."""
     if car_type not in CAR_KEYS:
@@ -166,10 +169,10 @@ def trip_options(
     opts.append(
         {
             "mode": "cars",
-            "label": f"{cars} cars ({car_occupancy} per car)",
+            "label": t("travel.cars", lang, cars=count(cars, "car", lang), occ=car_occupancy),
             "vehicles": cars,
             "kg_co2e": round(cars * km * f["kg_co2e"], 1),
-            "assumption": f"{f['kg_co2e']} kg CO2e per car-km",
+            "assumption": t("trip.per_car_km", lang, f=num(f["kg_co2e"], lang, 3)),
         }
     )
 
@@ -178,10 +181,12 @@ def trip_options(
     opts.append(
         {
             "mode": "minibus",
-            "label": f"{vans} minibus{'es' if vans > 1 else ''} ({VAN_SEATS} seats)",
+            "label": t(
+                "travel.minibuses", lang, minibuses=count(vans, "minibus", lang), seats=VAN_SEATS
+            ),
             "vehicles": vans,
             "kg_co2e": round(vans * km * f["kg_co2e"], 1),
-            "assumption": f"{f['kg_co2e']} kg CO2e per van-km",
+            "assumption": t("trip.per_van_km", lang, f=num(f["kg_co2e"], lang, 3)),
         }
     )
 
@@ -191,13 +196,17 @@ def trip_options(
     opts.append(
         {
             "mode": "coach",
-            "label": f"{coaches} hired coach{'es' if coaches > 1 else ''} ({COACH_SEATS} seats)",
+            "label": t(
+                "travel.coach", lang, coaches=count(coaches, "coach", lang), seats=COACH_SEATS
+            ),
             "vehicles": coaches,
             "kg_co2e": round(coaches * km * per_vehicle_km, 1),
-            "assumption": (
-                f"{per_vehicle_km:.3f} kg CO2e per coach-km "
-                f"({factor('coach')['kg_co2e']} per passenger-km "
-                f"x {COACH_AVG_OCCUPANCY} avg passengers)"
+            "assumption": t(
+                "trip.per_coach_km",
+                lang,
+                f=num(per_vehicle_km, lang, 3),
+                pkm=num(factor("coach")["kg_co2e"], lang, 5),
+                occ=COACH_AVG_OCCUPANCY,
             ),
         }
     )
@@ -207,10 +216,10 @@ def trip_options(
     opts.append(
         {
             "mode": "rail",
-            "label": "Train (scheduled service)",
+            "label": t("trip.rail", lang),
             "vehicles": None,
             "kg_co2e": round(people * km * f["kg_co2e"], 1),
-            "assumption": f"{f['kg_co2e']} kg CO2e per passenger-km",
+            "assumption": t("trip.per_pkm", lang, f=num(f["kg_co2e"], lang, 3)),
         }
     )
 

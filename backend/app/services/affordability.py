@@ -11,15 +11,16 @@ one; doing several together saves a little less than the sum (e.g. LED lowers th
 offsets), so the "after" figure is an upper bound on the saving.
 """
 
+from app.i18n import Lang, t
 from app.services import actions
 
 
-def affordability(club: dict | None = None, price: float | None = None) -> dict:
+def affordability(club: dict | None = None, price: float | None = None, lang: Lang = "en") -> dict:
     illustrative = club is None
     club = club or actions.sample_club()
     price = price if price is not None else actions.cost_assumptions()["electricity_price"]
     b = actions.baseline(club)
-    plan = actions.rank_actions(club, price_kwh=price)
+    plan = actions.rank_actions(club, price_kwh=price, lang=lang)
     children = club["children"]
 
     # Only costs the club itself pays (municipal facilities: electricity is the owner's bill).
@@ -51,10 +52,7 @@ def affordability(club: dict | None = None, price: float | None = None) -> dict:
         "families_save_per_child_km": round(plan["families_save_km_year"] / children, 1),
         "saving_share_pct": round(100 * plan["total_saves_km_year"] / running, 1) if running else 0,
         "electricity_price_km_per_kwh": price,
-        "scope": "Electricity and away-travel fuel only (not staff, pitch rent or kit)",
-        "note": (
-            "Actions are estimated one by one; doing several together saves somewhat less than "
-            "the sum, so 'after' is a best case."
-        ),
+        "scope": t("aff.scope", lang),
+        "note": t("aff.note", lang),
         "illustrative_club": illustrative,
     }

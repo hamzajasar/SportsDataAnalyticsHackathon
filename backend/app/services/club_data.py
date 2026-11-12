@@ -16,6 +16,7 @@ from typing import Any
 
 import pandas as pd
 
+from app.i18n import Lang, t
 from app.services.emissions import REFERENCE_DIR
 
 # Only these files can be served — never build a path from user input.
@@ -149,13 +150,15 @@ CLUB_LIKE = {"stadium", "sports_centre"}  # named stadiums/centres ≈ clubs (he
 PITCH_LIKE = {"pitch", "sports_hall"}
 
 
-def distance(from_lat: float, from_lon: float, to_lat: float, to_lon: float) -> dict:
+def distance(
+    from_lat: float, from_lon: float, to_lat: float, to_lon: float, lang: Lang = "en"
+) -> dict:
     straight = _haversine_km(from_lat, from_lon, to_lat, to_lon)
     return {
         "straight_km": round(straight, 2),
         "road_km_estimate": round(straight * ROAD_CIRCUITY, 1),
         "circuity_factor": ROAD_CIRCUITY,
-        "note": "Straight-line (haversine) distance; road distance estimated as straight x 1.3",
+        "note": t("distance.note", lang),
     }
 
 
@@ -168,7 +171,9 @@ def nearest(
     return rows[:n]
 
 
-def share_suggestions(lat: float, lon: float, radius_km: float = 10, n: int = 5) -> dict:
+def share_suggestions(
+    lat: float, lon: float, radius_km: float = 10, n: int = 5, lang: Lang = "en"
+) -> dict:
     """Who could share with a club at (lat, lon)?
 
     - shared_pitch: nearest pitches/halls (use a shared facility instead of building/heating one)
@@ -185,8 +190,5 @@ def share_suggestions(lat: float, lon: float, radius_km: float = 10, n: int = 5)
         "radius_km": radius_km,
         "shared_pitch": pitches,
         "carpool_partners": partners,
-        "note": (
-            "Partners = named stadiums/sports centres nearby (OSM): a heuristic for clubs, "
-            "verify locally"
-        ),
+        "note": t("share.note", lang),
     }

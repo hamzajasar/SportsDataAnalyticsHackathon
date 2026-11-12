@@ -14,6 +14,8 @@ ASSUMPTION: there is no sourced figure yet). CO2 factors come from emissions.fac
 
 import math
 
+from app.i18n import Lang, count
+from app.i18n import t as tr  # `t` is a local name for the travel dict below
 from app.services import club_data, emissions
 
 CAR_OCCUPANCY = 3  # people per car in the "all cars" option (assumption, shown in UI)
@@ -43,12 +45,9 @@ def _unit_rates() -> dict[str, dict]:
     }
 
 
-def _plural(n: int, word: str) -> str:
-    plural = {"car": "cars", "minibus": "minibuses", "coach": "coaches"}[word]
-    return f"{n} {word if n == 1 else plural}"
-
-
-def season_travel(club: dict, people_per_trip: int = 18, share_with_partner: bool = False) -> dict:
+def season_travel(
+    club: dict, people_per_trip: int = 18, share_with_partner: bool = False, lang: Lang = "en"
+) -> dict:
     if people_per_trip < 1:
         raise ValueError("people_per_trip must be at least 1")
     t = club["travel"]
@@ -73,15 +72,26 @@ def season_travel(club: dict, people_per_trip: int = 18, share_with_partner: boo
     coaches = math.ceil(people_per_trip / emissions.COACH_SEATS)
     current = {v: n for v, n in t["vehicles_per_trip"].items() if v in MODES and n > 0}
 
-    coach_label = f"{_plural(coaches, 'coach')} hired ({emissions.COACH_SEATS} seats)"
+    coach_label = tr(
+        "travel.coach", lang, coaches=count(coaches, "coach", lang), seats=emissions.COACH_SEATS
+    )
     if share_with_partner:
-        coach_label += ", shared by two clubs"
+        coach_label += tr("travel.coach_shared", lang)
     options = [
-        option("current", "Current mix of vehicles", current),
-        option("cars", f"{_plural(cars, 'car')} ({CAR_OCCUPANCY} per car)", {"car": cars}),
+        option("current", tr("travel.current", lang), current),
+        option(
+            "cars",
+            tr("travel.cars", lang, cars=count(cars, "car", lang), occ=CAR_OCCUPANCY),
+            {"car": cars},
+        ),
         option(
             "minibus",
-            f"{_plural(minibuses, 'minibus')} ({emissions.VAN_SEATS} seats)",
+            tr(
+                "travel.minibuses",
+                lang,
+                minibuses=count(minibuses, "minibus", lang),
+                seats=emissions.VAN_SEATS,
+            ),
             {"minibus": minibuses},
         ),
         option("coach", coach_label, {"coach": coaches}, 0.5 if share_with_partner else 1.0),
@@ -98,7 +108,7 @@ def season_travel(club: dict, people_per_trip: int = 18, share_with_partner: boo
         partners = club_data.share_suggestions(club["lat"], club["lon"])["carpool_partners"]
         shared_with = [p["name"] for p in partners if p["name"]]
         if not shared_with:
-            note = "No named partner club found nearby; a partner is assumed."
+            note = tr("travel.no_partner", lang)
     return {
         "trips": trips,
         "round_trip_km": round_trip_km,

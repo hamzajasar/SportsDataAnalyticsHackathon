@@ -1846,8 +1846,13 @@ export interface operations {
     };
     compareTrip: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2067,8 +2072,13 @@ export interface operations {
     };
     getActionPlan: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2083,12 +2093,26 @@ export interface operations {
                     "application/json": components["schemas"]["ActionPlan"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
     calculateActionPlan: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2120,8 +2144,13 @@ export interface operations {
     };
     calculateSeasonTravel: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2219,8 +2248,13 @@ export interface operations {
     };
     calculateEnergyProfile: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2252,8 +2286,13 @@ export interface operations {
     };
     calculateAffordability: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2305,8 +2344,13 @@ export interface operations {
     };
     quickClub: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
+            };
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2378,8 +2422,12 @@ export interface operations {
                 from_lon: number;
                 to_lat: number;
                 to_lon: number;
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
             };
-            header?: never;
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2412,8 +2460,12 @@ export interface operations {
                 lon: number;
                 radius_km?: number;
                 n?: number;
+                /** @description Response language: en or bs */
+                lang?: ("en" | "bs") | null;
             };
-            header?: never;
+            header?: {
+                "accept-language"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };

@@ -9,6 +9,7 @@ cost (KM)            = net kWh x electricity price
 CO2 (kg)             = net kWh x BiH grid gCO2/kWh / 1000
 """
 
+from app.i18n import Lang, pct, t
 from app.services import actions
 from app.services.club_data import load_csv
 from app.services.emissions import grid_intensity
@@ -21,7 +22,9 @@ def _solar_self_use() -> float:
     return float(solar["self_use_share"]) if solar else DEFAULT_SELF_USE
 
 
-def energy_profile(club: dict | None = None, kwp: float = 0, price: float | None = None) -> dict:
+def energy_profile(
+    club: dict | None = None, kwp: float = 0, price: float | None = None, lang: Lang = "en"
+) -> dict:
     illustrative = club is None
     club = club or actions.sample_club()
     el = club["electricity_kwh_year"]
@@ -79,11 +82,10 @@ def energy_profile(club: dict | None = None, kwp: float = 0, price: float | None
         "grid_gco2_per_kwh": gi.gco2_per_kwh,
         "grid_year": gi.year,
         "method": [
-            f"Heating spread by heating degree days (base {actions.HEATING_BASE_C:.0f} °C, "
-            "Sarajevo monthly temperatures, Open-Meteo)",
-            "Floodlights and hall spread evenly over 12 months (assumption)",
-            f"Solar: kWp x PVGIS monthly yield, {self_use:.0%} used on site (assumption)",
-            "Cost: Eurostat BiH non-household price; CO₂: Ember BiH grid intensity",
+            t("energy.heating", lang, base=f"{actions.HEATING_BASE_C:.0f}"),
+            t("energy.even", lang),
+            t("energy.solar", lang, self_use=pct(self_use, lang)),
+            t("energy.sources", lang),
         ],
         "club_pays_electricity": club.get("pays_electricity", True),
         "heating_type": club.get("heating_type", "electric"),
