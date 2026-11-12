@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -166,6 +166,13 @@ class Upgrade(BaseModel):
     cost_km_per_kwp: float | None = None
     self_use_share: float | None = None
     cuts_car_trips_share: float | None = None
+    reference_kwh: float | None = None
+    min_kwp: float | None = None
+    max_kwp: float | None = None
+    kits_per_child_year: float | None = None
+    swap_share: float | None = None
+    kg_per_kit: float | None = None
+    kit_price_km: float | None = None
     note: str | None = None
 
 
@@ -209,6 +216,9 @@ class Baseline(BaseModel):
     travel_t_co2: float
     grid_gco2_per_kwh: float
     grid_year: int
+    club_pays_electricity: bool = True
+    club_electricity_km: float = Field(description="Electricity cost the club itself pays")
+    heating_type: str = "electric"
     illustrative_club: bool = Field(description="True when calculated for the sample club")
 
 
@@ -221,6 +231,13 @@ class Action(BaseModel):
     saves_kwh_year: float
     payback_years: float | None
     basis: str
+    owner: Literal["club", "facility_owner", "families"] = Field(
+        "club", description="Who takes (and saves from) this action"
+    )
+    counts_for_club: bool = Field(True, description="Included in the club's totals and fee drop")
+    cost_type: Literal["free", "low", "investment"] = Field(
+        "investment", description="free = 0 KM, low = up to 1,000 KM, investment = more"
+    )
 
 
 class ActionPlanAssumptions(BaseModel):
@@ -235,6 +252,13 @@ class ActionPlan(BaseModel):
     total_saves_km_year: float
     total_saves_t_co2_year: float
     fee_drop_per_child_km: float
+    facility_owner_saves_km_year: float = Field(
+        0, description="Savings for the facility owner when the club doesn't pay electricity"
+    )
+    families_save_km_year: float = Field(
+        0, description="Savings for families (e.g. kit swap), not part of the club's totals"
+    )
+    notes: list[str] = Field(default_factory=list, description="Plain-language caveats to show")
     children: int
     assumptions: ActionPlanAssumptions
     illustrative_club: bool = Field(description="True when calculated for the sample club")

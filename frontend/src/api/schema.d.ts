@@ -442,6 +442,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cities
+         * @description BiH cities with approximate centre coordinates, for the club's location picker.
+         */
+        get: operations["listCities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/club/quick": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Quick Club
+         * @description Turn a few easy answers into a full club profile, marking every estimated value.
+         */
+        post: operations["quickClub"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/venues/nearest": {
         parameters: {
             query?: never;
@@ -515,6 +555,26 @@ export interface components {
             payback_years: number | null;
             /** Basis */
             basis: string;
+            /**
+             * Owner
+             * @description Who takes (and saves from) this action
+             * @default club
+             * @enum {string}
+             */
+            owner: "club" | "facility_owner" | "families";
+            /**
+             * Counts For Club
+             * @description Included in the club's totals and fee drop
+             * @default true
+             */
+            counts_for_club: boolean;
+            /**
+             * Cost Type
+             * @description free = 0 KM, low = up to 1,000 KM, investment = more
+             * @default investment
+             * @enum {string}
+             */
+            cost_type: "free" | "low" | "investment";
         };
         /** ActionPlan */
         ActionPlan: {
@@ -526,6 +586,23 @@ export interface components {
             total_saves_t_co2_year: number;
             /** Fee Drop Per Child Km */
             fee_drop_per_child_km: number;
+            /**
+             * Facility Owner Saves Km Year
+             * @description Savings for the facility owner when the club doesn't pay electricity
+             * @default 0
+             */
+            facility_owner_saves_km_year: number;
+            /**
+             * Families Save Km Year
+             * @description Savings for families (e.g. kit swap), not part of the club's totals
+             * @default 0
+             */
+            families_save_km_year: number;
+            /**
+             * Notes
+             * @description Plain-language caveats to show
+             */
+            notes?: string[];
             /** Children */
             children: number;
             assumptions: components["schemas"]["ActionPlanAssumptions"];
@@ -564,6 +641,11 @@ export interface components {
             total_fee_drop_per_child_km: number;
             /** Cost Per Child After Km */
             cost_per_child_after_km: number;
+            /**
+             * Families Save Per Child Km
+             * @default 0
+             */
+            families_save_per_child_km: number;
             /** Saving Share Pct */
             saving_share_pct: number;
             /** Electricity Price Km Per Kwh */
@@ -623,6 +705,21 @@ export interface components {
             grid_gco2_per_kwh: number;
             /** Grid Year */
             grid_year: number;
+            /**
+             * Club Pays Electricity
+             * @default true
+             */
+            club_pays_electricity: boolean;
+            /**
+             * Club Electricity Km
+             * @description Electricity cost the club itself pays
+             */
+            club_electricity_km: number;
+            /**
+             * Heating Type
+             * @default electric
+             */
+            heating_type: string;
             /**
              * Illustrative Club
              * @description True when calculated for the sample club
@@ -711,6 +808,17 @@ export interface components {
             /** File */
             file: string;
         };
+        /** City */
+        City: {
+            /** City */
+            city: string;
+            /** Lat */
+            lat: number;
+            /** Lon */
+            lon: number;
+            /** Source */
+            source: string;
+        };
         /** ClubAssumptions */
         ClubAssumptions: {
             /** Costs */
@@ -738,6 +846,19 @@ export interface components {
             teams: number;
             electricity_kwh_year: components["schemas"]["Electricity"];
             travel: components["schemas"]["Travel"];
+            /**
+             * Pays Electricity
+             * @description Does the club pay the electricity bill?
+             * @default true
+             */
+            pays_electricity: boolean;
+            /**
+             * Heating Type
+             * @description How the facility is heated
+             * @default electric
+             * @enum {string}
+             */
+            heating_type: "electric" | "district" | "gas" | "wood" | "other" | "unknown";
         };
         /**
          * ClubRequest
@@ -943,6 +1064,16 @@ export interface components {
             grid_year: number;
             /** Method */
             method: string[];
+            /**
+             * Club Pays Electricity
+             * @default true
+             */
+            club_pays_electricity: boolean;
+            /**
+             * Heating Type
+             * @default electric
+             */
+            heating_type: string;
             /** Illustrative Club */
             illustrative_club: boolean;
         };
@@ -1080,6 +1211,78 @@ export interface components {
             price_source_id: "unit_price" | "total_per_kwh" | "assumed" | "fuel";
             /** Based On */
             based_on: string;
+        };
+        /**
+         * QuickClubInput
+         * @description What a volunteer knows. Only city, children and teams are required.
+         */
+        QuickClubInput: {
+            /** Name */
+            name?: string | null;
+            /**
+             * City
+             * @description A city from GET /api/cities
+             */
+            city: string;
+            /**
+             * Lat
+             * @description Optional exact location
+             */
+            lat?: number | null;
+            /** Lon */
+            lon?: number | null;
+            /** Children */
+            children: number;
+            /** Teams */
+            teams: number;
+            /**
+             * Pays Electricity
+             * @default true
+             */
+            pays_electricity: boolean;
+            /**
+             * Monthly Bill Km
+             * @description Average KM/month
+             */
+            monthly_bill_km?: number | null;
+            /**
+             * Yearly Kwh
+             * @description If known (overrides bill)
+             */
+            yearly_kwh?: number | null;
+            /**
+             * Heating Type
+             * @default unknown
+             * @enum {string}
+             */
+            heating_type: "electric" | "district" | "gas" | "wood" | "other" | "unknown";
+            /**
+             * Away Games Per Team
+             * @description Per season
+             */
+            away_games_per_team?: number | null;
+            /** Avg One Way Km */
+            avg_one_way_km?: number | null;
+            /**
+             * Transport
+             * @default mixed
+             * @enum {string}
+             */
+            transport: "cars" | "minibus" | "mixed";
+        };
+        /** QuickClubResult */
+        QuickClubResult: {
+            club: components["schemas"]["ClubProfile"];
+            /**
+             * Estimated
+             * @description Profile parts we estimated (not given by the club)
+             */
+            estimated: string[];
+            /**
+             * Notes
+             * @description Plain-language explanation of every estimate
+             */
+            notes: string[];
         };
         /** SeasonTravel */
         SeasonTravel: {
@@ -1279,6 +1482,20 @@ export interface components {
             self_use_share?: number | null;
             /** Cuts Car Trips Share */
             cuts_car_trips_share?: number | null;
+            /** Reference Kwh */
+            reference_kwh?: number | null;
+            /** Min Kwp */
+            min_kwp?: number | null;
+            /** Max Kwp */
+            max_kwp?: number | null;
+            /** Kits Per Child Year */
+            kits_per_child_year?: number | null;
+            /** Swap Share */
+            swap_share?: number | null;
+            /** Kg Per Kit */
+            kg_per_kit?: number | null;
+            /** Kit Price Km */
+            kit_price_km?: number | null;
             /** Note */
             note?: string | null;
         };
@@ -2053,6 +2270,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Affordability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listCities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["City"][];
+                };
+            };
+        };
+    };
+    quickClub: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuickClubInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuickClubResult"];
                 };
             };
             /** @description Validation Error */

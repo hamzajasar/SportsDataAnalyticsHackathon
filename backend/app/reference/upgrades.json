@@ -3,29 +3,62 @@
   "id": "led",
   "name": "LED floodlights",
   "cost_km": 9000,
+  "reference_kwh": 22000,
   "saves_share_of": "floodlights",
   "share": 0.6,
-  "note": "typical 50-70% cut, assumption"
+  "note": "typical 50-70% cut, assumption; cost scales with floodlight use (9,000 KM for 22,000 kWh/yr)"
  },
  {
   "id": "solar",
-  "name": "Solar roof 20 kWp",
+  "name": "Solar roof",
   "kwp": 20,
+  "reference_kwh": 52000,
+  "min_kwp": 3,
+  "max_kwp": 50,
   "cost_km_per_kwp": 1200,
   "self_use_share": 0.8,
-  "yield_file": "pv_yield.json"
+  "note": "size scales with the club's electricity use (20 kWp for 52,000 kWh/yr), 3-50 kWp; assumption"
  },
  {
   "id": "insul",
   "name": "Insulation + heat pump",
   "cost_km": 15000,
+  "reference_kwh": 20000,
   "saves_share_of": "heating",
-  "share": 0.4
+  "share": 0.4,
+  "note": "assumption; cost scales with electric heating use (15,000 KM for 20,000 kWh/yr)"
  },
  {
   "id": "carshare",
   "name": "Car-sharing, fill the minibus",
   "cost_km": 0,
-  "cuts_car_trips_share": 0.4
+  "cuts_car_trips_share": 0.4,
+  "note": "assumption: a car-pool rota removes 40% of car-km"
+ },
+ {
+  "id": "lights_off",
+  "name": "Floodlights off when the pitch is empty (timer + rule)",
+  "cost_km": 300,
+  "saves_share_of": "floodlights",
+  "share": 0.1,
+  "note": "assumption: ~10% of floodlight hours are wasted; a simple timer costs ~300 KM"
+ },
+ {
+  "id": "heat_setpoint",
+  "name": "Heat 1 °C lower, and only when the hall is in use",
+  "cost_km": 0,
+  "saves_share_of": "heating",
+  "share": 0.06,
+  "note": "assumption: rule of thumb ~6% less heating energy per 1 °C lower"
+ },
+ {
+  "id": "kit_swap",
+  "name": "Kit-swap day: pass on outgrown kit",
+  "cost_km": 0,
+  "kits_per_child_year": 0.5,
+  "swap_share": 0.3,
+  "kg_per_kit": 0.6,
+  "kit_price_km": 60,
+  "note": "assumptions: each child needs a new kit every 2 years, 30% can be swapped, 0.6 kg and ~60 KM per kit; saves money for families"
  }
 ]

@@ -22,7 +22,8 @@ def affordability(club: dict | None = None, price: float | None = None) -> dict:
     plan = actions.rank_actions(club, price_kwh=price)
     children = club["children"]
 
-    electricity_km = round(b["electricity_kwh"] * price)
+    # Only costs the club itself pays (municipal facilities: electricity is the owner's bill).
+    electricity_km = round(b["electricity_kwh"] * price) if b["club_pays_electricity"] else 0
     running = electricity_km + b["travel_km_cost"]
     per_child = running / children
     rows = [
@@ -35,6 +36,7 @@ def affordability(club: dict | None = None, price: float | None = None) -> dict:
             "payback_years": a["payback_years"],
         }
         for a in plan["actions"]
+        if a["counts_for_club"]
     ]
     total_drop = plan["total_saves_km_year"] / children
     return {
@@ -46,6 +48,7 @@ def affordability(club: dict | None = None, price: float | None = None) -> dict:
         "actions": rows,
         "total_fee_drop_per_child_km": round(total_drop, 1),
         "cost_per_child_after_km": round(max(0.0, per_child - total_drop), 1),
+        "families_save_per_child_km": round(plan["families_save_km_year"] / children, 1),
         "saving_share_pct": round(100 * plan["total_saves_km_year"] / running, 1) if running else 0,
         "electricity_price_km_per_kwh": price,
         "scope": "Electricity and away-travel fuel only (not staff, pitch rent or kit)",

@@ -45,10 +45,10 @@ def test_doubling_children_halves_fee_drop(club):
     )
 
 
-def test_no_floodlights_means_led_saves_nothing(club):
+def test_no_floodlights_means_no_floodlight_actions(club):
     club["electricity_kwh_year"]["floodlights"] = 0
-    led = next(a for a in post_actions({"club": club})["actions"] if a["id"] == "led")
-    assert led["saves_km_year"] == 0 and led["saves_kwh_year"] == 0
+    ids = {a["id"] for a in post_actions({"club": club})["actions"]}
+    assert "led" not in ids and "lights_off" not in ids
 
 
 def test_club_numbers_flow_into_baseline(club):
@@ -74,9 +74,10 @@ def test_invalid_club_rejected(club):
 
 
 def test_solar_saving_capped_at_club_use(club):
-    club["electricity_kwh_year"] = {"floodlights": 2000, "heating": 2000, "hall_and_other": 1000}
+    # smallest system (3 kWp) still produces more than this club uses
+    club["electricity_kwh_year"] = {"floodlights": 500, "heating": 300, "hall_and_other": 200}
     solar = next(a for a in post_actions({"club": club})["actions"] if a["id"] == "solar")
-    assert solar["saves_kwh_year"] == 5000  # not the ~19,000 kWh the panels produce
+    assert solar["saves_kwh_year"] == 1000
     assert "capped" in solar["basis"]
 
 

@@ -4,6 +4,8 @@ travel, affordability). Mirrors backend/app/reference/sample_club.json.
 Send `ClubRequest` as the POST body; `club: null` means "use the illustrative sample club".
 """
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -28,6 +30,9 @@ class Travel(BaseModel):
     vehicles_per_trip: Vehicles
 
 
+HeatingType = Literal["electric", "district", "gas", "wood", "other", "unknown"]
+
+
 class ClubProfile(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     city: str = Field(min_length=1, max_length=80)
@@ -37,6 +42,11 @@ class ClubProfile(BaseModel):
     teams: int = Field(gt=0, le=500)
     electricity_kwh_year: Electricity
     travel: Travel
+    # Many clubs train on municipal/school facilities and never see the electricity bill:
+    # then facility upgrades are proposals for the owner, not savings for the club.
+    pays_electricity: bool = Field(True, description="Does the club pay the electricity bill?")
+    # Only electric heating shows up in electricity kWh; other heating isn't modelled.
+    heating_type: HeatingType = Field("electric", description="How the facility is heated")
 
 
 class ClubRequest(BaseModel):

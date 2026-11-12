@@ -85,5 +85,7 @@ def energy_profile(club: dict | None = None, kwp: float = 0, price: float | None
             f"Solar: kWp x PVGIS monthly yield, {self_use:.0%} used on site (assumption)",
             "Cost: Eurostat BiH non-household price; CO₂: Ember BiH grid intensity",
         ],
+        "club_pays_electricity": club.get("pays_electricity", True),
+        "heating_type": club.get("heating_type", "electric"),
         "illustrative_club": illustrative,
     }

@@ -1094,6 +1094,74 @@
         }
       }
     },
+    "/api/cities": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "List Cities",
+        "description": "BiH cities with approximate centre coordinates, for the club's location picker.",
+        "operationId": "listCities",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  },
+                  "type": "array",
+                  "title": "Response Listcities"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/club/quick": {
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Quick Club",
+        "description": "Turn a few easy answers into a full club profile, marking every estimated value.",
+        "operationId": "quickClub",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuickClubInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuickClubResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/venues/nearest": {
       "get": {
         "tags": [
@@ -1391,6 +1459,34 @@
           "basis": {
             "type": "string",
             "title": "Basis"
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "club",
+              "facility_owner",
+              "families"
+            ],
+            "title": "Owner",
+            "description": "Who takes (and saves from) this action",
+            "default": "club"
+          },
+          "counts_for_club": {
+            "type": "boolean",
+            "title": "Counts For Club",
+            "description": "Included in the club's totals and fee drop",
+            "default": true
+          },
+          "cost_type": {
+            "type": "string",
+            "enum": [
+              "free",
+              "low",
+              "investment"
+            ],
+            "title": "Cost Type",
+            "description": "free = 0 KM, low = up to 1,000 KM, investment = more",
+            "default": "investment"
           }
         },
         "type": "object",
@@ -1426,6 +1522,26 @@
           "fee_drop_per_child_km": {
             "type": "number",
             "title": "Fee Drop Per Child Km"
+          },
+          "facility_owner_saves_km_year": {
+            "type": "number",
+            "title": "Facility Owner Saves Km Year",
+            "description": "Savings for the facility owner when the club doesn't pay electricity",
+            "default": 0
+          },
+          "families_save_km_year": {
+            "type": "number",
+            "title": "Families Save Km Year",
+            "description": "Savings for families (e.g. kit swap), not part of the club's totals",
+            "default": 0
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes",
+            "description": "Plain-language caveats to show"
           },
           "children": {
             "type": "integer",
@@ -1516,6 +1632,11 @@
           "cost_per_child_after_km": {
             "type": "number",
             "title": "Cost Per Child After Km"
+          },
+          "families_save_per_child_km": {
+            "type": "number",
+            "title": "Families Save Per Child Km",
+            "default": 0
           },
           "saving_share_pct": {
             "type": "number",
@@ -1673,6 +1794,21 @@
             "type": "integer",
             "title": "Grid Year"
           },
+          "club_pays_electricity": {
+            "type": "boolean",
+            "title": "Club Pays Electricity",
+            "default": true
+          },
+          "club_electricity_km": {
+            "type": "number",
+            "title": "Club Electricity Km",
+            "description": "Electricity cost the club itself pays"
+          },
+          "heating_type": {
+            "type": "string",
+            "title": "Heating Type",
+            "default": "electric"
+          },
           "illustrative_club": {
             "type": "boolean",
             "title": "Illustrative Club",
@@ -1689,6 +1825,7 @@
           "travel_t_co2",
           "grid_gco2_per_kwh",
           "grid_year",
+          "club_electricity_km",
           "illustrative_club"
         ],
         "title": "Baseline"
@@ -1976,6 +2113,34 @@
         ],
         "title": "Body_readBill"
       },
+      "City": {
+        "properties": {
+          "city": {
+            "type": "string",
+            "title": "City"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city",
+          "lat",
+          "lon",
+          "source"
+        ],
+        "title": "City"
+      },
       "ClubAssumptions": {
         "properties": {
           "costs": {
@@ -2059,6 +2224,26 @@
           },
           "travel": {
             "$ref": "#/components/schemas/Travel"
+          },
+          "pays_electricity": {
+            "type": "boolean",
+            "title": "Pays Electricity",
+            "description": "Does the club pay the electricity bill?",
+            "default": true
+          },
+          "heating_type": {
+            "type": "string",
+            "enum": [
+              "electric",
+              "district",
+              "gas",
+              "wood",
+              "other",
+              "unknown"
+            ],
+            "title": "Heating Type",
+            "description": "How the facility is heated",
+            "default": "electric"
           }
         },
         "type": "object",
@@ -2670,6 +2855,16 @@
             "type": "array",
             "title": "Method"
           },
+          "club_pays_electricity": {
+            "type": "boolean",
+            "title": "Club Pays Electricity",
+            "default": true
+          },
+          "heating_type": {
+            "type": "string",
+            "title": "Heating Type",
+            "default": "electric"
+          },
           "illustrative_club": {
             "type": "boolean",
             "title": "Illustrative Club"
@@ -3043,6 +3238,189 @@
           "based_on"
         ],
         "title": "PlanUpdate"
+      },
+      "QuickClubInput": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "City",
+            "description": "A city from GET /api/cities"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 46.0,
+                "minimum": 42.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat",
+            "description": "Optional exact location"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 20.0,
+                "minimum": 15.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "children": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Children"
+          },
+          "teams": {
+            "type": "integer",
+            "maximum": 500.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Teams"
+          },
+          "pays_electricity": {
+            "type": "boolean",
+            "title": "Pays Electricity",
+            "default": true
+          },
+          "monthly_bill_km": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Bill Km",
+            "description": "Average KM/month"
+          },
+          "yearly_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yearly Kwh",
+            "description": "If known (overrides bill)"
+          },
+          "heating_type": {
+            "type": "string",
+            "enum": [
+              "electric",
+              "district",
+              "gas",
+              "wood",
+              "other",
+              "unknown"
+            ],
+            "title": "Heating Type",
+            "default": "unknown"
+          },
+          "away_games_per_team": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 200.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Away Games Per Team",
+            "description": "Per season"
+          },
+          "avg_one_way_km": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 2000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg One Way Km"
+          },
+          "transport": {
+            "type": "string",
+            "enum": [
+              "cars",
+              "minibus",
+              "mixed"
+            ],
+            "title": "Transport",
+            "default": "mixed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city",
+          "children",
+          "teams"
+        ],
+        "title": "QuickClubInput",
+        "description": "What a volunteer knows. Only city, children and teams are required."
+      },
+      "QuickClubResult": {
+        "properties": {
+          "club": {
+            "$ref": "#/components/schemas/ClubProfile"
+          },
+          "estimated": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Estimated",
+            "description": "Profile parts we estimated (not given by the club)"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes",
+            "description": "Plain-language explanation of every estimate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "club",
+          "estimated",
+          "notes"
+        ],
+        "title": "QuickClubResult"
       },
       "SeasonTravel": {
         "properties": {
@@ -3569,6 +3947,83 @@
               }
             ],
             "title": "Cuts Car Trips Share"
+          },
+          "reference_kwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Kwh"
+          },
+          "min_kwp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Kwp"
+          },
+          "max_kwp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Kwp"
+          },
+          "kits_per_child_year": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kits Per Child Year"
+          },
+          "swap_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Swap Share"
+          },
+          "kg_per_kit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kg Per Kit"
+          },
+          "kit_price_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kit Price Km"
           },
           "note": {
             "anyOf": [
