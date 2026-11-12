@@ -1350,10 +1350,10 @@
           "assumptions": {
             "$ref": "#/components/schemas/ActionPlanAssumptions"
           },
-          "example": {
+          "illustrative_club": {
             "type": "boolean",
-            "title": "Example",
-            "description": "True while serving example data, not the live model"
+            "title": "Illustrative Club",
+            "description": "True when calculated for the sample club"
           }
         },
         "type": "object",
@@ -1364,7 +1364,7 @@
           "fee_drop_per_child_km",
           "children",
           "assumptions",
-          "example"
+          "illustrative_club"
         ],
         "title": "ActionPlan"
       },
@@ -1589,10 +1589,10 @@
             "type": "integer",
             "title": "Grid Year"
           },
-          "example": {
+          "illustrative_club": {
             "type": "boolean",
-            "title": "Example",
-            "description": "True while serving example data, not the live model"
+            "title": "Illustrative Club",
+            "description": "True when calculated for the sample club"
           }
         },
         "type": "object",
@@ -1605,7 +1605,7 @@
           "travel_t_co2",
           "grid_gco2_per_kwh",
           "grid_year",
-          "example"
+          "illustrative_club"
         ],
         "title": "Baseline"
       },
@@ -2478,6 +2478,11 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Assumptions"
+          },
+          "illustrative_club": {
+            "type": "boolean",
+            "title": "Illustrative Club",
+            "description": "True when calculated for the sample club"
           }
         },
         "type": "object",
@@ -2490,7 +2495,8 @@
           "options",
           "cheapest",
           "lowest_co2",
-          "assumptions"
+          "assumptions",
+          "illustrative_club"
         ],
         "title": "SeasonTravel"
       },

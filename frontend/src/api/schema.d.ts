@@ -485,10 +485,10 @@ export interface components {
             children: number;
             assumptions: components["schemas"]["ActionPlanAssumptions"];
             /**
-             * Example
-             * @description True while serving example data, not the live model
+             * Illustrative Club
+             * @description True when calculated for the sample club
              */
-            example: boolean;
+            illustrative_club: boolean;
         };
         /** ActionPlanAssumptions */
         ActionPlanAssumptions: {
@@ -579,10 +579,10 @@ export interface components {
             /** Grid Year */
             grid_year: number;
             /**
-             * Example
-             * @description True while serving example data, not the live model
+             * Illustrative Club
+             * @description True when calculated for the sample club
              */
-            example: boolean;
+            illustrative_club: boolean;
         };
         /** ClubAssumptions */
         ClubAssumptions: {
@@ -899,6 +899,11 @@ export interface components {
             assumptions: {
                 [key: string]: unknown;
             };
+            /**
+             * Illustrative Club
+             * @description True when calculated for the sample club
+             */
+            illustrative_club: boolean;
         };
         /** SeasonTravelOption */
         SeasonTravelOption: {

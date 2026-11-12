@@ -39,3 +39,4 @@ class SeasonTravel(BaseModel):
     cheapest: str
     lowest_co2: str
     assumptions: dict
+    illustrative_club: bool = Field(description="True when calculated for the sample club")

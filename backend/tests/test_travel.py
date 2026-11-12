@@ -73,7 +73,11 @@ def test_custom_club_changes_the_result():
 
 def test_null_club_is_the_sample_club():
     assert post(club=None) == post()
-    assert post(club=sample()) == post()
+    # Sending the sample's numbers explicitly gives the same result; only the label differs
+    # (a club sent in the body counts as the user's own club).
+    explicit, default = post(club=sample()), post()
+    assert explicit.pop("illustrative_club") is False and default.pop("illustrative_club") is True
+    assert explicit == default
 
 
 def test_current_mix_uses_the_clubs_own_vehicles():

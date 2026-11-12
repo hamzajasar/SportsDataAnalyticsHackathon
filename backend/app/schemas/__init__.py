@@ -209,7 +209,7 @@ class Baseline(BaseModel):
     travel_t_co2: float
     grid_gco2_per_kwh: float
     grid_year: int
-    example: bool = Field(description="True while serving example data, not the live model")
+    illustrative_club: bool = Field(description="True when calculated for the sample club")
 
 
 class Action(BaseModel):
@@ -237,4 +237,4 @@ class ActionPlan(BaseModel):
     fee_drop_per_child_km: float
     children: int
     assumptions: ActionPlanAssumptions
-    example: bool = Field(description="True while serving example data, not the live model")
+    illustrative_club: bool = Field(description="True when calculated for the sample club")

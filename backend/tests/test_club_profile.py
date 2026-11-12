@@ -83,3 +83,11 @@ def test_solar_saving_capped_at_club_use(club):
 def test_solar_not_capped_for_large_club():
     solar = next(a for a in post_actions({})["actions"] if a["id"] == "solar")
     assert solar["saves_kwh_year"] < 52000 and "capped" not in solar["basis"]
+
+
+def test_every_club_endpoint_labels_the_sample_club_the_same_way(club):
+    for path in ("baseline", "actions", "energy", "affordability", "travel"):
+        sample = client.post(f"/api/club/{path}", json={}).json()
+        custom = client.post(f"/api/club/{path}", json={"club": club}).json()
+        assert sample["illustrative_club"] is True, path
+        assert custom["illustrative_club"] is False, path

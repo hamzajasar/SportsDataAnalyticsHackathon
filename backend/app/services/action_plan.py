@@ -9,11 +9,11 @@ from app.services import actions
 
 
 def baseline(club: dict | None = None) -> dict:
-    return {**actions.baseline(club), "example": False}
+    return {**actions.baseline(club), "illustrative_club": club is None}
 
 
 def action_plan(club: dict | None = None, price: float | None = None) -> dict:
     plan = actions.rank_actions(club, price_kwh=price)
     # The model always marks its club as illustrative; only the sample club actually is.
     plan["assumptions"] = {**plan["assumptions"], "illustrative_club": club is None}
-    return {**plan, "example": False}
+    return {**plan, "illustrative_club": club is None}

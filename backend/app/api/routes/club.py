@@ -113,4 +113,4 @@ def season_travel(req: SeasonTravelRequest) -> SeasonTravel:
         result = travel.season_travel(club, req.people_per_trip, req.share_with_partner)
     except FileNotFoundError as e:
         raise _missing(e) from None
-    return SeasonTravel(**result)
+    return SeasonTravel(**result, illustrative_club=req.club is None)
