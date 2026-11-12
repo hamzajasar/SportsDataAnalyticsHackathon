@@ -25,3 +25,12 @@ def test_datasets_disabled_in_production():
     assert Settings(environment="development").datasets_enabled is True
     assert Settings(environment="production").datasets_enabled is False
     assert Settings(environment="production", expose_datasets=True).datasets_enabled is True
+
+
+def test_hosted_database_urls_get_psycopg_driver():
+    from app.core.config import Settings
+
+    for raw in ("postgres://u:p@h:5432/db", "postgresql://u:p@h:5432/db"):
+        assert Settings(database_url=raw).database_url == "postgresql+psycopg://u:p@h:5432/db"
+    local = "postgresql+psycopg://u:p@localhost:5432/db"
+    assert Settings(database_url=local).database_url == local

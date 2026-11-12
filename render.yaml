@@ -1,15 +1,26 @@
-# Render blueprint for the backend (https://render.com/docs/blueprint-spec)
+# Render Blueprint: backend API + free Postgres. Deploys from the `dev` branch.
+# Setup steps: docs/DEPLOY.md
 services:
   - type: web
-    name: sports-analytics-api
+    name: club-footprint-api
     runtime: docker
-    rootDir: backend
     plan: free
+    branch: dev
+    dockerContext: .
+    dockerfilePath: ./backend/Dockerfile
     healthCheckPath: /api/health
     envVars:
       - key: ENVIRONMENT
         value: production
       - key: DATABASE_URL
+        fromDatabase:
+          name: club-footprint-db
+          property: connectionString
+      - key: CORS_ORIGINS # set after the frontend is deployed, e.g. ["https://xyz.vercel.app"]
         sync: false
-      - key: CORS_ORIGINS
-        sync: false
+
+databases:
+  - name: club-footprint-db
+    plan: free
+    databaseName: hackathon
+    user: hackathon

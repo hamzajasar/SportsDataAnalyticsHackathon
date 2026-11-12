@@ -10,7 +10,8 @@ import { cn } from '@/lib/utils'
 
 const nav = [
   { to: '/', label: 'Footprint', icon: Leaf },
-  { to: '/data', label: 'Data', icon: Database },
+  // Data explorer is a dev tool: its API is disabled in production (ENVIRONMENT=production)
+  ...(import.meta.env.DEV ? [{ to: '/data', label: 'Data', icon: Database }] : []),
   { to: '/methodology', label: 'How it works', icon: Info },
 ]
 

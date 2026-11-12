@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT_DIR = Path(__file__).resolve().parents[3]
@@ -16,6 +17,16 @@ class Settings(BaseSettings):
     # Raw-data explorer endpoints (/api/datasets/*). On for local dev, OFF when deployed
     # so the organisers' datasets are never publicly downloadable.
     expose_datasets: bool | None = None
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg_driver(cls, v: str) -> str:
+        # Hosting providers (Render, Heroku…) give postgres:// or postgresql:// URLs;
+        # SQLAlchemy needs the driver named explicitly.
+        for prefix in ("postgres://", "postgresql://"):
+            if v.startswith(prefix):
+                return "postgresql+psycopg://" + v[len(prefix) :]
+        return v
 
     @property
     def datasets_enabled(self) -> bool:

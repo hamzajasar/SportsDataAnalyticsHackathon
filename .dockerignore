@@ -1,0 +1,11 @@
+# Build context is the repo root: send ONLY what the backend image needs
+# (never .env, raw data, node_modules, .git).
+**
+!backend/pyproject.toml
+!backend/uv.lock
+!backend/alembic.ini
+!backend/app/**
+!backend/migrations/**
+!data/clean/**
+**/__pycache__
+**/.pytest_cache
