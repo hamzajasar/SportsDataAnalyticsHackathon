@@ -148,9 +148,30 @@ class MonthlyValue(BaseModel):
     source: str
 
 
+class Upgrade(BaseModel):
+    """One upgrade the action plan can recommend (backend/app/reference/upgrades.json).
+
+    Which fields are set depends on the kind of upgrade:
+    - share of one electricity use (LED, insulation): cost_km + saves_share_of + share
+    - solar: kwp + cost_km_per_kwp + self_use_share
+    - travel (car-sharing): cost_km + cuts_car_trips_share
+    """
+
+    id: str
+    name: str
+    cost_km: float | None = None
+    saves_share_of: str | None = None
+    share: float | None = None
+    kwp: float | None = None
+    cost_km_per_kwp: float | None = None
+    self_use_share: float | None = None
+    cuts_car_trips_share: float | None = None
+    note: str | None = None
+
+
 class ClubAssumptions(BaseModel):
     costs: list[CostAssumption]
-    upgrades: list[dict[str, Any]]
+    upgrades: list[Upgrade]
     pv_yield_monthly: list[MonthlyValue]  # kWh per installed kWp
     temperature_monthly: list[MonthlyValue]  # mean °C
 

@@ -533,7 +533,7 @@
           "club"
         ],
         "summary": "Sample Club",
-        "description": "Illustrative sample club (placeholder until the organisers' pack is integrated).",
+        "description": "The illustrative sample club, in the same format the POST endpoints accept\n(use it to pre-fill the club form).",
         "operationId": "getSampleClub",
         "responses": {
           "200": {
@@ -541,9 +541,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "type": "object",
-                  "title": "Response Getsampleclub"
+                  "$ref": "#/components/schemas/ClubProfile"
                 }
               }
             }
@@ -1417,8 +1415,7 @@
           },
           "upgrades": {
             "items": {
-              "additionalProperties": true,
-              "type": "object"
+              "$ref": "#/components/schemas/Upgrade"
             },
             "type": "array",
             "title": "Upgrades"
@@ -2455,6 +2452,113 @@
           "people"
         ],
         "title": "TripRequest"
+      },
+      "Upgrade": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "cost_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Km"
+          },
+          "saves_share_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saves Share Of"
+          },
+          "share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share"
+          },
+          "kwp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kwp"
+          },
+          "cost_km_per_kwp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Km Per Kwp"
+          },
+          "self_use_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Self Use Share"
+          },
+          "cuts_car_trips_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cuts Car Trips Share"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "Upgrade",
+        "description": "One upgrade the action plan can recommend (backend/app/reference/upgrades.json).\n\nWhich fields are set depends on the kind of upgrade:\n- share of one electricity use (LED, insulation): cost_km + saves_share_of + share\n- solar: kwp + cost_km_per_kwp + self_use_share\n- travel (car-sharing): cost_km + cuts_car_trips_share"
       },
       "ValidationError": {
         "properties": {

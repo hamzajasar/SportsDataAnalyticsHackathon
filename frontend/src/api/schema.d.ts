@@ -183,7 +183,8 @@ export interface paths {
         };
         /**
          * Sample Club
-         * @description Illustrative sample club (placeholder until the organisers' pack is integrated).
+         * @description The illustrative sample club, in the same format the POST endpoints accept
+         *     (use it to pre-fill the club form).
          */
         get: operations["getSampleClub"];
         put?: never;
@@ -504,9 +505,7 @@ export interface components {
             /** Costs */
             costs: components["schemas"]["CostAssumption"][];
             /** Upgrades */
-            upgrades: {
-                [key: string]: unknown;
-            }[];
+            upgrades: components["schemas"]["Upgrade"][];
             /** Pv Yield Monthly */
             pv_yield_monthly: components["schemas"]["MonthlyValue"][];
             /** Temperature Monthly */
@@ -879,6 +878,37 @@ export interface components {
              */
             car_type: string;
         };
+        /**
+         * Upgrade
+         * @description One upgrade the action plan can recommend (backend/app/reference/upgrades.json).
+         *
+         *     Which fields are set depends on the kind of upgrade:
+         *     - share of one electricity use (LED, insulation): cost_km + saves_share_of + share
+         *     - solar: kwp + cost_km_per_kwp + self_use_share
+         *     - travel (car-sharing): cost_km + cuts_car_trips_share
+         */
+        Upgrade: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Cost Km */
+            cost_km?: number | null;
+            /** Saves Share Of */
+            saves_share_of?: string | null;
+            /** Share */
+            share?: number | null;
+            /** Kwp */
+            kwp?: number | null;
+            /** Cost Km Per Kwp */
+            cost_km_per_kwp?: number | null;
+            /** Self Use Share */
+            self_use_share?: number | null;
+            /** Cuts Car Trips Share */
+            cuts_car_trips_share?: number | null;
+            /** Note */
+            note?: string | null;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -1242,9 +1272,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["ClubProfile"];
                 };
             };
         };

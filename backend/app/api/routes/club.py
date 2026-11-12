@@ -1,11 +1,9 @@
 """Club data, assumptions, venues and sources (from app/reference, shipped with the backend)."""
 
-from typing import Any
-
 from fastapi import APIRouter, HTTPException, Query
 
 from app.schemas import ActionPlan, Baseline, ClubAssumptions, MonthlySeries, Source, Venue
-from app.schemas.club import ClubRequest
+from app.schemas.club import ClubProfile, ClubRequest
 from app.schemas.travel import SeasonTravel, SeasonTravelRequest
 from app.services import action_plan, travel
 from app.services import club_data as svc
@@ -17,11 +15,12 @@ def _missing(e: FileNotFoundError) -> HTTPException:
     return HTTPException(503, str(e))
 
 
-@router.get("/club/sample", response_model=dict[str, Any], operation_id="getSampleClub")
-def sample_club() -> dict[str, Any]:
-    """Illustrative sample club (placeholder until the organisers' pack is integrated)."""
+@router.get("/club/sample", response_model=ClubProfile, operation_id="getSampleClub")
+def sample_club() -> ClubProfile:
+    """The illustrative sample club, in the same format the POST endpoints accept
+    (use it to pre-fill the club form)."""
     try:
-        return svc.sample_club()
+        return ClubProfile.model_validate(svc.sample_club())
     except FileNotFoundError as e:
         raise _missing(e) from None
 

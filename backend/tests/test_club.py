@@ -60,3 +60,18 @@ def test_temperature_and_pv_yield():
     pv = client.get("/api/solar/pv-yield").json()
     assert len(pv["months"]) == 12
     assert 900 < pv["annual"] < 1500  # kWh/kWp/year, plausible for Sarajevo
+
+
+def test_sample_club_is_typed_and_postable():
+    club = client.get("/api/club/sample").json()
+    assert "_note" not in club and "heating_note" not in club  # only profile fields
+    # The sample can be sent straight back to the POST endpoints.
+    r = client.post("/api/club/actions", json={"club": club})
+    assert r.status_code == 200
+
+
+def test_upgrades_are_typed():
+    ups = client.get("/api/club/assumptions").json()["upgrades"]
+    assert {u["id"] for u in ups} >= {"led", "solar", "insul", "carshare"}
+    solar = next(u for u in ups if u["id"] == "solar")
+    assert solar["kwp"] > 0 and solar["cost_km_per_kwp"] > 0
