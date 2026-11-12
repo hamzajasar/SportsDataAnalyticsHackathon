@@ -782,6 +782,46 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Calculate Baseline",
+        "description": "Baseline for the club in the body (`club: null` = sample club).",
+        "operationId": "calculateBaseline",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClubRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Baseline"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/club/actions": {
@@ -799,6 +839,46 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ActionPlan"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Calculate Actions",
+        "description": "Ranked actions for the club in the body, optionally with a different electricity price.",
+        "operationId": "calculateActionPlan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClubRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -1325,6 +1405,95 @@
         ],
         "title": "ClubAssumptions"
       },
+      "ClubProfile": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "City"
+          },
+          "lat": {
+            "type": "number",
+            "maximum": 46.0,
+            "minimum": 42.0,
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "maximum": 20.0,
+            "minimum": 15.0,
+            "title": "Lon"
+          },
+          "children": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Children"
+          },
+          "teams": {
+            "type": "integer",
+            "maximum": 500.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Teams"
+          },
+          "electricity_kwh_year": {
+            "$ref": "#/components/schemas/Electricity"
+          },
+          "travel": {
+            "$ref": "#/components/schemas/Travel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "city",
+          "lat",
+          "lon",
+          "children",
+          "teams",
+          "electricity_kwh_year",
+          "travel"
+        ],
+        "title": "ClubProfile"
+      },
+      "ClubRequest": {
+        "properties": {
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "electricity_price_km_per_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Electricity Price Km Per Kwh",
+            "description": "Override the sourced electricity price (KM/kWh)"
+          }
+        },
+        "type": "object",
+        "title": "ClubRequest",
+        "description": "POST body for club calculations. Omit `club` to use the sample club."
+      },
       "ColumnSummary": {
         "properties": {
           "name": {
@@ -1544,6 +1713,36 @@
           "note"
         ],
         "title": "Distance"
+      },
+      "Electricity": {
+        "properties": {
+          "floodlights": {
+            "type": "number",
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Floodlights"
+          },
+          "heating": {
+            "type": "number",
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Heating"
+          },
+          "hall_and_other": {
+            "type": "number",
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Hall And Other"
+          }
+        },
+        "type": "object",
+        "required": [
+          "floodlights",
+          "heating",
+          "hall_and_other"
+        ],
+        "title": "Electricity",
+        "description": "Yearly electricity use in kWh, split by what it is used for."
       },
       "ElectricityEstimate": {
         "properties": {
@@ -1900,6 +2099,32 @@
         ],
         "title": "Source"
       },
+      "Travel": {
+        "properties": {
+          "away_trips_per_team_year": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 0.0,
+            "title": "Away Trips Per Team Year"
+          },
+          "avg_one_way_km": {
+            "type": "number",
+            "maximum": 2000.0,
+            "minimum": 0.0,
+            "title": "Avg One Way Km"
+          },
+          "vehicles_per_trip": {
+            "$ref": "#/components/schemas/Vehicles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "away_trips_per_team_year",
+          "avg_one_way_km",
+          "vehicles_per_trip"
+        ],
+        "title": "Travel"
+      },
       "TripComparison": {
         "properties": {
           "distance_km": {
@@ -2060,6 +2285,29 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "Vehicles": {
+        "properties": {
+          "minibus": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Minibus"
+          },
+          "car": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Car"
+          }
+        },
+        "type": "object",
+        "required": [
+          "minibus",
+          "car"
+        ],
+        "title": "Vehicles",
+        "description": "Vehicles used for one away trip of one team."
       },
       "Venue": {
         "properties": {
