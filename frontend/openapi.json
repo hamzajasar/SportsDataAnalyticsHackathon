@@ -717,6 +717,50 @@
           }
         }
       }
+    },
+    "/api/climate/temperature": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Temperature",
+        "description": "Sarajevo monthly mean temperature (Open-Meteo) \u2014 drives the heating profile.",
+        "operationId": "getTemperature",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthlySeries"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/solar/pv-yield": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Pv Yield",
+        "description": "Solar output per installed kWp in Sarajevo, by month (PVGIS).",
+        "operationId": "getPvYield",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthlySeries"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1168,6 +1212,43 @@
           "points"
         ],
         "title": "IntensitySeries"
+      },
+      "MonthlySeries": {
+        "properties": {
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/MonthlyValue"
+            },
+            "type": "array",
+            "title": "Months"
+          },
+          "annual": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unit",
+          "months",
+          "source"
+        ],
+        "title": "MonthlySeries"
       },
       "MonthlyValue": {
         "properties": {

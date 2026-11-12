@@ -248,6 +248,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/climate/temperature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Temperature
+         * @description Sarajevo monthly mean temperature (Open-Meteo) — drives the heating profile.
+         */
+        get: operations["getTemperature"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/solar/pv-yield": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pv Yield
+         * @description Solar output per installed kWp in Sarajevo, by month (PVGIS).
+         */
+        get: operations["getPvYield"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -409,6 +449,17 @@ export interface components {
             code: string;
             /** Points */
             points: components["schemas"]["IntensityPoint"][];
+        };
+        /** MonthlySeries */
+        MonthlySeries: {
+            /** Unit */
+            unit: string;
+            /** Months */
+            months: components["schemas"]["MonthlyValue"][];
+            /** Annual */
+            annual?: number | null;
+            /** Source */
+            source: string;
         };
         /** MonthlyValue */
         MonthlyValue: {
@@ -922,6 +973,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Source"][];
+                };
+            };
+        };
+    };
+    getTemperature: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthlySeries"];
+                };
+            };
+        };
+    };
+    getPvYield: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthlySeries"];
                 };
             };
         };

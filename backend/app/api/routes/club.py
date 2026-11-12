@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 
-from app.schemas import ClubAssumptions, Source, Venue
+from app.schemas import ClubAssumptions, MonthlySeries, Source, Venue
 from app.services import club_data as svc
 
 router = APIRouter(tags=["club"])
@@ -53,5 +53,23 @@ def sources() -> list[Source]:
     """Every data source with licence + credit line (for the Methodology page and final slide)."""
     try:
         return [Source(**s) for s in svc.sources()]
+    except FileNotFoundError as e:
+        raise _missing(e) from None
+
+
+@router.get("/climate/temperature", response_model=MonthlySeries, operation_id="getTemperature")
+def temperature() -> MonthlySeries:
+    """Sarajevo monthly mean temperature (Open-Meteo) — drives the heating profile."""
+    try:
+        return MonthlySeries(**svc.temperature_series())
+    except FileNotFoundError as e:
+        raise _missing(e) from None
+
+
+@router.get("/solar/pv-yield", response_model=MonthlySeries, operation_id="getPvYield")
+def pv_yield() -> MonthlySeries:
+    """Solar output per installed kWp in Sarajevo, by month (PVGIS)."""
+    try:
+        return MonthlySeries(**svc.pv_yield_series())
     except FileNotFoundError as e:
         raise _missing(e) from None

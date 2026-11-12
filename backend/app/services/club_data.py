@@ -121,3 +121,23 @@ def venues(
     if near is not None:
         out.sort(key=lambda v: v["distance_km"])
     return out[:limit]
+
+
+def temperature_series() -> dict:
+    months = _monthly("temperature", "mean_temp_c")
+    return {
+        "unit": "°C (monthly mean)",
+        "months": months,
+        "annual": round(sum(m["value"] for m in months) / len(months), 1),
+        "source": months[0]["source"],
+    }
+
+
+def pv_yield_series() -> dict:
+    months = _monthly("pv_yield", "kwh_per_kwp")
+    return {
+        "unit": "kWh per installed kWp",
+        "months": months,
+        "annual": round(sum(m["value"] for m in months), 1),
+        "source": months[0]["source"],
+    }

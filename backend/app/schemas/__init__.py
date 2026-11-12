@@ -153,3 +153,10 @@ class ClubAssumptions(BaseModel):
     upgrades: list[dict[str, Any]]
     pv_yield_monthly: list[MonthlyValue]  # kWh per installed kWp
     temperature_monthly: list[MonthlyValue]  # mean °C
+
+
+class MonthlySeries(BaseModel):
+    unit: str
+    months: list[MonthlyValue]
+    annual: float | None = None  # sum (PV) or mean (temperature)
+    source: str
