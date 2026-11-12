@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useClub, type ClubProfile } from '@/state/club'
 import { useSampleClub } from '@/api/queries'
+import { useT } from '@/i18n'
 
 function Field({
   id,
@@ -62,7 +63,6 @@ type Draft = {
   avg_one_way_km: string
   vehicles_minibus: string
   vehicles_car: string
-  // Carried through unchanged until the form gets controls for them
   pays_electricity: ClubProfile['pays_electricity']
   heating_type: ClubProfile['heating_type']
 }
@@ -143,6 +143,7 @@ const DEFAULT_DRAFT: Draft = {
 export function ClubForm({ onClose }: { onClose: () => void }) {
   const { club, isSample, setClub, resetToSample } = useClub()
   const sample = useSampleClub()
+  const { t } = useT()
 
   const initialDraft = club
     ? profileToDraft(club)
@@ -159,7 +160,7 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
     e.preventDefault()
     const profile = draftToProfile(draft)
     if (!profile) {
-      setError('Please check your inputs: name required, children/teams ≥ 1, lat 42–46, lon 15–20')
+      setError(t('form.error'))
       return
     }
     setClub(profile)
@@ -175,30 +176,33 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Edit club numbers</CardTitle>
-        <CardDescription>
-          Your numbers stay in your browser. Leave as the sample Sarajevo club if you just want to
-          explore.
-        </CardDescription>
+        <CardTitle className="text-base">{t('form.title')}</CardTitle>
+        <CardDescription>{t('form.desc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               id="name"
-              label="Club name"
+              label={t('form.clubName')}
               value={draft.name}
               onChange={set('name')}
               type="text"
               required
             />
-            <Field id="city" label="City" value={draft.city} onChange={set('city')} type="text" />
+            <Field
+              id="city"
+              label={t('form.city')}
+              value={draft.city}
+              onChange={set('city')}
+              type="text"
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               id="children"
-              label="Children in the club"
+              label={t('form.children')}
               value={draft.children}
               onChange={set('children')}
               min={1}
@@ -206,7 +210,7 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
             />
             <Field
               id="teams"
-              label="Teams"
+              label={t('form.teams')}
               value={draft.teams}
               onChange={set('teams')}
               min={1}
@@ -215,11 +219,11 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
           </div>
 
           <fieldset className="space-y-3 rounded-md border p-4">
-            <legend className="px-1 text-sm font-medium">Electricity (kWh per year)</legend>
+            <legend className="px-1 text-sm font-medium">{t('form.electricity')}</legend>
             <div className="grid gap-4 sm:grid-cols-3">
               <Field
                 id="floodlights"
-                label="Floodlights"
+                label={t('form.floodlights')}
                 value={draft.floodlights}
                 onChange={set('floodlights')}
                 min={0}
@@ -227,7 +231,7 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
               />
               <Field
                 id="heating"
-                label="Heating"
+                label={t('form.heating')}
                 value={draft.heating}
                 onChange={set('heating')}
                 min={0}
@@ -235,7 +239,7 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
               />
               <Field
                 id="hall"
-                label="Hall & other"
+                label={t('form.hallOther')}
                 value={draft.hall_and_other}
                 onChange={set('hall_and_other')}
                 min={0}
@@ -245,11 +249,11 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
           </fieldset>
 
           <fieldset className="space-y-3 rounded-md border p-4">
-            <legend className="px-1 text-sm font-medium">Away travel</legend>
+            <legend className="px-1 text-sm font-medium">{t('form.awayTravel')}</legend>
             <div className="grid gap-4 sm:grid-cols-3">
               <Field
                 id="trips"
-                label="Away trips per team per year"
+                label={t('form.awayTrips')}
                 value={draft.away_trips_per_team_year}
                 onChange={set('away_trips_per_team_year')}
                 min={0}
@@ -257,7 +261,7 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
               />
               <Field
                 id="km"
-                label="Average one-way distance (km)"
+                label={t('form.avgKm')}
                 value={draft.avg_one_way_km}
                 onChange={set('avg_one_way_km')}
                 min={0}
@@ -267,8 +271,8 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
                 id="minibus"
-                label="Minibuses per trip"
-                hint="Hired coach = 0 minibuses"
+                label={t('form.minibuses')}
+                hint={t('form.minibusHint')}
                 value={draft.vehicles_minibus}
                 onChange={set('vehicles_minibus')}
                 min={0}
@@ -276,7 +280,7 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
               />
               <Field
                 id="cars"
-                label="Cars per trip"
+                label={t('form.cars')}
                 value={draft.vehicles_car}
                 onChange={set('vehicles_car')}
                 min={0}
@@ -287,12 +291,12 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
 
           <details className="text-sm">
             <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-              Location (lat/lon — used for the map)
+              {t('form.location')}
             </summary>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               <Field
                 id="lat"
-                label="Latitude (42–46)"
+                label={t('form.latitude')}
                 value={draft.lat}
                 onChange={set('lat')}
                 min={42}
@@ -301,7 +305,7 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
               />
               <Field
                 id="lon"
-                label="Longitude (15–20)"
+                label={t('form.longitude')}
                 value={draft.lon}
                 onChange={set('lon')}
                 min={15}
@@ -314,12 +318,12 @@ export function ClubForm({ onClose }: { onClose: () => void }) {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="flex flex-wrap items-center gap-3">
-            <Button type="submit">Calculate for this club</Button>
+            <Button type="submit">{t('form.submit')}</Button>
             <Button type="button" variant="outline" onClick={handleReset}>
-              {isSample ? 'Reset to sample' : 'Back to sample club'}
+              {isSample ? t('form.resetSample') : t('form.backSample')}
             </Button>
             <Button type="button" variant="ghost" onClick={onClose}>
-              Cancel
+              {t('form.cancel')}
             </Button>
           </div>
         </form>

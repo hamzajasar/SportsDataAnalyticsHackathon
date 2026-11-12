@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Leaf, Pencil, Zap, Bus, TrendingDown, ArrowRight } from 'lucide-react'
 import { useActionPlan, useClubBaseline } from '@/api/queries'
 import { useClub } from '@/state/club'
+import { useT } from '@/i18n'
 import { ClubForm } from '@/components/club/ClubForm'
 import { QueryState } from '@/components/common/QueryState'
 import { Badge } from '@/components/ui/badge'
@@ -26,12 +27,13 @@ export function OverviewPage() {
   const [editOpen, setEditOpen] = useState(false)
   const actions = useActionPlan(club)
   const baseline = useClubBaseline(club)
+  const { t } = useT()
 
   const plan = actions.data
   const base = baseline.data
   const top3 = plan?.actions.slice(0, 3) ?? []
   const source = plan ? `Ember ${plan.assumptions.grid_year} · UK GHG 2025` : ''
-  const clubName = isSample ? 'Sample Sarajevo club' : (club?.name ?? 'Your club')
+  const clubName = isSample ? t('common.sampleClub') : (club?.name ?? t('common.yourClub'))
 
   return (
     <div className="space-y-6">
@@ -39,11 +41,11 @@ export function OverviewPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold">{clubName}</h1>
-          {isSample && <Badge variant="secondary">Example</Badge>}
+          {isSample && <Badge variant="secondary">{t('common.example')}</Badge>}
         </div>
         <Button variant="outline" size="sm" onClick={() => setEditOpen((o) => !o)}>
           <Pencil className="mr-1.5 size-3.5" />
-          {editOpen ? 'Close form' : 'Edit club numbers'}
+          {editOpen ? t('overview.closeForm') : t('overview.editBtn')}
         </Button>
       </div>
 
@@ -51,12 +53,9 @@ export function OverviewPage() {
 
       {isSample && !editOpen && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
-          <p className="text-sm">
-            This is an <span className="font-medium">example Sarajevo club</span>. Enter your own
-            numbers to see your real footprint.
-          </p>
+          <p className="text-sm">{t('overview.sampleCta')}</p>
           <Button size="sm" onClick={() => navigate('/quick-start')}>
-            Enter my club <ArrowRight className="ml-1.5 size-3.5" />
+            {t('overview.enterClub')} <ArrowRight className="ml-1.5 size-3.5" />
           </Button>
         </div>
       )}
@@ -66,11 +65,12 @@ export function OverviewPage() {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
             <Leaf className="size-4 text-primary" />
-            Potential savings
+            {t('overview.potentialSavings')}
           </CardTitle>
           {!actions.isLoading && !actions.error && (
             <CardDescription>
-              All upgrades combined · {isSample ? 'sample data' : 'your club'} · {source}
+              {t('overview.allUpgradesCombined')} ·{' '}
+              {isSample ? t('overview.sampleData') : t('common.yourClub')} · {source}
             </CardDescription>
           )}
         </CardHeader>
@@ -79,24 +79,24 @@ export function OverviewPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <StatBlock
-                  label="Save per year"
+                  label={t('overview.savePerYear')}
                   value={`${formatNumber(plan?.total_saves_km_year ?? 0)} KM`}
                   sub={source}
                 />
                 <StatBlock
-                  label="Cut CO₂ per year"
+                  label={t('overview.cutCo2')}
                   value={`${plan?.total_saves_t_co2_year ?? 0} t`}
                   sub={source}
                 />
                 <StatBlock
-                  label="Fee drop per child"
+                  label={t('overview.feeDrop')}
                   value={`−${formatNumber(plan?.fee_drop_per_child_km ?? 0)} KM`}
-                  sub={`÷ ${plan?.children ?? 0} children · ${source}`}
+                  sub={t('overview.feeDropSub', { children: plan?.children ?? 0, source })}
                 />
               </div>
 
               <div>
-                <p className="mb-2 text-sm font-medium">Top 3 actions by payback</p>
+                <p className="mb-2 text-sm font-medium">{t('overview.top3')}</p>
                 <ol className="space-y-2">
                   {top3.map((action, i) => (
                     <li
@@ -114,14 +114,12 @@ export function OverviewPage() {
                       </div>
                       <div className="flex shrink-0 items-center gap-2 pl-5 sm:pl-0">
                         <span className="text-sm tabular-nums">
-                          {formatNumber(action.saves_km_year)} KM/yr
+                          {formatNumber(action.saves_km_year)} {t('common.kmYr')}
                         </span>
                         <Badge variant={action.payback_years === null ? 'default' : 'secondary'}>
-                          {action.payback_years === null
-                            ? 'Free'
-                            : action.payback_years === 0
-                              ? 'Free'
-                              : `${action.payback_years} yr`}
+                          {action.payback_years === null || action.payback_years === 0
+                            ? t('common.free')
+                            : t('common.yrPayback', { years: action.payback_years })}
                         </Badge>
                       </div>
                     </li>
@@ -138,21 +136,21 @@ export function OverviewPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <Zap className="size-4 text-yellow-500" /> Electricity — today
+              <Zap className="size-4 text-yellow-500" /> {t('overview.electricityToday')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <QueryState isLoading={baseline.isLoading} error={baseline.error}>
               <div className="grid grid-cols-3 gap-3">
                 <StatBlock
-                  label="Cost"
+                  label={t('overview.cost')}
                   value={`${formatNumber(base?.electricity_km ?? 0)} KM`}
-                  sub="per year"
+                  sub={t('common.perYear')}
                 />
                 <StatBlock
-                  label="Usage"
+                  label={t('overview.usage')}
                   value={`${formatNumber(base?.electricity_kwh ?? 0)} kWh`}
-                  sub="per year"
+                  sub={t('common.perYear')}
                 />
                 <StatBlock
                   label="CO₂"
@@ -167,21 +165,21 @@ export function OverviewPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <Bus className="size-4 text-blue-500" /> Away travel — today
+              <Bus className="size-4 text-blue-500" /> {t('overview.travelToday')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <QueryState isLoading={baseline.isLoading} error={baseline.error}>
               <div className="grid grid-cols-3 gap-3">
                 <StatBlock
-                  label="Cost"
+                  label={t('overview.cost')}
                   value={`${formatNumber(base?.travel_km_cost ?? 0)} KM`}
-                  sub="per year"
+                  sub={t('common.perYear')}
                 />
                 <StatBlock
-                  label="Km driven"
+                  label={t('overview.kmDriven')}
                   value={`${formatNumber(base?.travel_km_driven ?? 0)}`}
-                  sub="per year"
+                  sub={t('common.perYear')}
                 />
                 <StatBlock label="CO₂" value={`${base?.travel_t_co2 ?? 0} t`} sub="UK GHG 2025" />
               </div>
@@ -194,16 +192,16 @@ export function OverviewPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <TrendingDown className="size-4 text-primary" /> All upgrades ranked by payback
+            <TrendingDown className="size-4 text-primary" /> {t('overview.allActions')}
           </CardTitle>
-          <CardDescription>Shortest payback first — free actions at the top</CardDescription>
+          <CardDescription>{t('overview.allActionsDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <QueryState
             isLoading={actions.isLoading}
             error={actions.error}
             isEmpty={(plan?.actions.length ?? 0) === 0}
-            empty="No actions available."
+            empty={t('overview.noActions')}
           >
             <div className="space-y-1">
               {plan?.actions.map((action) => {
@@ -216,11 +214,13 @@ export function OverviewPage() {
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
                       <span className="font-medium">{action.name}</span>
                       <span className="text-xs text-muted-foreground">
-                        {formatNumber(action.saves_km_year)} KM/yr ·{' '}
+                        {formatNumber(action.saves_km_year)} {t('common.kmYr')} ·{' '}
                         {(action.saves_kg_co2_year / 1000).toFixed(2)} t CO₂ ·{' '}
-                        {action.cost_km > 0 ? `${formatNumber(action.cost_km)} KM cost` : 'no cost'}
+                        {action.cost_km > 0
+                          ? `${formatNumber(action.cost_km)} KM`
+                          : t('overview.noCost')}
                         {action.payback_years != null
-                          ? ` · ${action.payback_years} yr payback`
+                          ? ` · ${t('common.yrPaybackLong', { years: action.payback_years })}`
                           : ''}
                       </span>
                     </div>

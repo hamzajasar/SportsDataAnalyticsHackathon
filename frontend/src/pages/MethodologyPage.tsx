@@ -2,7 +2,8 @@ import type { ReactNode } from 'react'
 import { AlertTriangle, Database, FlaskConical, HeartHandshake, Target, Users } from 'lucide-react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { project } from '@/content/project'
+import { projectContent } from '@/content/project'
+import { useT } from '@/i18n'
 
 function Section({
   icon: Icon,
@@ -40,37 +41,40 @@ function Facts({ items }: { items: { label: string; value: string }[] }) {
 }
 
 export function MethodologyPage() {
+  const { t, lang } = useT()
+  const p = projectContent[lang] ?? projectContent.en
+
   return (
     <div className="space-y-6">
-      <PageHeader title="How it works" description={project.pitch} />
+      <PageHeader title={t('method.title')} description={p.pitch} />
       <div className="grid gap-4 lg:grid-cols-2">
-        <Section icon={Target} title="The problem">
+        <Section icon={Target} title={t('method.problem')}>
           <Facts
             items={[
-              { label: 'For', value: project.problem.who },
-              { label: 'Decision', value: project.problem.decision },
+              { label: t('method.for'), value: p.problem.who },
+              { label: t('method.decision'), value: p.problem.decision },
             ]}
           />
         </Section>
-        <Section icon={Database} title="Data">
-          <Facts items={project.data} />
+        <Section icon={Database} title={t('method.data')}>
+          <Facts items={p.data} />
         </Section>
-        <Section icon={FlaskConical} title="Method & validation">
-          <Facts items={project.method} />
+        <Section icon={FlaskConical} title={t('method.method')}>
+          <Facts items={p.method} />
         </Section>
-        <Section icon={AlertTriangle} title="Limitations">
+        <Section icon={AlertTriangle} title={t('method.limitations')}>
           <ul className="list-disc space-y-1 pl-4">
-            {project.limitations.map((l) => (
+            {p.limitations.map((l) => (
               <li key={l}>{l}</li>
             ))}
           </ul>
         </Section>
-        <Section icon={HeartHandshake} title="Impact & inclusion">
-          <Facts items={project.impact} />
+        <Section icon={HeartHandshake} title={t('method.impact')}>
+          <Facts items={p.impact} />
         </Section>
-        <Section icon={Users} title="Team">
+        <Section icon={Users} title={t('method.team')}>
           <ul className="space-y-1">
-            {project.team.map((m) => (
+            {p.team.map((m) => (
               <li key={m.name + m.role}>
                 <span className="font-medium">{m.name}</span>{' '}
                 <span className="text-muted-foreground">– {m.role}</span>

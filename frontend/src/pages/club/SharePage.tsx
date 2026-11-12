@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useClub } from '@/state/club'
 import { useShareSuggestions } from '@/api/queries'
+import { useT } from '@/i18n'
 import { QueryState } from '@/components/common/QueryState'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -51,10 +52,11 @@ const RADII = [5, 10, 25]
 export function SharePage() {
   const { club, isSample } = useClub()
   const [radius, setRadius] = useState(10)
+  const { t } = useT()
 
   const lat = club?.lat ?? 43.846_4
   const lon = club?.lon ?? 18.394_9
-  const clubName = isSample ? 'Sample Sarajevo club' : (club?.name ?? 'Your club')
+  const clubName = isSample ? t('common.sampleClub') : (club?.name ?? t('common.yourClub'))
 
   const suggestions = useShareSuggestions(lat, lon, radius)
   const data = suggestions.data
@@ -63,13 +65,11 @@ export function SharePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold">Share</h2>
-          <p className="text-sm text-muted-foreground">
-            Nearby pitches to share and clubs to carpool with
-          </p>
+          <h2 className="text-lg font-semibold">{t('share.title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('share.desc')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Radius:</span>
+          <span className="text-sm text-muted-foreground">{t('share.radius')}</span>
           {RADII.map((r) => (
             <Button
               key={r}
@@ -103,7 +103,9 @@ export function SharePage() {
             <Marker key={v.id} position={[v.lat, v.lon]} icon={venueIcon}>
               <Popup>
                 <strong>{v.name ?? v.leisure}</strong>
-                {v.distance_km != null && <> · {v.distance_km.toFixed(1)} km away</>}
+                {v.distance_km != null && (
+                  <> · {t('share.kmAway', { km: v.distance_km.toFixed(1) })}</>
+                )}
               </Popup>
             </Marker>
           ))}
@@ -111,7 +113,9 @@ export function SharePage() {
             <Marker key={v.id} position={[v.lat, v.lon]} icon={venueIcon}>
               <Popup>
                 <strong>{v.name ?? v.leisure}</strong>
-                {v.distance_km != null && <> · {v.distance_km.toFixed(1)} km away</>}
+                {v.distance_km != null && (
+                  <> · {t('share.kmAway', { km: v.distance_km.toFixed(1) })}</>
+                )}
               </Popup>
             </Marker>
           ))}
@@ -123,16 +127,14 @@ export function SharePage() {
           {/* Shared pitches */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Pitches & halls to share</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('share.pitchesTitle')}</CardTitle>
               <CardDescription>
-                {data?.shared_pitch.length ?? 0} venues within {radius} km
+                {t('share.pitchesCount', { count: data?.shared_pitch.length ?? 0, radius })}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {(data?.shared_pitch.length ?? 0) === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No pitches or halls found in this radius.
-                </p>
+                <p className="text-sm text-muted-foreground">{t('share.noPitches')}</p>
               ) : (
                 <ul className="space-y-2">
                   {data!.shared_pitch.map((v) => (
@@ -156,14 +158,14 @@ export function SharePage() {
           {/* Carpool partners */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Carpool partners (nearby clubs)</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('share.carpoolTitle')}</CardTitle>
               <CardDescription>
-                {data?.carpool_partners.length ?? 0} clubs within {radius} km
+                {t('share.carpoolCount', { count: data?.carpool_partners.length ?? 0, radius })}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {(data?.carpool_partners.length ?? 0) === 0 ? (
-                <p className="text-sm text-muted-foreground">No nearby clubs found.</p>
+                <p className="text-sm text-muted-foreground">{t('share.noClubs')}</p>
               ) : (
                 <ul className="space-y-2">
                   {data!.carpool_partners.map((v) => (

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useClub } from '@/state/club'
 import { useEnergyProfile, useGridIntensity, useElectricityMix } from '@/api/queries'
+import { useT } from '@/i18n'
 import { QueryState } from '@/components/common/QueryState'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -14,24 +15,9 @@ import {
 } from '@/components/ui/chart'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { formatNumber } from '@/lib/format'
+import { formatNumber, monthName } from '@/lib/format'
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const COUNTRIES = ['BIH', 'HRV', 'SRB', 'EU']
-
-const energyConfig = {
-  heating_kwh: { label: 'Heating', color: 'var(--chart-1)' },
-  floodlights_kwh: { label: 'Floodlights', color: 'var(--chart-2)' },
-  hall_kwh: { label: 'Hall & other', color: 'var(--chart-3)' },
-  solar_used_kwh: { label: 'Solar used', color: 'var(--chart-4)' },
-} satisfies ChartConfig
-
-const gridConfig = {
-  BIH: { label: 'Bosnia and Herzegovina', color: 'var(--chart-1)' },
-  HRV: { label: 'Croatia', color: 'var(--chart-2)' },
-  SRB: { label: 'Serbia', color: 'var(--chart-3)' },
-  EU: { label: 'EU average', color: 'var(--chart-4)' },
-} satisfies ChartConfig
 
 export function EnergyPage() {
   const { club } = useClub()
@@ -39,13 +25,28 @@ export function EnergyPage() {
   const energy = useEnergyProfile(club, kwp)
   const grid = useGridIntensity(COUNTRIES, 2010)
   const mix = useElectricityMix('BIH')
+  const { t } = useT()
 
   const profile = energy.data
+
+  const energyConfig = {
+    heating_kwh: { label: t('energy.heating'), color: 'var(--chart-1)' },
+    floodlights_kwh: { label: t('energy.floodlights'), color: 'var(--chart-2)' },
+    hall_kwh: { label: t('energy.hallOther'), color: 'var(--chart-3)' },
+    solar_used_kwh: { label: t('energy.solarUsed'), color: 'var(--chart-4)' },
+  } satisfies ChartConfig
+
+  const gridConfig = {
+    BIH: { label: t('energy.bosniaLabel'), color: 'var(--chart-1)' },
+    HRV: { label: t('energy.croatiaLabel'), color: 'var(--chart-2)' },
+    SRB: { label: t('energy.serbiaLabel'), color: 'var(--chart-3)' },
+    EU: { label: t('energy.euLabel'), color: 'var(--chart-4)' },
+  } satisfies ChartConfig
 
   const chartData = useMemo(
     () =>
       (profile?.months ?? []).map((m, i) => ({
-        month: MONTHS[i] ?? String(i + 1),
+        month: monthName(i, 'short'),
         heating_kwh: m.heating_kwh,
         floodlights_kwh: m.floodlights_kwh,
         hall_kwh: m.hall_kwh,
@@ -67,19 +68,18 @@ export function EnergyPage() {
   }, [grid.data])
   const latest = gridRows.at(-1)
 
+  const descKey = profile?.illustrative_club ? 'energy.descSample' : 'energy.descYours'
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold">Energy</h2>
-          <p className="text-sm text-muted-foreground">
-            Monthly electricity use and optional solar —{' '}
-            {profile?.illustrative_club ? 'sample club' : 'your club'}
-          </p>
+          <h2 className="text-lg font-semibold">{t('energy.title')}</h2>
+          <p className="text-sm text-muted-foreground">{t(descKey)}</p>
         </div>
         <div className="flex items-end gap-3">
           <div className="grid gap-1.5">
-            <Label htmlFor="kwp">Solar panels (kWp)</Label>
+            <Label htmlFor="kwp">{t('energy.solarLabel')}</Label>
             <Input
               id="kwp"
               type="number"
@@ -99,13 +99,19 @@ export function EnergyPage() {
       <QueryState isLoading={energy.isLoading} error={energy.error}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { label: 'Net kWh/yr', value: formatNumber(profile?.totals.net_kwh ?? 0) },
-            { label: 'Cost/yr', value: `${formatNumber(profile?.totals.cost_km ?? 0)} KM` },
-            { label: 'CO₂/yr', value: `${((profile?.totals.co2_kg ?? 0) / 1000).toFixed(1)} t` },
+            { label: t('energy.netKwh'), value: formatNumber(profile?.totals.net_kwh ?? 0) },
+            {
+              label: t('energy.costYr'),
+              value: `${formatNumber(profile?.totals.cost_km ?? 0)} KM`,
+            },
+            {
+              label: t('energy.co2Yr'),
+              value: `${((profile?.totals.co2_kg ?? 0) / 1000).toFixed(1)} t`,
+            },
             ...(kwp > 0
               ? [
                   {
-                    label: 'Solar produced',
+                    label: t('energy.solarProduced'),
                     value: `${formatNumber(profile?.totals.solar_produced_kwh ?? 0)} kWh`,
                   },
                 ]
@@ -122,9 +128,9 @@ export function EnergyPage() {
       {/* Monthly chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">Monthly electricity use</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('energy.monthlyTitle')}</CardTitle>
           <CardDescription>
-            {kwp > 0 ? `${kwp} kWp solar installed · ` : ''}kWh by use, with solar offset
+            {kwp > 0 ? t('energy.solarDesc', { kwp }) : t('energy.monthlyDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -159,7 +165,7 @@ export function EnergyPage() {
       {/* Grid intensity chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">Grid CO₂ intensity</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('energy.gridTitle')}</CardTitle>
           <CardDescription>
             Grams of CO₂ per kWh · BiH {latest?.BIH ? `${formatNumber(latest.BIH)} g/kWh` : ''} in{' '}
             {latest?.year ?? ''}

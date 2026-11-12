@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useCities } from '@/api/queries'
 import { useClub } from '@/state/club'
+import { useT, type Dict } from '@/i18n'
 import type { components } from '@/api/schema'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,25 +22,11 @@ import { Loader2 } from 'lucide-react'
 
 type QuickClubInput = components['schemas']['QuickClubInput']
 
-const HEATING_LABELS: Record<QuickClubInput['heating_type'], string> = {
-  electric: 'Electric',
-  district: 'District heating',
-  gas: 'Gas',
-  wood: 'Wood / biomass',
-  other: 'Other',
-  unknown: "Don't know",
-}
-
-const TRANSPORT_LABELS: Record<QuickClubInput['transport'], string> = {
-  cars: 'Cars (families drive separately)',
-  minibus: 'Minibus / hired coach',
-  mixed: 'Mixed — some cars, some minibus',
-}
-
 export function QuickStartPage() {
   const navigate = useNavigate()
   const { setClub } = useClub()
   const cities = useCities()
+  const { t } = useT()
 
   const [city, setCity] = useState('')
   const [children, setChildren] = useState('60')
@@ -56,11 +43,11 @@ export function QuickStartPage() {
   const [notes, setNotes] = useState<string[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const cityError = !city ? 'Please select a city.' : null
+  const cityError = !city ? t('quick.cityRequired') : null
   const childrenError =
-    !children || isNaN(parseInt(children)) || parseInt(children) < 1 ? 'Enter a number ≥ 1.' : null
+    !children || isNaN(parseInt(children)) || parseInt(children) < 1 ? t('quick.numberMin1') : null
   const teamsError =
-    !teams || isNaN(parseInt(teams)) || parseInt(teams) < 1 ? 'Enter a number ≥ 1.' : null
+    !teams || isNaN(parseInt(teams)) || parseInt(teams) < 1 ? t('quick.numberMin1') : null
 
   const canSubmit = !cityError && !childrenError && !teamsError
 
@@ -87,7 +74,7 @@ export function QuickStartPage() {
       setClub(data.club)
       setNotes(data.notes)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.')
+      setError(err instanceof Error ? err.message : t('common.error'))
     } finally {
       setSubmitting(false)
     }
@@ -97,16 +84,14 @@ export function QuickStartPage() {
     return (
       <div className="mx-auto max-w-xl space-y-6">
         <div>
-          <h1 className="text-xl font-semibold">Your club is ready</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Here's what we estimated from your answers.
-          </p>
+          <h1 className="text-xl font-semibold">{t('quick.ready')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('quick.readyDesc')}</p>
         </div>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">What we assumed</CardTitle>
-            <CardDescription>You can adjust any of these in the full edit form.</CardDescription>
+            <CardTitle className="text-sm font-medium">{t('quick.assumed')}</CardTitle>
+            <CardDescription>{t('quick.assumedDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-1.5">
@@ -121,9 +106,9 @@ export function QuickStartPage() {
         </Card>
 
         <div className="flex flex-wrap gap-3">
-          <Button onClick={() => navigate('/')}>View your club overview</Button>
+          <Button onClick={() => navigate('/')}>{t('quick.viewOverview')}</Button>
           <Button variant="outline" onClick={() => navigate('/')}>
-            Edit the numbers
+            {t('quick.editNumbers')}
           </Button>
         </div>
       </div>
@@ -133,29 +118,27 @@ export function QuickStartPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Enter your club</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Answer a few questions — we'll fill in the rest from typical BiH club data.
-        </p>
+        <h1 className="text-xl font-semibold">{t('quick.title')}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t('quick.desc')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Location */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Location</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('quick.location')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="city">City</Label>
+              <Label htmlFor="city">{t('quick.cityLabel')}</Label>
               <Select value={city} onValueChange={(v) => setCity(v ?? '')}>
                 <SelectTrigger id="city">
-                  <SelectValue placeholder="Select your city…" />
+                  <SelectValue placeholder={t('quick.cityPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {cities.isLoading && (
                     <SelectItem value="__loading" disabled>
-                      Loading cities…
+                      {t('quick.cityLoading')}
                     </SelectItem>
                   )}
                   {cities.data?.map((c) => (
@@ -172,12 +155,12 @@ export function QuickStartPage() {
         {/* Club size */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Club size</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('quick.size')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="children">Children / members</Label>
+                <Label htmlFor="children">{t('quick.children')}</Label>
                 <Input
                   id="children"
                   type="number"
@@ -188,7 +171,7 @@ export function QuickStartPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="teams">Teams</Label>
+                <Label htmlFor="teams">{t('quick.teams')}</Label>
                 <Input
                   id="teams"
                   type="number"
@@ -205,11 +188,11 @@ export function QuickStartPage() {
         {/* Energy */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Energy</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('quick.energy')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label>Who pays the electricity bill?</Label>
+              <Label>{t('quick.whoPaysBill')}</Label>
               <div className="flex gap-2">
                 {(['yes', 'no'] as const).map((v) => (
                   <Button
@@ -219,7 +202,7 @@ export function QuickStartPage() {
                     size="sm"
                     onClick={() => setPaysElectricity(v)}
                   >
-                    {v === 'yes' ? 'Our club' : 'Municipality / school'}
+                    {v === 'yes' ? t('quick.ourClub') : t('quick.municipality')}
                   </Button>
                 ))}
               </div>
@@ -227,7 +210,7 @@ export function QuickStartPage() {
 
             {paysElectricity === 'yes' && (
               <div className="space-y-1.5">
-                <Label htmlFor="bill">Monthly electricity bill (KM)</Label>
+                <Label htmlFor="bill">{t('quick.monthlyBill')}</Label>
                 <div className="flex gap-2">
                   <Input
                     id="bill"
@@ -249,14 +232,14 @@ export function QuickStartPage() {
                     size="sm"
                     onClick={() => setDontKnowBill((v) => !v)}
                   >
-                    Don't know
+                    {t('quick.dontKnow')}
                   </Button>
                 </div>
               </div>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="heating">How is the facility heated?</Label>
+              <Label htmlFor="heating">{t('quick.heatingType')}</Label>
               <Select
                 value={heatingType}
                 onValueChange={(v) =>
@@ -267,9 +250,18 @@ export function QuickStartPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(HEATING_LABELS) as QuickClubInput['heating_type'][]).map((k) => (
+                  {(
+                    [
+                      'electric',
+                      'district',
+                      'gas',
+                      'wood',
+                      'other',
+                      'unknown',
+                    ] as QuickClubInput['heating_type'][]
+                  ).map((k) => (
                     <SelectItem key={k} value={k}>
-                      {HEATING_LABELS[k]}
+                      {t(`heating.${k}` as keyof Dict)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -281,15 +273,13 @@ export function QuickStartPage() {
         {/* Travel */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Away travel</CardTitle>
-            <CardDescription>
-              Optional — we'll use typical BiH figures if you skip these.
-            </CardDescription>
+            <CardTitle className="text-sm font-medium">{t('quick.awayTravel')}</CardTitle>
+            <CardDescription>{t('quick.awayTravelDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="away-games">Away games per team</Label>
+                <Label htmlFor="away-games">{t('quick.awayGames')}</Label>
                 <Input
                   id="away-games"
                   type="number"
@@ -300,7 +290,7 @@ export function QuickStartPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="avg-km">Typical one-way km</Label>
+                <Label htmlFor="avg-km">{t('quick.avgKm')}</Label>
                 <Input
                   id="avg-km"
                   type="number"
@@ -314,9 +304,9 @@ export function QuickStartPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label>How do you usually travel to away games?</Label>
+              <Label>{t('quick.transport')}</Label>
               <div className="flex flex-wrap gap-2">
-                {(Object.keys(TRANSPORT_LABELS) as QuickClubInput['transport'][]).map((k) => (
+                {(['cars', 'minibus', 'mixed'] as QuickClubInput['transport'][]).map((k) => (
                   <Button
                     key={k}
                     type="button"
@@ -324,7 +314,7 @@ export function QuickStartPage() {
                     size="sm"
                     onClick={() => setTransport(k)}
                   >
-                    {TRANSPORT_LABELS[k]}
+                    {t(`transport.${k}` as keyof Dict)}
                   </Button>
                 ))}
               </div>
@@ -341,18 +331,18 @@ export function QuickStartPage() {
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" disabled={!canSubmit || submitting}>
             {submitting && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Calculate for my club
+            {t('quick.submit')}
           </Button>
           <Button type="button" variant="ghost" onClick={() => navigate('/')}>
-            Use example club instead
+            {t('quick.useExample')}
           </Button>
         </div>
 
         {!canSubmit && (
           <div className="flex flex-wrap gap-2">
-            {cityError && <Badge variant="destructive">City: {cityError}</Badge>}
-            {childrenError && <Badge variant="destructive">Members: {childrenError}</Badge>}
-            {teamsError && <Badge variant="destructive">Teams: {teamsError}</Badge>}
+            {cityError && <Badge variant="destructive">{cityError}</Badge>}
+            {childrenError && <Badge variant="destructive">{childrenError}</Badge>}
+            {teamsError && <Badge variant="destructive">{teamsError}</Badge>}
           </div>
         )}
       </form>

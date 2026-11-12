@@ -3,13 +3,13 @@ import { AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { errorMessage } from '@/lib/errors'
+import { useT } from '@/i18n'
 
-/** Standard loading / error / empty handling for a React Query result. */
 export function QueryState({
   isLoading,
   error,
   isEmpty,
-  empty = 'No data.',
+  empty,
   children,
 }: {
   isLoading: boolean
@@ -18,6 +18,8 @@ export function QueryState({
   empty?: ReactNode
   children: ReactNode
 }) {
+  const { t } = useT()
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -31,11 +33,17 @@ export function QueryState({
     return (
       <Alert variant="destructive">
         <AlertCircle />
-        <AlertTitle>Something went wrong</AlertTitle>
+        <AlertTitle>{t('common.error')}</AlertTitle>
         <AlertDescription>{errorMessage(error)}</AlertDescription>
       </Alert>
     )
   }
-  if (isEmpty) return <p className="py-8 text-center text-sm text-muted-foreground">{empty}</p>
+  if (isEmpty) {
+    return (
+      <p className="py-8 text-center text-sm text-muted-foreground">
+        {empty ?? t('common.noData')}
+      </p>
+    )
+  }
   return <>{children}</>
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Bus, Car, TrainFront } from 'lucide-react'
 import { useClub } from '@/state/club'
 import { useSeasonTravel } from '@/api/queries'
+import { useT } from '@/i18n'
 import { QueryState } from '@/components/common/QueryState'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,6 +24,7 @@ export function TravelPage() {
   const { club } = useClub()
   const [people, setPeople] = useState(18)
   const [share, setShare] = useState(false)
+  const { t } = useT()
 
   const season = useSeasonTravel(club, people, share)
   const st = season.data
@@ -30,16 +32,14 @@ export function TravelPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold">Travel</h2>
-        <p className="text-sm text-muted-foreground">
-          Season-wide away travel costs and CO₂ — compare transport options
-        </p>
+        <h2 className="text-lg font-semibold">{t('travel.title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('travel.desc')}</p>
       </div>
 
       {/* Controls */}
       <div className="flex flex-wrap items-end gap-4">
         <div className="grid gap-1.5">
-          <Label htmlFor="people">People per trip (squad + staff)</Label>
+          <Label htmlFor="people">{t('travel.people')}</Label>
           <Input
             id="people"
             type="number"
@@ -55,16 +55,15 @@ export function TravelPage() {
           onClick={() => setShare((s) => !s)}
           className="mb-0.5"
         >
-          {share ? '✓ Sharing a coach' : 'Share coach with partner club'}
+          {share ? t('travel.sharingCoach') : t('travel.shareCoach')}
         </Button>
       </div>
 
       {st && (
         <p className="text-sm text-muted-foreground">
-          {st.trips} trips × {formatNumber(st.round_trip_km)} km round trip · {st.people_per_trip}{' '}
-          people per trip
+          {st.trips} × {formatNumber(st.round_trip_km)} km · {st.people_per_trip} pax
           {st.share_with_partner && st.shared_with.length > 0
-            ? ` · sharing with ${st.shared_with.join(', ')}`
+            ? ` · ${t('travel.sharingWith', { clubs: st.shared_with.join(', ') })}`
             : ''}
           {st.note && ` · ${st.note}`}
         </p>
@@ -73,8 +72,8 @@ export function TravelPage() {
       {/* Season options */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">Full season — transport options</CardTitle>
-          <CardDescription>Total cost and CO₂ for all away trips this season</CardDescription>
+          <CardTitle className="text-sm font-medium">{t('travel.seasonTitle')}</CardTitle>
+          <CardDescription>{t('travel.seasonDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <QueryState isLoading={season.isLoading} error={season.error}>
@@ -95,9 +94,8 @@ export function TravelPage() {
                       <div className="flex items-center gap-2">
                         <Icon className="size-4 text-muted-foreground" />
                         <span className="font-medium">{opt.label}</span>
-                        {isCheapest && <Badge variant="default">Cheapest</Badge>}
-                        {isLowCo2 && !isCheapest && <Badge variant="secondary">Lowest CO₂</Badge>}
-                        {isLowCo2 && isCheapest && <Badge variant="secondary">Lowest CO₂</Badge>}
+                        {isCheapest && <Badge variant="default">{t('travel.cheapest')}</Badge>}
+                        {isLowCo2 && <Badge variant="secondary">{t('travel.lowestCo2')}</Badge>}
                       </div>
                       <div className="flex items-center gap-4 text-sm tabular-nums">
                         <span>{formatNumber(opt.cost_km)} KM</span>
@@ -107,11 +105,17 @@ export function TravelPage() {
                     {opt.mode !== 'current' && (
                       <div className="mt-1.5 flex gap-4 text-xs text-muted-foreground">
                         {opt.saving_vs_current_cost_km > 0 && (
-                          <span>saves {formatNumber(opt.saving_vs_current_cost_km)} KM/yr</span>
+                          <span>
+                            {t('travel.savesKm', {
+                              km: formatNumber(opt.saving_vs_current_cost_km),
+                            })}
+                          </span>
                         )}
                         {opt.saving_vs_current_co2_kg > 0 && (
                           <span>
-                            saves {(opt.saving_vs_current_co2_kg / 1000).toFixed(1)} t CO₂/yr
+                            {t('travel.savesCo2', {
+                              t: (opt.saving_vs_current_co2_kg / 1000).toFixed(1),
+                            })}
                           </span>
                         )}
                       </div>

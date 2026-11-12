@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Copy, Printer, ReceiptText } from 'lucide-react'
 import { useClub } from '@/state/club'
 import { useAnalyseBill, type BillAnalysis, type ConfirmedBill } from '@/api/bill'
+import { useT } from '@/i18n'
 import { QueryState } from '@/components/common/QueryState'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -9,38 +10,19 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { formatNumber } from '@/lib/format'
+import { formatNumber, monthName } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
+const MONTH_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
-const CHECKS: Record<string, string> = {
-  floodlights: 'Check the floodlight timers and whether lights stay on after training.',
-  heating: 'Check the heating set-point and whether unused rooms or the hall are heated.',
-  baseload: "Compare with last month's bill and read the meter to rule out a billing error.",
+type StatusKey = 'normal' | 'above' | 'high' | 'below' | 'unknown'
+const STATUS_VARIANT: Record<StatusKey, 'secondary' | 'outline' | 'destructive'> = {
+  normal: 'secondary',
+  above: 'outline',
+  high: 'destructive',
+  below: 'secondary',
+  unknown: 'outline',
 }
-
-const STATUS: Record<string, { label: string; variant: 'secondary' | 'outline' | 'destructive' }> =
-  {
-    normal: { label: 'Normal', variant: 'secondary' },
-    above: { label: 'Above expected', variant: 'outline' },
-    high: { label: 'High: worth checking', variant: 'destructive' },
-    below: { label: 'Below expected', variant: 'secondary' },
-    unknown: { label: 'Unknown', variant: 'outline' },
-  }
 
 const SAMPLE = { month: 1, year: 2026, kwh: '9420', amount: '2900' }
 const selectClass =
@@ -57,6 +39,7 @@ function signed(n: number, digits = 0) {
 
 export function BillPage() {
   const { club } = useClub()
+  const { t } = useT()
   const [kind, setKind] = useState<'electricity' | 'fuel'>('electricity')
   const [month, setMonth] = useState(() => new Date().getMonth() + 1)
   const [year, setYear] = useState(() => String(new Date().getFullYear()))
@@ -126,19 +109,16 @@ export function BillPage() {
   return (
     <div className="space-y-6">
       <div className="no-print">
-        <h2 className="text-lg font-semibold">Check a bill</h2>
-        <p className="text-sm text-muted-foreground">
-          Type in one electricity bill or fuel receipt: we check it against the weather, update the
-          club&apos;s plan and draft the board decision in Bosnian.
-        </p>
+        <h2 className="text-lg font-semibold">{t('bill.title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('bill.desc')}</p>
       </div>
 
       <Card className="no-print">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ReceiptText className="size-4" /> The bill
+            <ReceiptText className="size-4" /> {t('bill.cardTitle')}
           </CardTitle>
-          <CardDescription>Copy the numbers from the paper bill or receipt</CardDescription>
+          <CardDescription>{t('bill.cardDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
@@ -146,13 +126,13 @@ export function BillPage() {
               variant={kind === 'electricity' ? 'default' : 'outline'}
               onClick={() => setKind('electricity')}
             >
-              Electricity bill
+              {t('bill.electricity')}
             </Button>
             <Button
               variant={kind === 'fuel' ? 'default' : 'outline'}
               onClick={() => setKind('fuel')}
             >
-              Fuel receipt
+              {t('bill.fuel')}
             </Button>
           </div>
 
@@ -160,22 +140,22 @@ export function BillPage() {
             {kind === 'electricity' ? (
               <>
                 <div className="grid gap-1.5">
-                  <Label htmlFor="bill-month">Month</Label>
+                  <Label htmlFor="bill-month">{t('bill.month')}</Label>
                   <select
                     id="bill-month"
                     className={selectClass}
                     value={month}
                     onChange={(e) => setMonth(Number(e.target.value))}
                   >
-                    {MONTHS.map((m, i) => (
-                      <option key={m} value={i + 1}>
-                        {m}
+                    {MONTH_INDICES.map((i) => (
+                      <option key={i} value={i + 1}>
+                        {monthName(i, 'long')}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="grid gap-1.5">
-                  <Label htmlFor="bill-year">Year</Label>
+                  <Label htmlFor="bill-year">{t('bill.year')}</Label>
                   <Input
                     id="bill-year"
                     type="number"
@@ -186,7 +166,7 @@ export function BillPage() {
                   />
                 </div>
                 <div className="grid gap-1.5">
-                  <Label htmlFor="bill-kwh">Consumption (kWh)</Label>
+                  <Label htmlFor="bill-kwh">{t('bill.kwh')}</Label>
                   <Input
                     id="bill-kwh"
                     type="text"
@@ -201,7 +181,7 @@ export function BillPage() {
             ) : (
               <>
                 <div className="grid gap-1.5">
-                  <Label htmlFor="bill-fuel">Fuel</Label>
+                  <Label htmlFor="bill-fuel">{t('bill.fuelType')}</Label>
                   <select
                     id="bill-fuel"
                     className={selectClass}
@@ -213,7 +193,7 @@ export function BillPage() {
                   </select>
                 </div>
                 <div className="grid gap-1.5">
-                  <Label htmlFor="bill-litres">Litres</Label>
+                  <Label htmlFor="bill-litres">{t('bill.litres')}</Label>
                   <Input
                     id="bill-litres"
                     type="text"
@@ -228,7 +208,7 @@ export function BillPage() {
             )}
             <div className="grid gap-1.5">
               <Label htmlFor="bill-amount">
-                Total paid (KM){kind === 'electricity' ? ', optional' : ''}
+                {kind === 'electricity' ? t('bill.amountOptional') : t('bill.amountRequired')}
               </Label>
               <Input
                 id="bill-amount"
@@ -242,13 +222,13 @@ export function BillPage() {
             </div>
             {kind === 'electricity' && (
               <div className="grid gap-1.5">
-                <Label htmlFor="bill-temp">Real mean temp. (°C), optional</Label>
+                <Label htmlFor="bill-temp">{t('bill.tempLabel')}</Label>
                 <Input
                   id="bill-temp"
                   type="text"
                   inputMode="decimal"
                   className="w-36"
-                  placeholder="typical for month"
+                  placeholder={t('bill.tempPlaceholder')}
                   value={temp}
                   onChange={(e) => setTemp(e.target.value)}
                 />
@@ -258,10 +238,10 @@ export function BillPage() {
 
           <div className="flex flex-wrap gap-2">
             <Button disabled={!bill} onClick={() => bill && setSubmitted({ bill, temp: tempNum })}>
-              Check this bill
+              {t('bill.checkBtn')}
             </Button>
             <Button variant="outline" onClick={useSample}>
-              Use a sample bill
+              {t('bill.sampleBtn')}
             </Button>
           </div>
         </CardContent>
@@ -285,28 +265,58 @@ function Results({
   copied: boolean
   onCopy: () => void
 }) {
+  const { t } = useT()
   const w = data.waste
   const f = data.fuel
   const { before, after } = data.plan
-  const status = w ? STATUS[w.status] : null
+  const statusKey = (w?.status ?? 'unknown') as StatusKey
+  const statusVariant = STATUS_VARIANT[statusKey] ?? 'outline'
   const pct = w?.difference_pct ?? null
+
+  const statusLabel = (): string => {
+    switch (statusKey) {
+      case 'normal':
+        return t('bill.statusNormal')
+      case 'above':
+        return t('bill.statusAbove')
+      case 'high':
+        return t('bill.statusHigh')
+      case 'below':
+        return t('bill.statusBelow')
+      default:
+        return t('bill.statusUnknown')
+    }
+  }
+
+  const checkText = (s: string): string => {
+    switch (s) {
+      case 'floodlights':
+        return t('bill.checkFloodlights')
+      case 'heating':
+        return t('bill.checkHeating')
+      case 'baseload':
+        return t('bill.checkBaseload')
+      default:
+        return s
+    }
+  }
 
   const rows: { label: string; b: number; a: number; unit: string; digits?: number }[] = [
     {
-      label: 'Save per year',
+      label: t('bill.savePerYear'),
       b: before.total_saves_km_year,
       a: after.total_saves_km_year,
       unit: 'KM',
     },
     {
-      label: 'Cut CO₂ per year',
+      label: t('bill.cutCo2'),
       b: before.total_saves_t_co2_year,
       a: after.total_saves_t_co2_year,
       unit: 't',
       digits: 1,
     },
     {
-      label: 'Fee drop per child',
+      label: t('bill.feeDrop'),
       b: before.fee_drop_per_child_km,
       a: after.fee_drop_per_child_km,
       unit: 'KM',
@@ -318,13 +328,13 @@ function Results({
     <div className="space-y-6">
       {data.illustrative_club && (
         <Badge variant="outline" className="no-print">
-          Illustrative sample club: set up your club on the Overview tab for real figures
+          {t('bill.illustrative')}
         </Badge>
       )}
 
       {data.warnings.length > 0 && (
         <Alert className="no-print">
-          <AlertTitle>Check these before relying on the result</AlertTitle>
+          <AlertTitle>{t('bill.warnings')}</AlertTitle>
           <AlertDescription>
             <ul className="list-disc pl-4">
               {data.warnings.map((m) => (
@@ -335,12 +345,12 @@ function Results({
         </Alert>
       )}
 
-      {w && status && (
+      {w && (
         <Card className="no-print">
           <CardHeader>
             <CardTitle className="flex flex-wrap items-center gap-2">
-              Is this month higher than the weather explains?
-              <Badge variant={status.variant}>{status.label}</Badge>
+              {t('bill.weatherQuestion')}
+              <Badge variant={statusVariant}>{statusLabel()}</Badge>
             </CardTitle>
             <CardDescription>{w.temperature_source}</CardDescription>
           </CardHeader>
@@ -369,16 +379,16 @@ function Results({
             )}
             {w.suggestions.length > 0 && (
               <div>
-                <p className="mb-1 text-sm font-medium">Check first</p>
+                <p className="mb-1 text-sm font-medium">{t('bill.checkFirst')}</p>
                 <ul className="list-disc space-y-0.5 pl-5 text-sm text-muted-foreground">
                   {w.suggestions.map((s) => (
-                    <li key={s}>{CHECKS[s] ?? s}</li>
+                    <li key={s}>{checkText(s)}</li>
                   ))}
                 </ul>
               </div>
             )}
             <p className="text-xs text-muted-foreground">
-              A flag means &quot;worth checking&quot;, not a diagnosis. {w.basis}.
+              {t('bill.flagNote')} {w.basis}.
             </p>
           </CardContent>
         </Card>
@@ -387,7 +397,7 @@ function Results({
       {f && (
         <Card className="no-print">
           <CardHeader>
-            <CardTitle>Fuel price check</CardTitle>
+            <CardTitle>{t('bill.fuelTitle')}</CardTitle>
           </CardHeader>
           <CardContent className="text-sm">
             You paid <strong>{formatNumber(f.price_km_per_litre, 2)} KM/l</strong> for {f.fuel_type}
@@ -399,7 +409,7 @@ function Results({
 
       <Card className="no-print">
         <CardHeader>
-          <CardTitle>What it does to the club&apos;s plan</CardTitle>
+          <CardTitle>{t('bill.planTitle')}</CardTitle>
           <CardDescription>{data.plan.based_on}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -428,17 +438,14 @@ function Results({
 
       <Card>
         <CardHeader className="no-print">
-          <CardTitle>Draft board decision (Bosnian)</CardTitle>
-          <CardDescription>
-            Ready to print. Every figure comes from the calculation above, not from a language
-            model.
-          </CardDescription>
+          <CardTitle>{t('bill.boardTitle')}</CardTitle>
+          <CardDescription>{t('bill.boardDesc')}</CardDescription>
           <div className="flex gap-2 pt-2">
             <Button onClick={() => window.print()}>
-              <Printer className="size-4" /> Print / save as PDF
+              <Printer className="size-4" /> {t('common.print')}
             </Button>
             <Button variant="outline" onClick={onCopy}>
-              <Copy className="size-4" /> {copied ? 'Copied' : 'Copy text'}
+              <Copy className="size-4" /> {copied ? t('common.copied') : t('common.copyText')}
             </Button>
           </div>
         </CardHeader>
