@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Activity, Database, Info, LayoutDashboard, Moon, Sun } from 'lucide-react'
+import { Activity, Database, Info, Leaf, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useHealth } from '@/api/queries'
@@ -9,7 +9,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { cn } from '@/lib/utils'
 
 const nav = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/', label: 'Footprint', icon: Leaf },
   { to: '/data', label: 'Data', icon: Database },
   { to: '/methodology', label: 'How it works', icon: Info },
 ]

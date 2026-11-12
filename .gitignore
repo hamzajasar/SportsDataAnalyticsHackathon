@@ -19,6 +19,7 @@ data/processed/*
 !data/**/.gitkeep
 # Dataset formats are ignored EVERYWHERE (organisers' data must not reach git).
 # To commit a small hand-made file on purpose: git add -f path/to/file
+# Exception: small derived reference tables the app computes with (sources credited in-file)
 *.csv
 *.tsv
 *.xlsx
@@ -29,6 +30,7 @@ data/processed/*
 *.ndjson
 *.zip
 *.gz
+!backend/app/reference/*.csv
 *.db
 *.duckdb
 *.sqlite

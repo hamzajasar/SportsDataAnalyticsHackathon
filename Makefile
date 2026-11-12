@@ -1,4 +1,4 @@
-.PHONY: help setup dev db db-stop migrate migration profile seed sample-data clean-sample backend frontend notebook gen-api lint format test check clean
+.PHONY: help setup dev db db-stop migrate migration data reference profile seed sample-data clean-sample backend frontend notebook gen-api lint format test check clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -22,6 +22,12 @@ migrate: ## Apply DB migrations (alembic upgrade head)
 migration: ## Create migration from model changes: make migration m="add teams table"
 	@test -n "$(m)" || (echo 'usage: make migration m="message"' && exit 1)
 	cd backend && uv run alembic revision --autogenerate -m "$(m)"
+
+data: ## Download Topic 6 open datasets into data/raw/sustainability (FORCE=1 to refresh)
+	cd backend && FORCE=$(FORCE) uv run python -m scripts.fetch_open_data
+
+reference: ## Rebuild committed reference tables (backend/app/reference) from data/raw
+	cd backend && uv run python -m scripts.build_reference
 
 profile: ## Profile all datasets in data/raw -> data/processed/_profile.md
 	cd backend && uv run python -m scripts.profile_data

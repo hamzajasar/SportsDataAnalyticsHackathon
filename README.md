@@ -1,6 +1,6 @@
 # SportsDataAnalyticsHackathon
 
-> **Topic:** _TBD_ · **Team:** _TBD_ · **Live demo:** _TBD_
+> **Topic:** 06 · The Sustainable Sports Club — _How can community clubs use data to cut energy use, travel emissions or equipment waste?_ (see [docs/TOPIC.md](docs/TOPIC.md)) · **Team:** _TBD_ · **Live demo:** _TBD_
 
 <!-- Sections mirror the judging criteria in docs/JUDGING_CRITERIA.md. Keep each short and concrete. -->
 
@@ -55,7 +55,8 @@ Run `make help` for all commands.
 ### Working with the provided datasets
 
 ```bash
-# put files (csv, parquet, json, xlsx) in data/raw/ — they are git-ignored
+make data           # download the open datasets for our topic (see docs/DATA_SOURCES.md)
+# organisers' synthetic pack -> data/raw/pack/  (git-ignored)
 make profile        # rows, columns, types, missing %, likely keys, probable joins
                     # -> data/processed/_profile.md
 make seed           # optional: load them into Postgres as raw_* tables

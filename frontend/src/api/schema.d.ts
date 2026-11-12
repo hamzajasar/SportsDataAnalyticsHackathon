@@ -72,17 +72,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/sample/stats": {
+    "/api/sustainability/grid-intensity": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get Sample Stats */
-        get: operations["getSampleStats"];
+        /** Grid Intensity */
+        get: operations["getGridIntensity"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sustainability/electricity-mix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Electricity Mix */
+        get: operations["getElectricityMix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sustainability/electricity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Electricity */
+        get: operations["estimateElectricity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sustainability/factors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Factors */
+        get: operations["listEmissionFactors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sustainability/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Estimate */
+        get: operations["estimateAmount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sustainability/trip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Trip */
+        post: operations["compareTrip"];
         delete?: never;
         options?: never;
         head?: never;
@@ -93,6 +178,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AmountEstimate */
+        AmountEstimate: {
+            /** Key */
+            key: string;
+            /** Unit */
+            unit: string;
+            /** Kg Co2E */
+            kg_co2e: number;
+            /** Amount */
+            amount: number;
+            /** Total Kg Co2E */
+            total_kg_co2e: number;
+            /** Source */
+            source: string;
+        };
         /** ColumnSummary */
         ColumnSummary: {
             /** Name */
@@ -111,13 +211,6 @@ export interface components {
             mean: number | null;
             /** Likely Key */
             likely_key: boolean;
-        };
-        /** DataPoint */
-        DataPoint: {
-            /** Label */
-            label: string;
-            /** Value */
-            value: number;
         };
         /** DatasetInfo */
         DatasetInfo: {
@@ -148,6 +241,47 @@ export interface components {
             /** Columns */
             columns: components["schemas"]["ColumnSummary"][];
         };
+        /** ElectricityEstimate */
+        ElectricityEstimate: {
+            /** Kwh */
+            kwh: number;
+            /** Kg Co2E */
+            kg_co2e: number;
+            /** Country */
+            country: string;
+            /** Year */
+            year: number;
+            /** Gco2 Per Kwh */
+            gco2_per_kwh: number;
+            /** Source */
+            source: string;
+        };
+        /** ElectricityMix */
+        ElectricityMix: {
+            /** Entity */
+            entity: string;
+            /** Year */
+            year: number;
+            /** Shares Pct */
+            shares_pct: {
+                [key: string]: number;
+            };
+            /** Source */
+            source: string;
+        };
+        /** EmissionFactor */
+        EmissionFactor: {
+            /** Category */
+            category: string;
+            /** Key */
+            key: string;
+            /** Unit */
+            unit: string;
+            /** Kg Co2E */
+            kg_co2e: number;
+            /** Source */
+            source: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -160,12 +294,74 @@ export interface components {
             /** Database */
             database: boolean;
         };
-        /** SampleStats */
-        SampleStats: {
-            /** Title */
-            title: string;
+        /** IntensityPoint */
+        IntensityPoint: {
+            /** Year */
+            year: number;
+            /** Gco2 Per Kwh */
+            gco2_per_kwh: number;
+        };
+        /** IntensitySeries */
+        IntensitySeries: {
+            /** Entity */
+            entity: string;
+            /** Code */
+            code: string;
             /** Points */
-            points: components["schemas"]["DataPoint"][];
+            points: components["schemas"]["IntensityPoint"][];
+        };
+        /** TripComparison */
+        TripComparison: {
+            /** Distance Km */
+            distance_km: number;
+            /** Total Km */
+            total_km: number;
+            /** People */
+            people: number;
+            /** Options */
+            options: components["schemas"]["TripOption"][];
+            /** Source */
+            source: string;
+        };
+        /** TripOption */
+        TripOption: {
+            /** Mode */
+            mode: string;
+            /** Label */
+            label: string;
+            /** Vehicles */
+            vehicles: number | null;
+            /** Kg Co2E */
+            kg_co2e: number;
+            /** Saving Vs Worst Kg */
+            saving_vs_worst_kg: number;
+            /** Assumption */
+            assumption: string;
+        };
+        /** TripRequest */
+        TripRequest: {
+            /**
+             * Distance Km
+             * @description One-way distance
+             */
+            distance_km: number;
+            /** People */
+            people: number;
+            /**
+             * Round Trip
+             * @default true
+             */
+            round_trip: boolean;
+            /**
+             * Car Occupancy
+             * @default 3
+             */
+            car_occupancy: number;
+            /**
+             * Car Type
+             * @default car_average
+             */
+            car_type: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -295,9 +491,12 @@ export interface operations {
             };
         };
     };
-    getSampleStats: {
+    getGridIntensity: {
         parameters: {
-            query?: never;
+            query?: {
+                countries?: string[];
+                from_year?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -310,7 +509,177 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SampleStats"];
+                    "application/json": components["schemas"]["IntensitySeries"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    getElectricityMix: {
+        parameters: {
+            query?: {
+                country?: string;
+                year?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElectricityMix"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estimateElectricity: {
+        parameters: {
+            query: {
+                kwh: number;
+                country?: string;
+                year?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElectricityEstimate"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listEmissionFactors: {
+        parameters: {
+            query?: {
+                category?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmissionFactor"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estimateAmount: {
+        parameters: {
+            query: {
+                key: string;
+                amount: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AmountEstimate"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compareTrip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TripRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripComparison"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -184,20 +184,342 @@
         }
       }
     },
-    "/api/sample/stats": {
+    "/api/sustainability/grid-intensity": {
       "get": {
         "tags": [
-          "sample"
+          "sustainability"
         ],
-        "summary": "Get Sample Stats",
-        "operationId": "getSampleStats",
+        "summary": "Grid Intensity",
+        "operationId": "getGridIntensity",
+        "parameters": [
+          {
+            "name": "countries",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "BIH",
+                "HRV",
+                "SRB",
+                "EU"
+              ],
+              "title": "Countries"
+            }
+          },
+          {
+            "name": "from_year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 2100,
+              "minimum": 1990,
+              "default": 2010,
+              "title": "From Year"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SampleStats"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IntensitySeries"
+                  },
+                  "title": "Response Getgridintensity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sustainability/electricity-mix": {
+      "get": {
+        "tags": [
+          "sustainability"
+        ],
+        "summary": "Electricity Mix",
+        "operationId": "getElectricityMix",
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "BIH",
+              "title": "Country"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectricityMix"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sustainability/electricity": {
+      "get": {
+        "tags": [
+          "sustainability"
+        ],
+        "summary": "Electricity",
+        "operationId": "estimateElectricity",
+        "parameters": [
+          {
+            "name": "kwh",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 1000000000.0,
+              "exclusiveMinimum": 0,
+              "title": "Kwh"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "BIH",
+              "title": "Country"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectricityEstimate"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sustainability/factors": {
+      "get": {
+        "tags": [
+          "sustainability"
+        ],
+        "summary": "Factors",
+        "operationId": "listEmissionFactors",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmissionFactor"
+                  },
+                  "title": "Response Listemissionfactors"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sustainability/estimate": {
+      "get": {
+        "tags": [
+          "sustainability"
+        ],
+        "summary": "Estimate",
+        "operationId": "estimateAmount",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 1000000000.0,
+              "exclusiveMinimum": 0,
+              "title": "Amount"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AmountEstimate"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sustainability/trip": {
+      "post": {
+        "tags": [
+          "sustainability"
+        ],
+        "summary": "Trip",
+        "operationId": "compareTrip",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripComparison"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -208,6 +530,44 @@
   },
   "components": {
     "schemas": {
+      "AmountEstimate": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "kg_co2e": {
+            "type": "number",
+            "title": "Kg Co2E"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "total_kg_co2e": {
+            "type": "number",
+            "title": "Total Kg Co2E"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "unit",
+          "kg_co2e",
+          "amount",
+          "total_kg_co2e",
+          "source"
+        ],
+        "title": "AmountEstimate"
+      },
       "ColumnSummary": {
         "properties": {
           "name": {
@@ -276,24 +636,6 @@
           "likely_key"
         ],
         "title": "ColumnSummary"
-      },
-      "DataPoint": {
-        "properties": {
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "value": {
-            "type": "number",
-            "title": "Value"
-          }
-        },
-        "type": "object",
-        "required": [
-          "label",
-          "value"
-        ],
-        "title": "DataPoint"
       },
       "DatasetInfo": {
         "properties": {
@@ -379,6 +721,108 @@
         ],
         "title": "DatasetSummary"
       },
+      "ElectricityEstimate": {
+        "properties": {
+          "kwh": {
+            "type": "number",
+            "title": "Kwh"
+          },
+          "kg_co2e": {
+            "type": "number",
+            "title": "Kg Co2E"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "gco2_per_kwh": {
+            "type": "number",
+            "title": "Gco2 Per Kwh"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kwh",
+          "kg_co2e",
+          "country",
+          "year",
+          "gco2_per_kwh",
+          "source"
+        ],
+        "title": "ElectricityEstimate"
+      },
+      "ElectricityMix": {
+        "properties": {
+          "entity": {
+            "type": "string",
+            "title": "Entity"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "shares_pct": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Shares Pct"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entity",
+          "year",
+          "shares_pct",
+          "source"
+        ],
+        "title": "ElectricityMix"
+      },
+      "EmissionFactor": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "kg_co2e": {
+            "type": "number",
+            "title": "Kg Co2E"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "key",
+          "unit",
+          "kg_co2e",
+          "source"
+        ],
+        "title": "EmissionFactor"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -410,15 +854,37 @@
         ],
         "title": "Health"
       },
-      "SampleStats": {
+      "IntensityPoint": {
         "properties": {
-          "title": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "gco2_per_kwh": {
+            "type": "number",
+            "title": "Gco2 Per Kwh"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "gco2_per_kwh"
+        ],
+        "title": "IntensityPoint"
+      },
+      "IntensitySeries": {
+        "properties": {
+          "entity": {
             "type": "string",
-            "title": "Title"
+            "title": "Entity"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
           },
           "points": {
             "items": {
-              "$ref": "#/components/schemas/DataPoint"
+              "$ref": "#/components/schemas/IntensityPoint"
             },
             "type": "array",
             "title": "Points"
@@ -426,10 +892,132 @@
         },
         "type": "object",
         "required": [
-          "title",
+          "entity",
+          "code",
           "points"
         ],
-        "title": "SampleStats"
+        "title": "IntensitySeries"
+      },
+      "TripComparison": {
+        "properties": {
+          "distance_km": {
+            "type": "number",
+            "title": "Distance Km"
+          },
+          "total_km": {
+            "type": "number",
+            "title": "Total Km"
+          },
+          "people": {
+            "type": "integer",
+            "title": "People"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/TripOption"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "distance_km",
+          "total_km",
+          "people",
+          "options",
+          "source"
+        ],
+        "title": "TripComparison"
+      },
+      "TripOption": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "vehicles": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vehicles"
+          },
+          "kg_co2e": {
+            "type": "number",
+            "title": "Kg Co2E"
+          },
+          "saving_vs_worst_kg": {
+            "type": "number",
+            "title": "Saving Vs Worst Kg"
+          },
+          "assumption": {
+            "type": "string",
+            "title": "Assumption"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "label",
+          "vehicles",
+          "kg_co2e",
+          "saving_vs_worst_kg",
+          "assumption"
+        ],
+        "title": "TripOption"
+      },
+      "TripRequest": {
+        "properties": {
+          "distance_km": {
+            "type": "number",
+            "maximum": 5000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Distance Km",
+            "description": "One-way distance"
+          },
+          "people": {
+            "type": "integer",
+            "maximum": 200.0,
+            "exclusiveMinimum": 0.0,
+            "title": "People"
+          },
+          "round_trip": {
+            "type": "boolean",
+            "title": "Round Trip",
+            "default": true
+          },
+          "car_occupancy": {
+            "type": "integer",
+            "maximum": 7.0,
+            "minimum": 1.0,
+            "title": "Car Occupancy",
+            "default": 3
+          },
+          "car_type": {
+            "type": "string",
+            "title": "Car Type",
+            "default": "car_average"
+          }
+        },
+        "type": "object",
+        "required": [
+          "distance_km",
+          "people"
+        ],
+        "title": "TripRequest"
       },
       "ValidationError": {
         "properties": {

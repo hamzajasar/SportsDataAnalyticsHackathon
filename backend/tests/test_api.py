@@ -19,12 +19,6 @@ def test_health_database_connected():
     assert client.get("/api/health").json()["database"] is True
 
 
-def test_sample_stats():
-    r = client.get("/api/sample/stats")
-    assert r.status_code == 200
-    assert len(r.json()["points"]) == 10
-
-
 def test_datasets_disabled_in_production():
     from app.core.config import Settings
 
