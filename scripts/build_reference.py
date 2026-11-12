@@ -39,3 +39,10 @@ write("cost_assumptions.csv", ["key", "value", "unit", "note", "source"], [
     ["minibus_kg_per_km", vf["minibus"]["value"], "kg CO2e/vehicle-km", vf["minibus"]["basis"], "UK GHG 2025 (OGL v3.0)"],
     ["coach_kg_per_km", vf["coach"]["value"], "kg CO2e/vehicle-km", vf["coach"]["basis"], "UK GHG 2025 (OGL v3.0) + assumed occupancy"],
 ])
+
+# Inputs for the action-plan model (JSON, copied as-is)
+import shutil
+
+for n in ("sample_club.json", "upgrades.json"):
+    shutil.copy(CLEAN / n, REF / n)
+    print("copied", n)
