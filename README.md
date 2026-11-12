@@ -54,6 +54,16 @@ Run `make help` for all commands.
 
 ### Working with the provided datasets
 
+**Where data goes — what is shared through git:**
+
+| Folder | Shared via `git pull`? | Put here |
+|---|---|---|
+| `data/clean/` | ✅ yes (any format) | Small cleaned files the team works from — commit them |
+| `backend/app/reference/` | ✅ yes | Reference tables the API computes with (`make reference`) |
+| `data/raw/` | ❌ no, stays on your laptop | Raw downloads and the organisers' pack (`data/raw/pack/`) |
+
+Keep committed files small (hook limit: 2 MB per file). Re-create raw data with `make data`.
+
 ```bash
 make data           # download the open datasets for our topic (see docs/DATA_SOURCES.md)
 # organisers' synthetic pack -> data/raw/pack/  (git-ignored)

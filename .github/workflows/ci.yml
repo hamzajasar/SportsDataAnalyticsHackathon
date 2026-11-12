@@ -29,7 +29,7 @@ jobs:
       - name: No dataset files committed
         run: |
           bad=$(git ls-files | grep -Ei '\.(csv|tsv|xlsx?|parquet|feather|jsonl|ndjson|zip|gz)$' \
-            | grep -v '^backend/app/reference/' || true)
+            | grep -vE '^(backend/app/reference|data/clean)/' || true)
           if [ -n "$bad" ]; then echo "::error::Dataset files must not be committed:"; echo "$bad"; exit 1; fi
       - name: Notebooks have no outputs
         run: |
