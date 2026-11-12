@@ -761,6 +761,260 @@
           }
         }
       }
+    },
+    "/api/venues/nearest": {
+      "get": {
+        "tags": [
+          "share"
+        ],
+        "summary": "Nearest",
+        "operationId": "nearestVenues",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 46,
+              "minimum": 42,
+              "title": "Lat"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 20,
+              "minimum": 15,
+              "title": "Lon"
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 10,
+              "title": "N"
+            }
+          },
+          {
+            "name": "leisure",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(pitch|stadium|sports_centre|sports_hall)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Leisure"
+            }
+          },
+          {
+            "name": "named_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Named Only"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Venue"
+                  },
+                  "title": "Response Nearestvenues"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/distance": {
+      "get": {
+        "tags": [
+          "share"
+        ],
+        "summary": "Distance",
+        "operationId": "getDistance",
+        "parameters": [
+          {
+            "name": "from_lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 46,
+              "minimum": 42,
+              "title": "From Lat"
+            }
+          },
+          {
+            "name": "from_lon",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 20,
+              "minimum": 15,
+              "title": "From Lon"
+            }
+          },
+          {
+            "name": "to_lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 46,
+              "minimum": 42,
+              "title": "To Lat"
+            }
+          },
+          {
+            "name": "to_lon",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 20,
+              "minimum": 15,
+              "title": "To Lon"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Distance"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/share/suggestions": {
+      "get": {
+        "tags": [
+          "share"
+        ],
+        "summary": "Share",
+        "operationId": "shareSuggestions",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 46,
+              "minimum": 42,
+              "title": "Lat"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 20,
+              "minimum": 15,
+              "title": "Lon"
+            }
+          },
+          {
+            "name": "radius_km",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 100,
+              "exclusiveMinimum": 0,
+              "default": 10,
+              "title": "Radius Km"
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 5,
+              "title": "N"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareSuggestions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1036,6 +1290,34 @@
         ],
         "title": "DatasetSummary"
       },
+      "Distance": {
+        "properties": {
+          "straight_km": {
+            "type": "number",
+            "title": "Straight Km"
+          },
+          "road_km_estimate": {
+            "type": "number",
+            "title": "Road Km Estimate"
+          },
+          "circuity_factor": {
+            "type": "number",
+            "title": "Circuity Factor"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "straight_km",
+          "road_km_estimate",
+          "circuity_factor",
+          "note"
+        ],
+        "title": "Distance"
+      },
       "ElectricityEstimate": {
         "properties": {
           "kwh": {
@@ -1272,6 +1554,40 @@
           "source"
         ],
         "title": "MonthlyValue"
+      },
+      "ShareSuggestions": {
+        "properties": {
+          "radius_km": {
+            "type": "number",
+            "title": "Radius Km"
+          },
+          "shared_pitch": {
+            "items": {
+              "$ref": "#/components/schemas/Venue"
+            },
+            "type": "array",
+            "title": "Shared Pitch"
+          },
+          "carpool_partners": {
+            "items": {
+              "$ref": "#/components/schemas/Venue"
+            },
+            "type": "array",
+            "title": "Carpool Partners"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "radius_km",
+          "shared_pitch",
+          "carpool_partners",
+          "note"
+        ],
+        "title": "ShareSuggestions"
       },
       "Source": {
         "properties": {
