@@ -4,7 +4,8 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 
-from app.schemas import ClubAssumptions, MonthlySeries, Source, Venue
+from app.schemas import ActionPlan, Baseline, ClubAssumptions, MonthlySeries, Source, Venue
+from app.services import action_plan
 from app.services import club_data as svc
 
 router = APIRouter(tags=["club"])
@@ -73,3 +74,15 @@ def pv_yield() -> MonthlySeries:
         return MonthlySeries(**svc.pv_yield_series())
     except FileNotFoundError as e:
         raise _missing(e) from None
+
+
+@router.get("/club/baseline", response_model=Baseline, operation_id="getClubBaseline")
+def club_baseline() -> Baseline:
+    """Yearly electricity and travel: kWh, KM cost and t CO2 for the sample club."""
+    return Baseline(**action_plan.baseline())
+
+
+@router.get("/club/actions", response_model=ActionPlan, operation_id="getActionPlan")
+def club_actions() -> ActionPlan:
+    """Upgrades ranked by payback, with KM/CO2 saved and fee drop per child (summary bar)."""
+    return ActionPlan(**action_plan.action_plan())

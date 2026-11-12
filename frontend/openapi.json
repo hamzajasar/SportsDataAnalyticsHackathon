@@ -762,6 +762,50 @@
         }
       }
     },
+    "/api/club/baseline": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Club Baseline",
+        "description": "Yearly electricity and travel: kWh, KM cost and t CO2 for the sample club.",
+        "operationId": "getClubBaseline",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Baseline"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/club/actions": {
+      "get": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Club Actions",
+        "description": "Upgrades ranked by payback, with KM/CO2 saved and fee drop per child (summary bar).",
+        "operationId": "getActionPlan",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/venues/nearest": {
       "get": {
         "tags": [
@@ -1019,6 +1063,135 @@
   },
   "components": {
     "schemas": {
+      "Action": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "cost_km": {
+            "type": "number",
+            "title": "Cost Km"
+          },
+          "saves_km_year": {
+            "type": "number",
+            "title": "Saves Km Year"
+          },
+          "saves_kg_co2_year": {
+            "type": "number",
+            "title": "Saves Kg Co2 Year"
+          },
+          "saves_kwh_year": {
+            "type": "number",
+            "title": "Saves Kwh Year"
+          },
+          "payback_years": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payback Years"
+          },
+          "basis": {
+            "type": "string",
+            "title": "Basis"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "cost_km",
+          "saves_km_year",
+          "saves_kg_co2_year",
+          "saves_kwh_year",
+          "payback_years",
+          "basis"
+        ],
+        "title": "Action"
+      },
+      "ActionPlan": {
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/Action"
+            },
+            "type": "array",
+            "title": "Actions"
+          },
+          "total_saves_km_year": {
+            "type": "number",
+            "title": "Total Saves Km Year"
+          },
+          "total_saves_t_co2_year": {
+            "type": "number",
+            "title": "Total Saves T Co2 Year"
+          },
+          "fee_drop_per_child_km": {
+            "type": "number",
+            "title": "Fee Drop Per Child Km"
+          },
+          "children": {
+            "type": "integer",
+            "title": "Children"
+          },
+          "assumptions": {
+            "$ref": "#/components/schemas/ActionPlanAssumptions"
+          },
+          "example": {
+            "type": "boolean",
+            "title": "Example",
+            "description": "True while serving example data, not the live model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actions",
+          "total_saves_km_year",
+          "total_saves_t_co2_year",
+          "fee_drop_per_child_km",
+          "children",
+          "assumptions",
+          "example"
+        ],
+        "title": "ActionPlan"
+      },
+      "ActionPlanAssumptions": {
+        "properties": {
+          "electricity_price_km_per_kwh": {
+            "type": "number",
+            "title": "Electricity Price Km Per Kwh"
+          },
+          "grid_gco2_per_kwh": {
+            "type": "number",
+            "title": "Grid Gco2 Per Kwh"
+          },
+          "grid_year": {
+            "type": "integer",
+            "title": "Grid Year"
+          },
+          "illustrative_club": {
+            "type": "boolean",
+            "title": "Illustrative Club"
+          }
+        },
+        "type": "object",
+        "required": [
+          "electricity_price_km_per_kwh",
+          "grid_gco2_per_kwh",
+          "grid_year",
+          "illustrative_club"
+        ],
+        "title": "ActionPlanAssumptions"
+      },
       "AmountEstimate": {
         "properties": {
           "key": {
@@ -1056,6 +1229,60 @@
           "source"
         ],
         "title": "AmountEstimate"
+      },
+      "Baseline": {
+        "properties": {
+          "electricity_kwh": {
+            "type": "number",
+            "title": "Electricity Kwh"
+          },
+          "electricity_km": {
+            "type": "number",
+            "title": "Electricity Km"
+          },
+          "electricity_t_co2": {
+            "type": "number",
+            "title": "Electricity T Co2"
+          },
+          "travel_km_driven": {
+            "type": "number",
+            "title": "Travel Km Driven"
+          },
+          "travel_km_cost": {
+            "type": "number",
+            "title": "Travel Km Cost"
+          },
+          "travel_t_co2": {
+            "type": "number",
+            "title": "Travel T Co2"
+          },
+          "grid_gco2_per_kwh": {
+            "type": "number",
+            "title": "Grid Gco2 Per Kwh"
+          },
+          "grid_year": {
+            "type": "integer",
+            "title": "Grid Year"
+          },
+          "example": {
+            "type": "boolean",
+            "title": "Example",
+            "description": "True while serving example data, not the live model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "electricity_kwh",
+          "electricity_km",
+          "electricity_t_co2",
+          "travel_km_driven",
+          "travel_km_cost",
+          "travel_t_co2",
+          "grid_gco2_per_kwh",
+          "grid_year",
+          "example"
+        ],
+        "title": "Baseline"
       },
       "ClubAssumptions": {
         "properties": {
