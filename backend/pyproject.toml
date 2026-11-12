@@ -1,0 +1,58 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Sports Data Analytics Hackathon - API"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "fastapi[standard]",
+    "pydantic-settings",
+    "sqlalchemy>=2",
+    "psycopg[binary]",
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "xgboost",
+    "statsmodels",
+    "duckdb",
+    "pyarrow",
+    "httpx",
+    "alembic>=1.20.1",
+    "openpyxl>=3.1.5",
+    "joblib>=1.6.0",
+    "statsbombpy>=1.22.0",
+    "kloppy>=3.19.1",
+    "mplsoccer>=1.8.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "pre-commit",
+    "nbstripout",
+    "jupyterlab",
+    "ipykernel",
+    "matplotlib",
+    "seaborn",
+    "plotly",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+# Same import order whether ruff runs from backend/ (make lint) or repo root (pre-commit)
+known-first-party = ["app", "scripts"]
+
+[tool.ruff.lint.per-file-ignores]
+# Template/exploration notebooks import things "just in case"
+"*.ipynb" = ["F401", "E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

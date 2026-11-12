@@ -1,0 +1,32 @@
+# `docker compose up -d db`            -> just Postgres (default for local dev, see `make dev`)
+# `docker compose --profile full up`   -> Postgres + backend in containers
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: hackathon
+      POSTGRES_PASSWORD: hackathon
+      POSTGRES_DB: hackathon
+    ports:
+      - "127.0.0.1:5432:5432" # localhost only — never expose the DB to the network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hackathon"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    profiles: ["full"]
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://hackathon:hackathon@db:5432/hackathon
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

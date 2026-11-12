@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=2000"]
+      - id: detect-private-key
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks # blocks API keys, tokens, passwords, connection strings
+
+  - repo: local
+    hooks:
+      - id: nbstripout
+        name: nbstripout (clear notebook outputs)
+        entry: uv run --project backend nbstripout
+        language: system
+        files: \.ipynb$
+      - id: ruff-check
+        name: ruff check
+        entry: uv run --project backend ruff check --fix --config backend/pyproject.toml
+        language: system
+        types_or: [python, jupyter]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --project backend ruff format --config backend/pyproject.toml
+        language: system
+        types_or: [python, jupyter]
+      - id: prettier
+        name: prettier
+        entry: bash -c 'cd frontend && npx prettier --write --ignore-unknown "${@/#frontend\//}"' --
+        language: system
+        files: ^frontend/
+      - id: oxlint
+        name: oxlint
+        entry: bash -c 'cd frontend && npx oxlint'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx)$
+        pass_filenames: false

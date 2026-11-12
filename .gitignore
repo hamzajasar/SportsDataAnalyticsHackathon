@@ -1,0 +1,57 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Data (keep folder structure only)
+data/raw/*
+data/processed/*
+!data/**/.gitkeep
+# Dataset formats are ignored EVERYWHERE (organisers' data must not reach git).
+# To commit a small hand-made file on purpose: git add -f path/to/file
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.parquet
+*.feather
+*.jsonl
+*.ndjson
+*.zip
+*.gz
+*.db
+*.duckdb
+*.sqlite
+
+# Models / artifacts
+models/*
+!models/.gitkeep
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Claude Code (local only)
+CLAUDE.md
+.claude/
