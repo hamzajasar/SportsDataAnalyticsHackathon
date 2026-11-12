@@ -11,14 +11,12 @@ dependencies = [
     "pandas",
     "numpy",
     "scikit-learn",
-    "xgboost",
     "statsmodels",
     "duckdb",
     "pyarrow",
     "httpx",
     "alembic>=1.20.1",
     "openpyxl>=3.1.5",
-    "joblib>=1.6.0",
 ]
 
 [dependency-groups]

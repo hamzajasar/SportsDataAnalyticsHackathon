@@ -1,8 +1,6 @@
 export const formatNumber = (n: number, digits = 0) =>
   n.toLocaleString(undefined, { maximumFractionDigits: digits })
 
-export const formatPercent = (n: number, digits = 1) => `${n.toFixed(digits)}%`
-
 export function formatBytes(n: number): string {
   const units = ['B', 'KB', 'MB', 'GB']
   let i = 0

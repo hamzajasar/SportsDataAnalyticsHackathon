@@ -1,4 +1,4 @@
-.PHONY: help setup feature sync dev db db-stop migrate migration data reference profile seed sample-data clean-sample backend frontend notebook gen-api lint format test check clean
+.PHONY: help setup feature sync dev db db-stop migrate migration data reference profile seed backend frontend notebook gen-api lint format test check clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -44,12 +44,6 @@ profile: ## Profile all datasets in data/raw -> data/processed/_profile.md
 
 seed: db ## Load data/raw files into Postgres as raw_* tables (one file: make seed f="x.csv")
 	cd backend && uv run python -m scripts.seed_db $(f)
-
-sample-data: ## Generate fake sports data in data/raw/_sample to try the tooling
-	cd backend && uv run python -m scripts.make_sample_data
-
-clean-sample: ## Remove the fake sample data
-	rm -rf data/raw/_sample
 
 backend: ## Run FastAPI with reload on :8000 (docs at /docs)
 	cd backend && uv run fastapi dev app/main.py --port 8000
