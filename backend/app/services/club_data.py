@@ -121,3 +121,74 @@ def venues(
     if near is not None:
         out.sort(key=lambda v: v["distance_km"])
     return out[:limit]
+
+
+def temperature_series() -> dict:
+    months = _monthly("temperature", "mean_temp_c")
+    return {
+        "unit": "°C (monthly mean)",
+        "months": months,
+        "annual": round(sum(m["value"] for m in months) / len(months), 1),
+        "source": months[0]["source"],
+    }
+
+
+def pv_yield_series() -> dict:
+    months = _monthly("pv_yield", "kwh_per_kwp")
+    return {
+        "unit": "kWh per installed kWp",
+        "months": months,
+        "annual": round(sum(m["value"] for m in months), 1),
+        "source": months[0]["source"],
+    }
+
+
+# ---- Distances & sharing suggestions ----------------------------------------------------------
+
+# Roads are longer than the straight line; ~1.3x is a common rule of thumb (assumption, in API).
+ROAD_CIRCUITY = 1.3
+CLUB_LIKE = {"stadium", "sports_centre"}  # named stadiums/centres ≈ clubs (heuristic, labelled)
+PITCH_LIKE = {"pitch", "sports_hall"}
+
+
+def distance(from_lat: float, from_lon: float, to_lat: float, to_lon: float) -> dict:
+    straight = _haversine_km(from_lat, from_lon, to_lat, to_lon)
+    return {
+        "straight_km": round(straight, 2),
+        "road_km_estimate": round(straight * ROAD_CIRCUITY, 1),
+        "circuity_factor": ROAD_CIRCUITY,
+        "note": "Straight-line (haversine) distance; road distance estimated as straight x 1.3",
+    }
+
+
+def nearest(
+    lat: float, lon: float, n: int = 10, leisure: str | None = None, named_only: bool = False
+) -> list[dict]:
+    rows = venues(leisure=leisure, near=(lat, lon), limit=5000)
+    if named_only:
+        rows = [v for v in rows if v["name"]]
+    return rows[:n]
+
+
+def share_suggestions(lat: float, lon: float, radius_km: float = 10, n: int = 5) -> dict:
+    """Who could share with a club at (lat, lon)?
+
+    - shared_pitch: nearest pitches/halls (use a shared facility instead of building/heating one)
+    - carpool_partners: nearest named stadiums/sports centres (likely clubs) to share transport
+    """
+    near = [
+        v
+        for v in venues(near=(lat, lon), radius_km=radius_km, limit=5000)
+        if v["distance_km"] > 0.05  # skip the club's own location
+    ]
+    pitches = [v for v in near if v["leisure"] in PITCH_LIKE][:n]
+    partners = [v for v in near if v["leisure"] in CLUB_LIKE and v["name"]][:n]
+    return {
+        "radius_km": radius_km,
+        "shared_pitch": pitches,
+        "carpool_partners": partners,
+        "note": (
+            "Partners = named stadiums/sports centres nearby (OSM): a heuristic for clubs, "
+            "verify locally"
+        ),
+    }

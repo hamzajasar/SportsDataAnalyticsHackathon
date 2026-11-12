@@ -50,3 +50,13 @@ def test_only_whitelisted_files():
 def test_haversine_sarajevo_mostar():
     d = club_data._haversine_km(43.8563, 18.4131, 43.3438, 17.8078)
     assert 70 < d < 80
+
+
+def test_temperature_and_pv_yield():
+    t = client.get("/api/climate/temperature").json()
+    assert len(t["months"]) == 12 and t["source"]
+    winter, summer = t["months"][0]["value"], t["months"][6]["value"]
+    assert winter < summer
+    pv = client.get("/api/solar/pv-yield").json()
+    assert len(pv["months"]) == 12
+    assert 900 < pv["annual"] < 1500  # kWh/kWp/year, plausible for Sarajevo

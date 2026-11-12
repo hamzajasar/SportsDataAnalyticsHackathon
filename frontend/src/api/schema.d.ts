@@ -248,6 +248,97 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/climate/temperature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Temperature
+         * @description Sarajevo monthly mean temperature (Open-Meteo) — drives the heating profile.
+         */
+        get: operations["getTemperature"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/solar/pv-yield": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pv Yield
+         * @description Solar output per installed kWp in Sarajevo, by month (PVGIS).
+         */
+        get: operations["getPvYield"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/venues/nearest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Nearest */
+        get: operations["nearestVenues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/distance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Distance */
+        get: operations["getDistance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/share/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Share */
+        get: operations["shareSuggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -341,6 +432,17 @@ export interface components {
             /** Columns */
             columns: components["schemas"]["ColumnSummary"][];
         };
+        /** Distance */
+        Distance: {
+            /** Straight Km */
+            straight_km: number;
+            /** Road Km Estimate */
+            road_km_estimate: number;
+            /** Circuity Factor */
+            circuity_factor: number;
+            /** Note */
+            note: string;
+        };
         /** ElectricityEstimate */
         ElectricityEstimate: {
             /** Kwh */
@@ -410,6 +512,17 @@ export interface components {
             /** Points */
             points: components["schemas"]["IntensityPoint"][];
         };
+        /** MonthlySeries */
+        MonthlySeries: {
+            /** Unit */
+            unit: string;
+            /** Months */
+            months: components["schemas"]["MonthlyValue"][];
+            /** Annual */
+            annual?: number | null;
+            /** Source */
+            source: string;
+        };
         /** MonthlyValue */
         MonthlyValue: {
             /** Month */
@@ -418,6 +531,17 @@ export interface components {
             value: number;
             /** Source */
             source: string;
+        };
+        /** ShareSuggestions */
+        ShareSuggestions: {
+            /** Radius Km */
+            radius_km: number;
+            /** Shared Pitch */
+            shared_pitch: components["schemas"]["Venue"][];
+            /** Carpool Partners */
+            carpool_partners: components["schemas"]["Venue"][];
+            /** Note */
+            note: string;
         };
         /** Source */
         Source: {
@@ -922,6 +1046,149 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Source"][];
+                };
+            };
+        };
+    };
+    getTemperature: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthlySeries"];
+                };
+            };
+        };
+    };
+    getPvYield: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonthlySeries"];
+                };
+            };
+        };
+    };
+    nearestVenues: {
+        parameters: {
+            query: {
+                lat: number;
+                lon: number;
+                n?: number;
+                leisure?: string | null;
+                named_only?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Venue"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    getDistance: {
+        parameters: {
+            query: {
+                from_lat: number;
+                from_lon: number;
+                to_lat: number;
+                to_lon: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Distance"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shareSuggestions: {
+        parameters: {
+            query: {
+                lat: number;
+                lon: number;
+                radius_km?: number;
+                n?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareSuggestions"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
