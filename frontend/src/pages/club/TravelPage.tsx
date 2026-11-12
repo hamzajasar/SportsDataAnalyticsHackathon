@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Bus, Car, TrainFront } from 'lucide-react'
 import { useClub } from '@/state/club'
-import { useSeasonTravel, useTripComparison, type TripRequest } from '@/api/queries'
+import { useSeasonTravel } from '@/api/queries'
 import { QueryState } from '@/components/common/QueryState'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,21 +26,6 @@ export function TravelPage() {
 
   const season = useSeasonTravel(club, people, share)
   const st = season.data
-
-  // Single-trip calculator
-  const [distance, setDistance] = useState(120)
-  const [tripPeople, setTripPeople] = useState(18)
-  const [occupancy, setOccupancy] = useState(3)
-  const tripValid = distance > 0 && tripPeople > 0 && occupancy >= 1 && occupancy <= 7
-  const tripReq: TripRequest = {
-    distance_km: distance,
-    people: tripPeople,
-    round_trip: true,
-    car_occupancy: occupancy,
-    car_type: 'car_average',
-  }
-  const trip = useTripComparison(tripReq, tripValid)
-  const worst = Math.max(...(trip.data?.options.map((o) => o.kg_co2e) ?? [1]))
 
   return (
     <div className="space-y-6">
@@ -135,83 +120,6 @@ export function TravelPage() {
                 )
               })}
             </div>
-          </QueryState>
-        </CardContent>
-      </Card>
-
-      {/* Single trip calculator */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Bus className="size-4" /> Single away game: compare modes
-          </CardTitle>
-          <CardDescription>Round trip, whole squad and staff</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="tdist">Distance (km, one way)</Label>
-              <Input
-                id="tdist"
-                type="number"
-                inputMode="decimal"
-                min={0}
-                value={distance}
-                onChange={(e) => setDistance(Number(e.target.value) || 0)}
-              />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="tpeople">People</Label>
-              <Input
-                id="tpeople"
-                type="number"
-                inputMode="decimal"
-                min={1}
-                value={tripPeople}
-                onChange={(e) => setTripPeople(Number(e.target.value) || 1)}
-              />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="tocc">People per car</Label>
-              <Input
-                id="tocc"
-                type="number"
-                inputMode="decimal"
-                min={1}
-                max={7}
-                value={occupancy}
-                onChange={(e) => setOccupancy(Number(e.target.value) || 1)}
-              />
-            </div>
-          </div>
-          <QueryState isLoading={trip.isLoading} error={trip.error}>
-            <ul className={cn('space-y-2', trip.isFetching && 'opacity-60')}>
-              {trip.data?.options.map((o) => {
-                const Icon = MODE_ICON[o.mode] ?? Car
-                return (
-                  <li key={o.mode} className="space-y-1">
-                    <div className="flex items-center justify-between gap-2 text-sm">
-                      <span className="flex items-center gap-2">
-                        <Icon className="size-4 text-muted-foreground" /> {o.label}
-                      </span>
-                      <span className="font-medium tabular-nums">{formatNumber(o.kg_co2e)} kg</span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary transition-all"
-                        style={{ width: `${(o.kg_co2e / worst) * 100}%` }}
-                      />
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-            {trip.data && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                Best option saves {formatNumber(trip.data.options[0].saving_vs_worst_kg)} kg CO₂ per
-                trip vs the worst. Factors: UK Government GHG conversion factors 2025.
-              </p>
-            )}
           </QueryState>
         </CardContent>
       </Card>

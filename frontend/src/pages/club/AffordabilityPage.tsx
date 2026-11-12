@@ -1,8 +1,6 @@
-import { useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from 'recharts'
-import { Shirt, Leaf } from 'lucide-react'
 import { useClub } from '@/state/club'
-import { useAffordability, useEmissionFactors } from '@/api/queries'
+import { useAffordability } from '@/api/queries'
 import { QueryState } from '@/components/common/QueryState'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -11,33 +9,15 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { formatNumber } from '@/lib/format'
 
 const affordConfig = {
   fee_drop: { label: 'Fee drop (KM/child)', color: 'var(--chart-1)' },
 } satisfies ChartConfig
 
-function carKm(kg: number, factor: number | undefined) {
-  return factor ? `≈ ${formatNumber(kg / factor)} km by car` : ''
-}
-
 export function AffordabilityPage() {
   const { club } = useClub()
   const afford = useAffordability(club)
-  const factors = useEmissionFactors()
-  const f = useMemo(
-    () => Object.fromEntries((factors.data ?? []).map((x) => [x.key, x.kg_co2e])),
-    [factors.data],
-  )
-  const carFactor = f['car_average']
-
-  // Kit calculator
-  const [kits, setKits] = useState(40)
-  const [kgPerKit, setKgPerKit] = useState(0.6)
-  const kitNew = kits * kgPerKit * (f['material_clothing_new'] ?? 0)
-  const kitReused = kits * kgPerKit * (f['material_clothing_reused'] ?? 0)
 
   const a = afford.data
   const barData = (a?.actions ?? []).map((act) => ({
@@ -133,63 +113,6 @@ export function AffordabilityPage() {
           <p>{a.note}</p>
         </div>
       )}
-
-      {/* Kit calculator */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Shirt className="size-4" /> Kit: buy new or pass it on?
-          </CardTitle>
-          <CardDescription>
-            Footprint of producing the kit a club hands out each season
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="kits">Kits per season</Label>
-              <Input
-                id="kits"
-                type="number"
-                inputMode="decimal"
-                min={0}
-                value={kits}
-                onChange={(e) => setKits(Number(e.target.value) || 0)}
-              />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="kgk">kg per kit</Label>
-              <Input
-                id="kgk"
-                type="number"
-                inputMode="decimal"
-                min={0}
-                step={0.1}
-                value={kgPerKit}
-                onChange={(e) => setKgPerKit(Number(e.target.value) || 0)}
-              />
-              <p className="text-xs text-muted-foreground">Assumption: shirt + shorts + socks</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-md border p-3">
-              <p className="text-muted-foreground">All new</p>
-              <p className="text-2xl font-semibold tabular-nums">{formatNumber(kitNew)} kg</p>
-              <p className="text-xs text-muted-foreground">{carKm(kitNew, carFactor)}</p>
-            </div>
-            <div className="rounded-md border p-3">
-              <p className="flex items-center gap-1 text-muted-foreground">
-                <Leaf className="size-3" /> Re-used (kit swap)
-              </p>
-              <p className="text-2xl font-semibold tabular-nums">{formatNumber(kitReused)} kg</p>
-              <p className="text-xs text-muted-foreground">{carKm(kitReused, carFactor)}</p>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Factors: UK Government GHG Conversion Factors 2025 (OGL v3.0).
-          </p>
-        </CardContent>
-      </Card>
     </div>
   )
 }
