@@ -61,3 +61,8 @@ npm-debug.log*
 # Claude Code (local only)
 CLAUDE.md
 .claude/
+
+# Raw downloads (large)
+data/raw/*
+!data/raw/.gitkeep
+scripts/__pycache__/

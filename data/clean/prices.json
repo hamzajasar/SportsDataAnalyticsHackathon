@@ -1,0 +1,9 @@
+{
+ "_note": "ASSUMPTIONS, verify before the pitch (Eurostat nrg_pc_205 / BHAS / FBiH Ministry of Trade).",
+ "electricity_km_per_kwh": 0.22,
+ "fuel_km_per_km_driven": {
+  "car": 0.32,
+  "minibus": 0.34
+ },
+ "currency": "KM"
+}

@@ -1,0 +1,89 @@
+{
+ "sources": [
+  {
+   "id": "pack",
+   "name": "Synthetic data pack (hackathon)",
+   "use": "Sample club: energy, travel, children",
+   "licence": "Provided by organisers (synthetic)",
+   "credit": "Sports Analytics Hackathon, IUS Sarajevo, synthetic data pack",
+   "url": null,
+   "status": "pack not yet added"
+  },
+  {
+   "id": "ember",
+   "name": "Ember yearly electricity data",
+   "use": "Grid CO2 per kWh: BiH vs Croatia vs EU",
+   "licence": "CC BY 4.0",
+   "credit": "Ember, Yearly Electricity Data (CC BY 4.0)",
+   "url": "https://ember-energy.org/data/yearly-electricity-data/",
+   "file": "grid_factor.json",
+   "status": "loaded"
+  },
+  {
+   "id": "ukghg",
+   "name": "UK Government GHG Conversion Factors 2025",
+   "use": "CO2 per vehicle-km: car, minibus (proxy), coach",
+   "licence": "Open Government Licence v3.0",
+   "credit": "Contains public sector information licensed under the Open Government Licence v3.0. DESNZ/Defra, GHG Conversion Factors 2025",
+   "url": "https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2025",
+   "file": "vehicle_factors.json",
+   "status": "loaded"
+  },
+  {
+   "id": "openmeteo",
+   "name": "Open-Meteo historical weather",
+   "use": "Sarajevo monthly temperature to shape heating",
+   "licence": "CC BY 4.0 (free API is non-commercial)",
+   "credit": "Weather data by Open-Meteo.com (CC BY 4.0)",
+   "url": "https://open-meteo.com/",
+   "file": "sarajevo_monthly_temp.json",
+   "status": "loaded"
+  },
+  {
+   "id": "osm",
+   "name": "OpenStreetMap via Overpass",
+   "use": "Pitches and halls, distances, map tiles",
+   "licence": "ODbL 1.0",
+   "credit": "© OpenStreetMap contributors (ODbL)",
+   "url": "https://www.openstreetmap.org/copyright",
+   "file": "osm_sport_venues.json",
+   "status": "loaded"
+  },
+  {
+   "id": "eurostat_prices",
+   "name": "Eurostat electricity prices, non-household (nrg_pc_205)",
+   "use": "KM per kWh",
+   "licence": "Eurostat reuse policy (CC BY 4.0), credit source",
+   "credit": "Source: Eurostat (nrg_pc_205)",
+   "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_205",
+   "status": "planned"
+  },
+  {
+   "id": "pvgis",
+   "name": "PVGIS (EU Joint Research Centre)",
+   "use": "Solar yield for a clubhouse roof",
+   "licence": "Free reuse with source acknowledged",
+   "credit": "PVGIS © European Communities",
+   "url": "https://re.jrc.ec.europa.eu/pvg_tools/en/",
+   "status": "planned"
+  },
+  {
+   "id": "fuel",
+   "name": "BiH fuel prices (FBiH Ministry of Trade / aggregator)",
+   "use": "KM cost of away trips",
+   "licence": "Not verified",
+   "credit": "TBD once source confirmed",
+   "url": null,
+   "status": "planned, licence to check"
+  },
+  {
+   "id": "wages",
+   "name": "BHAS average net wages",
+   "use": "Fees as share of income (low priority)",
+   "licence": "Not verified",
+   "credit": "Agency for Statistics of Bosnia and Herzegovina",
+   "url": "https://bhas.gov.ba/",
+   "status": "planned, terms to check"
+  }
+ ]
+}
