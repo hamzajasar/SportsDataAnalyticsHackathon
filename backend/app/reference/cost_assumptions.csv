@@ -1,0 +1,6 @@
+key,value,unit,note,source
+electricity_price,0.22,KM/kWh,non-household tariff estimate,ASSUMPTION - verify before use
+fuel_cost_car,0.32,KM/vehicle-km,fuel cost per km driven,ASSUMPTION - verify before use
+fuel_cost_minibus,0.34,KM/vehicle-km,fuel cost per km driven,ASSUMPTION - verify before use
+minibus_kg_per_km,0.2543,kg CO2e/vehicle-km,"PROXY: DEFRA has no minibus row; average van up to 3.5 t, unknown fuel, km",UK GHG 2025 (OGL v3.0)
+coach_kg_per_km,0.972,kg CO2e/vehicle-km,DEFRA coach 0.02776 kg CO2e per passenger-km x assumed 35 passengers (editable),UK GHG 2025 (OGL v3.0) + assumed occupancy
