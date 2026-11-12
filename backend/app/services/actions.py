@@ -151,11 +151,16 @@ def rank_actions(
     for u in upgrades():
         if "kwp" in u:
             cost = u["kwp"] * u["cost_km_per_kwp"]
-            kwh_saved = u["kwp"] * pv_kwh_per_kwp_year() * u["self_use_share"]
+            produced_used = u["kwp"] * pv_kwh_per_kwp_year() * u["self_use_share"]
+            # A club can't save more electricity than it actually buys.
+            club_kwh = sum(el.values())
+            kwh_saved = min(produced_used, club_kwh)
             basis = (
                 f"{u['kwp']} kWp x {pv_kwh_per_kwp_year():.0f} kWh/kWp (PVGIS) "
                 f"x {u['self_use_share']:.0%} used on site"
             )
+            if kwh_saved < produced_used:
+                basis += f", capped at the club's own use ({club_kwh:.0f} kWh)"
         elif "cuts_car_trips_share" in u:
             car_km = km * club["travel"]["vehicles_per_trip"]["car"] * u["cuts_car_trips_share"]
             basis = f"{u['cuts_car_trips_share']:.0%} fewer car-km ({car_km:.0f} km)"

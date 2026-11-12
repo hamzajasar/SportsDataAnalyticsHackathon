@@ -71,3 +71,15 @@ def test_invalid_club_rejected(club):
         client.post("/api/club/actions", json={"electricity_price_km_per_kwh": -1}).status_code
         == 422
     )
+
+
+def test_solar_saving_capped_at_club_use(club):
+    club["electricity_kwh_year"] = {"floodlights": 2000, "heating": 2000, "hall_and_other": 1000}
+    solar = next(a for a in post_actions({"club": club})["actions"] if a["id"] == "solar")
+    assert solar["saves_kwh_year"] == 5000  # not the ~19,000 kWh the panels produce
+    assert "capped" in solar["basis"]
+
+
+def test_solar_not_capped_for_large_club():
+    solar = next(a for a in post_actions({})["actions"] if a["id"] == "solar")
+    assert solar["saves_kwh_year"] < 52000 and "capped" not in solar["basis"]
