@@ -44,6 +44,20 @@ export function useElectricityMix(country = 'BIH') {
   })
 }
 
+// ---- Cities ----
+
+export function useCities() {
+  return useQuery({
+    queryKey: ['cities'],
+    queryFn: async () => {
+      const { data, error } = await api.GET('/api/cities')
+      if (error) throw error
+      return data
+    },
+    staleTime: Infinity,
+  })
+}
+
 // ---- Club static data ----
 
 export function useSampleClub() {
