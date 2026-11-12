@@ -62,6 +62,9 @@ type Draft = {
   avg_one_way_km: string
   vehicles_minibus: string
   vehicles_car: string
+  // Carried through unchanged until the form gets controls for them
+  pays_electricity: ClubProfile['pays_electricity']
+  heating_type: ClubProfile['heating_type']
 }
 
 function profileToDraft(p: ClubProfile): Draft {
@@ -79,6 +82,8 @@ function profileToDraft(p: ClubProfile): Draft {
     avg_one_way_km: String(p.travel.avg_one_way_km),
     vehicles_minibus: String(p.travel.vehicles_per_trip.minibus),
     vehicles_car: String(p.travel.vehicles_per_trip.car),
+    pays_electricity: p.pays_electricity ?? true,
+    heating_type: p.heating_type ?? 'electric',
   }
 }
 
@@ -112,6 +117,8 @@ function draftToProfile(d: Draft): ClubProfile | null {
         car: Math.max(0, n(d.vehicles_car) || 0),
       },
     },
+    pays_electricity: d.pays_electricity,
+    heating_type: d.heating_type,
   }
 }
 
@@ -129,6 +136,8 @@ const DEFAULT_DRAFT: Draft = {
   avg_one_way_km: '80',
   vehicles_minibus: '1',
   vehicles_car: '3',
+  pays_electricity: true,
+  heating_type: 'electric',
 }
 
 export function ClubForm({ onClose }: { onClose: () => void }) {
