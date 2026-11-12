@@ -1,4 +1,4 @@
-.PHONY: help setup feature sync dev db db-stop migrate migration data reference profile seed backend frontend notebook gen-api lint format test check clean
+.PHONY: help setup feature sync finish dev db db-stop migrate migration data reference profile seed backend frontend notebook gen-api lint format test check clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -19,6 +19,17 @@ feature: ## Start a feature branch from latest dev: make feature name=trip-calcu
 sync: ## Update current feature branch with latest dev (merge)
 	git fetch origin
 	git merge origin/dev
+
+finish: ## Test this feature branch; if it passes, merge it into dev and push (no PRs)
+	@b=$$(git branch --show-current); \
+	case "$$b" in dev|main) echo "Run this from a feature branch, not $$b"; exit 1;; esac; \
+	test -z "$$(git status --porcelain)" || { echo "Commit or stash your changes first"; exit 1; }; \
+	git fetch origin && git merge --no-edit origin/dev && \
+	$(MAKE) check && \
+	git push -u origin "$$b" && \
+	git switch dev && git merge --ff-only origin/dev && git merge --no-edit "$$b" && \
+	git push origin dev && git switch "$$b" && \
+	echo "OK: $$b merged into dev and pushed"
 
 db: ## Start Postgres in Docker
 	docker compose up -d --wait db

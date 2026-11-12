@@ -31,6 +31,9 @@ data/processed/*
 *.zip
 *.gz
 !backend/app/reference/*.csv
+# Cleaned, small, shareable data the team works from (raw downloads stay in data/raw, ignored)
+!data/clean/
+!data/clean/**
 *.db
 *.duckdb
 *.sqlite
