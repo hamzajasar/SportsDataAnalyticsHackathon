@@ -42,6 +42,14 @@ def test_trip_options_sorted_and_consistent():
     assert r["options"][-1]["saving_vs_worst_kg"] == 0
 
 
+def test_coach_is_counted_per_vehicle_not_per_passenger():
+    small = svc.trip_options(distance_km=100, people=10)
+    big = svc.trip_options(distance_km=100, people=45)
+    coach = lambda r: next(o for o in r["options"] if o["mode"] == "coach")  # noqa: E731
+    assert coach(small)["kg_co2e"] == coach(big)["kg_co2e"]  # same single coach
+    assert coach(svc.trip_options(distance_km=100, people=60))["vehicles"] == 2
+
+
 def test_reused_kit_beats_new():
     new = svc.factor("material_clothing_new")["kg_co2e"]
     reused = svc.factor("material_clothing_reused")["kg_co2e"]
