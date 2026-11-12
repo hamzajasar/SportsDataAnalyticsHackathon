@@ -1,4 +1,4 @@
-.PHONY: help setup feature sync finish deps dev db db-stop migrate migration data reference profile seed backend frontend notebook gen-api lint format test check clean
+.PHONY: help setup feature sync finish deps dev db db-stop migrate migration data reference profile backend frontend notebook gen-api lint format test check clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -53,9 +53,6 @@ reference: ## Rebuild ALL committed reference tables in backend/app/reference
 profile: ## Profile all datasets in data/raw -> data/processed/_profile.md
 	cd backend && uv run python -m scripts.profile_data
 
-seed: db ## Load data/raw files into Postgres as raw_* tables (one file: make seed f="x.csv")
-	cd backend && uv run python -m scripts.seed_db $(f)
-
 backend: ## Run FastAPI with reload on :8000 (docs at /docs)
 	cd backend && uv run fastapi dev app/main.py --port 8000
 
@@ -89,7 +86,7 @@ format: ## Auto-format backend + frontend
 	cd frontend && npm run format
 
 test: ## Run backend + frontend tests
-	cd backend && uv run pytest -q
+	cd backend && uv run pytest -q --cov=app --cov-fail-under=85
 	cd frontend && npm test
 
 check: lint test ## Lint + test + frontend build (same as CI)

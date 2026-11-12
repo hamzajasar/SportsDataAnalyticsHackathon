@@ -30,6 +30,7 @@ dev = [
     "matplotlib",
     "seaborn",
     "plotly",
+    "pytest-cov>=7.1.0",
 ]
 
 [tool.ruff]
@@ -53,3 +54,11 @@ known-first-party = ["app", "scripts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+
+[tool.coverage.report]
+# The suite measures ~94%. This floor fails CI if tests decay or new code ships untested.
+fail_under = 85
+

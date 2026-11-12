@@ -68,7 +68,7 @@ jobs:
         run: uv run alembic upgrade head
       - name: Models and migrations are in sync
         run: uv run alembic check
-      - run: uv run pytest -q
+      - run: uv run pytest -q --cov=app --cov-fail-under=85
 
   frontend:
     runs-on: ubuntu-latest

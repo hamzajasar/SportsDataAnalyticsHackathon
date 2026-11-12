@@ -17,7 +17,7 @@ target_metadata = Base.metadata
 
 
 def include_object(obj, name, type_, reflected, compare_to):
-    # Ignore raw_* tables created by `make seed` (not managed by migrations)
+    # Ignore raw_* tables loaded outside migrations
     return not (type_ == "table" and reflected and compare_to is None and name.startswith("raw_"))
 
 

@@ -1,6 +1,6 @@
 """Generic, read-only access to whatever datasets are dropped into data/raw/.
 
-Used by the data-explorer API, `make profile` and `make seed`. Works for any topic.
+Used by `make profile` and notebooks. Works for any topic.
 """
 
 import json
