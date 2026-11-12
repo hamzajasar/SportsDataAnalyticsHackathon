@@ -10,6 +10,7 @@ import {
 import { PageHeader } from '@/components/common/PageHeader'
 import { QueryState } from '@/components/common/QueryState'
 import { StatCard } from '@/components/common/StatCard'
+import { SummaryBar } from '@/components/common/SummaryBar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   ChartContainer,
@@ -138,6 +139,8 @@ export function FootprintPage() {
         title="Club carbon footprint"
         description="Where a community club's emissions come from — and the cheapest ways to cut them."
       />
+
+      <SummaryBar />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
