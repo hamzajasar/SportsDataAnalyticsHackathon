@@ -782,6 +782,46 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Calculate Baseline",
+        "description": "Baseline for the club in the body (`club: null` = sample club).",
+        "operationId": "calculateBaseline",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClubRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Baseline"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/club/actions": {
@@ -799,6 +839,46 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ActionPlan"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "club"
+        ],
+        "summary": "Calculate Actions",
+        "description": "Ranked actions for the club in the body, optionally with a different electricity price.",
+        "operationId": "calculateActionPlan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClubRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionPlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -1424,6 +1504,37 @@
           "travel"
         ],
         "title": "ClubProfile"
+      },
+      "ClubRequest": {
+        "properties": {
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubProfile"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "electricity_price_km_per_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Electricity Price Km Per Kwh",
+            "description": "Override the sourced electricity price (KM/kWh)"
+          }
+        },
+        "type": "object",
+        "title": "ClubRequest",
+        "description": "POST body for club calculations. Omit `club` to use the sample club."
       },
       "ColumnSummary": {
         "properties": {

@@ -5,6 +5,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query
 
 from app.schemas import ActionPlan, Baseline, ClubAssumptions, MonthlySeries, Source, Venue
+from app.schemas.club import ClubRequest
 from app.schemas.travel import SeasonTravel, SeasonTravelRequest
 from app.services import action_plan, travel
 from app.services import club_data as svc
@@ -87,6 +88,22 @@ def club_baseline() -> Baseline:
 def club_actions() -> ActionPlan:
     """Upgrades ranked by payback, with KM/CO2 saved and fee drop per child (summary bar)."""
     return ActionPlan(**action_plan.action_plan())
+
+
+def _club(req: ClubRequest) -> dict | None:
+    return req.club.model_dump() if req.club else None
+
+
+@router.post("/club/baseline", response_model=Baseline, operation_id="calculateBaseline")
+def calculate_baseline(req: ClubRequest) -> Baseline:
+    """Baseline for the club in the body (`club: null` = sample club)."""
+    return Baseline(**action_plan.baseline(_club(req)))
+
+
+@router.post("/club/actions", response_model=ActionPlan, operation_id="calculateActionPlan")
+def calculate_actions(req: ClubRequest) -> ActionPlan:
+    """Ranked actions for the club in the body, optionally with a different electricity price."""
+    return ActionPlan(**action_plan.action_plan(_club(req), req.electricity_price_km_per_kwh))
 
 
 @router.post("/club/travel", response_model=SeasonTravel, operation_id="calculateSeasonTravel")

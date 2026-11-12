@@ -301,7 +301,11 @@ export interface paths {
          */
         get: operations["getClubBaseline"];
         put?: never;
-        post?: never;
+        /**
+         * Calculate Baseline
+         * @description Baseline for the club in the body (`club: null` = sample club).
+         */
+        post: operations["calculateBaseline"];
         delete?: never;
         options?: never;
         head?: never;
@@ -321,7 +325,11 @@ export interface paths {
          */
         get: operations["getActionPlan"];
         put?: never;
-        post?: never;
+        /**
+         * Calculate Actions
+         * @description Ranked actions for the club in the body, optionally with a different electricity price.
+         */
+        post: operations["calculateActionPlan"];
         delete?: never;
         options?: never;
         head?: never;
@@ -520,6 +528,18 @@ export interface components {
             teams: number;
             electricity_kwh_year: components["schemas"]["Electricity"];
             travel: components["schemas"]["Travel"];
+        };
+        /**
+         * ClubRequest
+         * @description POST body for club calculations. Omit `club` to use the sample club.
+         */
+        ClubRequest: {
+            club?: components["schemas"]["ClubProfile"] | null;
+            /**
+             * Electricity Price Km Per Kwh
+             * @description Override the sourced electricity price (KM/kWh)
+             */
+            electricity_price_km_per_kwh?: number | null;
         };
         /** ColumnSummary */
         ColumnSummary: {
@@ -1364,6 +1384,39 @@ export interface operations {
             };
         };
     };
+    calculateBaseline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClubRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Baseline"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     getActionPlan: {
         parameters: {
             query?: never;
@@ -1380,6 +1433,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ActionPlan"];
+                };
+            };
+        };
+    };
+    calculateActionPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClubRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionPlan"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
