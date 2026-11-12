@@ -1,16 +1,13 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Activity, Database, Info, Leaf, Moon, Sun } from 'lucide-react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Activity, Database, Info, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useHealth } from '@/api/queries'
 import { project } from '@/content/project'
 import { useTheme } from '@/hooks/use-theme'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
-import { cn } from '@/lib/utils'
 
-const nav = [
-  { to: '/', label: 'Footprint', icon: Leaf },
-  // Data explorer is a dev tool: its API is disabled in production (ENVIRONMENT=production)
+const secondaryNav = [
   ...(import.meta.env.DEV ? [{ to: '/data', label: 'Data', icon: Database }] : []),
   { to: '/methodology', label: 'How it works', icon: Info },
 ]
@@ -22,28 +19,22 @@ export function AppLayout() {
 
   return (
     <div className="min-h-svh bg-background text-foreground">
-      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
+      <header className="no-print sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
-          <div className="flex items-center gap-2 font-semibold">
+          <Link to="/" className="flex items-center gap-2 font-semibold hover:opacity-80">
             <Activity className="size-5" />
-            <span>{project.name}</span>
-          </div>
+            <span className="hidden sm:inline">{project.name}</span>
+          </Link>
           <nav className="flex items-center gap-1">
-            {nav.map(({ to, label, icon: Icon }) => (
-              <NavLink
+            {secondaryNav.map(({ to, label, icon: Icon }) => (
+              <Link
                 key={to}
                 to={to}
-                end
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground',
-                    isActive && 'bg-muted text-foreground',
-                  )
-                }
+                className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
               >
                 <Icon className="size-4" />
                 <span className="hidden sm:inline">{label}</span>
-              </NavLink>
+              </Link>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">

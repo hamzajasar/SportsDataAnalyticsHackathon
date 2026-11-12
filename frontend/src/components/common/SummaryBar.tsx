@@ -1,12 +1,14 @@
 import { Leaf } from 'lucide-react'
 import { useActionPlan } from '@/api/queries'
+import { useClub } from '@/state/club'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { QueryState } from '@/components/common/QueryState'
 import { formatNumber } from '@/lib/format'
 
 export function SummaryBar() {
-  const { data, isLoading, error } = useActionPlan()
+  const { club, isSample } = useClub()
+  const { data, isLoading, error } = useActionPlan(club)
 
   const top3 = data?.actions.slice(0, 3) ?? []
   const source = data ? `Ember ${data.assumptions.grid_year} · UK GHG 2025` : ''
@@ -17,6 +19,7 @@ export function SummaryBar() {
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <Leaf className="size-4 text-primary" />
           Potential savings — illustrative Sarajevo club
+          {isSample && <Badge variant="secondary">Example</Badge>}
         </CardTitle>
         {!isLoading && !error && (
           <CardDescription>
