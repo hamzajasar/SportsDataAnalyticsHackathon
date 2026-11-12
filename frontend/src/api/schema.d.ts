@@ -288,6 +288,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/club/baseline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Club Baseline
+         * @description Yearly electricity and travel: kWh, KM cost and t CO2 for the sample club.
+         */
+        get: operations["getClubBaseline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/club/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Club Actions
+         * @description Upgrades ranked by payback, with KM/CO2 saved and fee drop per child (summary bar).
+         */
+        get: operations["getActionPlan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/venues/nearest": {
         parameters: {
             query?: never;
@@ -343,6 +383,55 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Action */
+        Action: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Cost Km */
+            cost_km: number;
+            /** Saves Km Year */
+            saves_km_year: number;
+            /** Saves Kg Co2 Year */
+            saves_kg_co2_year: number;
+            /** Saves Kwh Year */
+            saves_kwh_year: number;
+            /** Payback Years */
+            payback_years: number | null;
+            /** Basis */
+            basis: string;
+        };
+        /** ActionPlan */
+        ActionPlan: {
+            /** Actions */
+            actions: components["schemas"]["Action"][];
+            /** Total Saves Km Year */
+            total_saves_km_year: number;
+            /** Total Saves T Co2 Year */
+            total_saves_t_co2_year: number;
+            /** Fee Drop Per Child Km */
+            fee_drop_per_child_km: number;
+            /** Children */
+            children: number;
+            assumptions: components["schemas"]["ActionPlanAssumptions"];
+            /**
+             * Example
+             * @description True while serving example data, not the live model
+             */
+            example: boolean;
+        };
+        /** ActionPlanAssumptions */
+        ActionPlanAssumptions: {
+            /** Electricity Price Km Per Kwh */
+            electricity_price_km_per_kwh: number;
+            /** Grid Gco2 Per Kwh */
+            grid_gco2_per_kwh: number;
+            /** Grid Year */
+            grid_year: number;
+            /** Illustrative Club */
+            illustrative_club: boolean;
+        };
         /** AmountEstimate */
         AmountEstimate: {
             /** Key */
@@ -357,6 +446,30 @@ export interface components {
             total_kg_co2e: number;
             /** Source */
             source: string;
+        };
+        /** Baseline */
+        Baseline: {
+            /** Electricity Kwh */
+            electricity_kwh: number;
+            /** Electricity Km */
+            electricity_km: number;
+            /** Electricity T Co2 */
+            electricity_t_co2: number;
+            /** Travel Km Driven */
+            travel_km_driven: number;
+            /** Travel Km Cost */
+            travel_km_cost: number;
+            /** Travel T Co2 */
+            travel_t_co2: number;
+            /** Grid Gco2 Per Kwh */
+            grid_gco2_per_kwh: number;
+            /** Grid Year */
+            grid_year: number;
+            /**
+             * Example
+             * @description True while serving example data, not the live model
+             */
+            example: boolean;
         };
         /** ClubAssumptions */
         ClubAssumptions: {
@@ -1086,6 +1199,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MonthlySeries"];
+                };
+            };
+        };
+    };
+    getClubBaseline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Baseline"];
+                };
+            };
+        };
+    };
+    getActionPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionPlan"];
                 };
             };
         };

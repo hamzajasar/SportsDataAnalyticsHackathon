@@ -174,3 +174,46 @@ class ShareSuggestions(BaseModel):
     shared_pitch: list[Venue]
     carpool_partners: list[Venue]
     note: str
+
+
+# ---- Action plan (shape = Lane A's services/actions.py output) ----
+
+
+class Baseline(BaseModel):
+    electricity_kwh: float
+    electricity_km: float
+    electricity_t_co2: float
+    travel_km_driven: float
+    travel_km_cost: float
+    travel_t_co2: float
+    grid_gco2_per_kwh: float
+    grid_year: int
+    example: bool = Field(description="True while serving example data, not the live model")
+
+
+class Action(BaseModel):
+    id: str
+    name: str
+    cost_km: float
+    saves_km_year: float
+    saves_kg_co2_year: float
+    saves_kwh_year: float
+    payback_years: float | None
+    basis: str
+
+
+class ActionPlanAssumptions(BaseModel):
+    electricity_price_km_per_kwh: float
+    grid_gco2_per_kwh: float
+    grid_year: int
+    illustrative_club: bool
+
+
+class ActionPlan(BaseModel):
+    actions: list[Action]  # sorted by payback, free actions first
+    total_saves_km_year: float
+    total_saves_t_co2_year: float
+    fee_drop_per_child_km: float
+    children: int
+    assumptions: ActionPlanAssumptions
+    example: bool = Field(description="True while serving example data, not the live model")
