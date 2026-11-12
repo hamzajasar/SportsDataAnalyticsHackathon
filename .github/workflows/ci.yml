@@ -1,11 +1,10 @@
 name: CI
 
-# Workflow: feature/<name> branches off dev -> PR into dev after CI passes -> main only at the end
+# Workflow: feature/<name> branches off dev -> merged into dev once tests pass (no PRs)
+# -> main only at the very end. CI runs on every pushed branch.
 on:
   push:
-    branches: [dev, main, "feature/**"]
-  pull_request:
-    branches: [dev, main]
+    branches: ["**"]
 
 # Least privilege: CI can only read the repo
 permissions:

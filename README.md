@@ -108,17 +108,17 @@ docs/               # brief, judging criteria, presentation assets
 
 ```
 main  ─────────────────────────────────────────────●  (final release only)
-                                                  ↑ PR at the end
+                                                  ↑ at the very end
 dev   ──●──────────●──────────●───────────────────●
          \        ↑ \        ↑
-          feature/a   feature/b      (one branch per feature)
+          feature/a   feature/b      (one branch per feature, merged when tests pass)
 ```
 
 1. `make feature name=<short-name>` → creates `feature/<short-name>` from the latest `dev`
-2. Commit + `git push -u origin feature/<short-name>` (CI runs on every push)
-3. `make sync` if `dev` moved on, `make check` locally
-4. Open a PR **into `dev`**; merge only when CI is green
-5. **Never commit or push to `main`.** It only receives one PR from `dev` at the end
+2. Work and commit on that branch (`git push -u origin feature/<short-name>` any time; CI runs on every push)
+3. `make finish` → merges the latest `dev` in, runs `make check`, and **only if it passes** merges your
+   branch into `dev` and pushes. No pull requests.
+4. **Never commit or push to `main`.** It only gets `dev` at the very end
    (a local hook blocks commits on `main`).
 
 Other rules: never commit data files or `.env`; notebooks are numbered (`02_model.ipynb`) and reusable
